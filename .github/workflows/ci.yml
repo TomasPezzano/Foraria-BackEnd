@@ -1,0 +1,35 @@
+# .github/workflows/dotnet-ci.yml
+name: .NET CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout del código
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup .NET (ajusta la versión a la que uses, ej: 8.0, 7.0, 6.0)
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3. Restore de dependencias
+      - name: Restore dependencies
+        run: dotnet restore Foraria/Foraria.sln
+
+      # 4. Build (sin warnings tratados como errores)
+      - name: Build
+        run: dotnet build Foraria/Foraria.sln --no-restore --configuration Release
+
+      # 5. Run tests
+      - name: Test
+        run: dotnet test Foraria/Foraria.sln --no-build --configuration Release --verbosity normal
