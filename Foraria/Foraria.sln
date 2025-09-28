@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96 d17.13
+VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foraria", "Foraria\Foraria.csproj", "{7BE1E849-07FE-492E-8731-477E6A06AF4A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForariaTest", "ForariaTest\ForariaTest.csproj", "{C24C0CF2-DFD4-43EA-9285-471F1252F919}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForariaDomain", "ForariaDomain\ForariaDomain.csproj", "{43D75E14-E410-4E89-8040-E03FE26208E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C24C0CF2-DFD4-43EA-9285-471F1252F919}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C24C0CF2-DFD4-43EA-9285-471F1252F919}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C24C0CF2-DFD4-43EA-9285-471F1252F919}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43D75E14-E410-4E89-8040-E03FE26208E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43D75E14-E410-4E89-8040-E03FE26208E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43D75E14-E410-4E89-8040-E03FE26208E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43D75E14-E410-4E89-8040-E03FE26208E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
