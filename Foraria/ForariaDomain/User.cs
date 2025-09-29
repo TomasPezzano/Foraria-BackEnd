@@ -37,5 +37,10 @@ namespace ForariaDomain
 
         //preguntar si esto es correcto
         public ICollection<Event> Events { get; set; }
+
+        public ICollection<Thread> Threads { get; set; }
+
+        public ICollection<Message> Messages { get; set; }
+
     }
 }

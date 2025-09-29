@@ -1,5 +1,6 @@
 ﻿using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
+using Thread = ForariaDomain.Thread;
 
 namespace Foraria.Infrastructure.Persistence
 {
@@ -28,6 +29,13 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<Reserve> Reserves { get; set; }
 
+        public DbSet<Forum> Forums { get; set; }
+
+        public DbSet<Thread> Threads { get; set; }
+
+        public DbSet<Message> Messages { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,6 +49,9 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<Residence>().ToTable("residence");
             modelBuilder.Entity<Place>().ToTable("place");
             modelBuilder.Entity<Reserve>().ToTable("reserves");
+            modelBuilder.Entity<Forum>().ToTable("forum");
+            modelBuilder.Entity<Thread>().ToTable("thread");    
+            modelBuilder.Entity<Message>().ToTable("message");
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)  
@@ -102,6 +113,32 @@ namespace Foraria.Infrastructure.Persistence
                       j => j.HasOne<Event>().WithMany().HasForeignKey("EventId"), 
                       j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
                   );
+
+            modelBuilder.Entity<Thread>()
+                .HasOne(u => u.Forum)
+                .WithMany(r => r.Threads)
+                .HasForeignKey(u => u.Forum_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Thread>()
+                .HasOne(u => u.User)
+                .WithMany(r => r.Threads)
+                .HasForeignKey(u => u.User_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(u => u.Thread)
+                .WithMany(r => r.Messages)
+                .HasForeignKey(u => u.Thread_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(u => u.User)
+                .WithMany(r => r.Messages)
+                .HasForeignKey(u => u.User_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
         }
 
        
