@@ -46,6 +46,8 @@ namespace ForariaDomain
 
         public ICollection<Vote> Votes { get; set; }
 
+        public ICollection<UserDocument> UserDocuments { get; set; }
+
 
     }
 }
