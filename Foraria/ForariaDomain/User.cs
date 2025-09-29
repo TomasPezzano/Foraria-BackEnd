@@ -19,13 +19,23 @@ namespace ForariaDomain
 
         public long Dni { get; set; }
 
-        public long Telefono { get; set; }
+        public long PhoneNumber { get; set; }
 
-        public string Foto { get; set; }
+        public string Photo { get; set; }
 
-        [ForeignKey("Rol")] 
-        public int Rol_id { get; set; }
+        public int Role_id { get; set; }
 
-        public Rol rol { get; set; }
+        public Role Role { get; set; }
+
+        public ICollection<Claim> Claims { get; set; }
+
+        public ICollection<ClaimResponse> ClaimsResponse { get; set; }
+
+        public ICollection<Residence> Residence { get; set; }
+
+        public ICollection<Reserve> Reserves { get; set; }
+
+        //preguntar si esto es correcto
+        public ICollection<Event> Events { get; set; }
     }
 }

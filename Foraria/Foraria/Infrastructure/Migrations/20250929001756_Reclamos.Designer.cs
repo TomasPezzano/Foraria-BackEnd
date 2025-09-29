@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20250929001756_Reclamos")]
+    partial class Reclamos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,129 +130,6 @@ namespace Foraria.Migrations
                     b.ToTable("consortium", (string)null);
                 });
 
-            modelBuilder.Entity("ForariaDomain.Event", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Mandatory")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("NumberOfPersons")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("event", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.Place", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("place", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.Reserve", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Place_id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Residence_id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("User_id")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Place_id");
-
-                    b.HasIndex("Residence_id");
-
-                    b.HasIndex("User_id");
-
-                    b.ToTable("reserves", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.Residence", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Floor")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Tower")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("residence", (string)null);
-                });
-
             modelBuilder.Entity("ForariaDomain.ResponsibleSector", b =>
                 {
                     b.Property<int>("Id")
@@ -328,36 +208,6 @@ namespace Foraria.Migrations
                     b.ToTable("user", (string)null);
                 });
 
-            modelBuilder.Entity("UserEvent", b =>
-                {
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("EventId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserEvent");
-                });
-
-            modelBuilder.Entity("UserResidence", b =>
-                {
-                    b.Property<int>("ResidenceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ResidenceId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserResidence");
-                });
-
             modelBuilder.Entity("ForariaDomain.Claim", b =>
                 {
                     b.HasOne("ForariaDomain.ClaimResponse", "ClaimResponse")
@@ -396,33 +246,6 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Reserve", b =>
-                {
-                    b.HasOne("ForariaDomain.Place", "Place")
-                        .WithMany("Reserves")
-                        .HasForeignKey("Place_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.Residence", "Residence")
-                        .WithMany("Reserves")
-                        .HasForeignKey("Residence_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.User", "User")
-                        .WithMany("Reserves")
-                        .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Place");
-
-                    b.Navigation("Residence");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ForariaDomain.User", b =>
                 {
                     b.HasOne("ForariaDomain.Role", "Role")
@@ -434,50 +257,10 @@ namespace Foraria.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("UserEvent", b =>
-                {
-                    b.HasOne("ForariaDomain.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("UserResidence", b =>
-                {
-                    b.HasOne("ForariaDomain.Residence", null)
-                        .WithMany()
-                        .HasForeignKey("ResidenceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ForariaDomain.ClaimResponse", b =>
                 {
                     b.Navigation("Claim")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ForariaDomain.Place", b =>
-                {
-                    b.Navigation("Reserves");
-                });
-
-            modelBuilder.Entity("ForariaDomain.Residence", b =>
-                {
-                    b.Navigation("Reserves");
                 });
 
             modelBuilder.Entity("ForariaDomain.ResponsibleSector", b =>
@@ -495,8 +278,6 @@ namespace Foraria.Migrations
                     b.Navigation("Claims");
 
                     b.Navigation("ClaimsResponse");
-
-                    b.Navigation("Reserves");
                 });
 #pragma warning restore 612, 618
         }
