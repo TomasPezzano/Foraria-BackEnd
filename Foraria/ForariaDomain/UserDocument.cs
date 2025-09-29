@@ -24,6 +24,6 @@ public class UserDocument
     public int User_id { get; set; }
     public User User { get; set; }
 
-    public int Residence_id { get; set; }
-    public Residence Residence { get; set; }
+    public int Consortium_id { get; set; }
+    public Consortium Consortium { get; set; }
 }
