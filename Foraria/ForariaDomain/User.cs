@@ -42,5 +42,10 @@ namespace ForariaDomain
 
         public ICollection<Message> Messages { get; set; }
 
+        public ICollection<Poll> Polls { get; set; }
+
+        public ICollection<Vote> Votes { get; set; }
+
+
     }
 }

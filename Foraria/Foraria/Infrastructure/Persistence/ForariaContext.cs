@@ -35,6 +35,16 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<Message> Messages { get; set; }
 
+        public DbSet<Poll> Polls { get; set; }
+
+        public DbSet<PollOption> PollOptions { get; set; }
+
+        public DbSet<Vote> Votes { get; set; }
+
+        public DbSet<ResultPoll> ResultPoll { get; set; }
+
+        public DbSet<CategoryPoll> CategoryPolls { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -52,6 +62,11 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<Forum>().ToTable("forum");
             modelBuilder.Entity<Thread>().ToTable("thread");    
             modelBuilder.Entity<Message>().ToTable("message");
+            modelBuilder.Entity<Poll>().ToTable("poll");
+            modelBuilder.Entity<PollOption>().ToTable("pollOption");
+            modelBuilder.Entity<Vote>().ToTable("vote");
+            modelBuilder.Entity<ResultPoll>().ToTable("resultPoll");
+            modelBuilder.Entity<CategoryPoll>().ToTable("categoryPoll");
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)  
@@ -136,6 +151,48 @@ namespace Foraria.Infrastructure.Persistence
                 .HasOne(u => u.User)
                 .WithMany(r => r.Messages)
                 .HasForeignKey(u => u.User_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Poll>()
+                .HasOne(u => u.User)
+                .WithMany(r => r.Polls)
+                .HasForeignKey(u => u.User_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Vote>()
+                .HasOne(u => u.User)
+                .WithMany(r => r.Votes)
+                .HasForeignKey(u => u.User_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Vote>()
+                .HasOne(u => u.Poll)
+                .WithMany(r => r.Votes)
+                .HasForeignKey(u => u.Poll_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Vote>()
+                .HasOne(u => u.PollOption)
+                .WithMany(r => r.Votes)
+                .HasForeignKey(u => u.PollOption_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PollOption>()
+                .HasOne(u => u.Poll)
+                .WithMany(r => r.PollOptions)
+                .HasForeignKey(u => u.Poll_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Poll>()
+                .HasOne(u => u.CategoryPoll)
+                .WithMany(r => r.Polls)
+                .HasForeignKey(u => u.CategoryPoll_id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Poll>()
+                .HasOne(u => u.ResultPoll)
+                .WithOne(r => r.Poll)
+                .HasForeignKey<Poll>(u => u.ResultPoll_id)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
