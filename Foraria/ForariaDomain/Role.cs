@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace ForariaDomain
 {
-    public class Rol
+    public class Role
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string Descripcion { get; set; }
+        public string Description { get; set; }
 
         public ICollection<User> Users { get; set; }
 
