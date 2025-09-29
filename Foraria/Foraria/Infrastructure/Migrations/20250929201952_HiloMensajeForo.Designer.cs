@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20250929201952_HiloMensajeForo")]
+    partial class HiloMensajeForo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,23 +24,6 @@ namespace Foraria.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ForariaDomain.CategoryPoll", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("categoryPoll", (string)null);
-                });
 
             modelBuilder.Entity("ForariaDomain.Claim", b =>
                 {
@@ -253,75 +239,6 @@ namespace Foraria.Migrations
                     b.ToTable("place", (string)null);
                 });
 
-            modelBuilder.Entity("ForariaDomain.Poll", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryPoll_id")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ResultPoll_id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("User_id")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryPoll_id");
-
-                    b.HasIndex("ResultPoll_id")
-                        .IsUnique();
-
-                    b.HasIndex("User_id");
-
-                    b.ToTable("poll", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.PollOption", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Poll_id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Poll_id");
-
-                    b.ToTable("pollOption", (string)null);
-                });
-
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
                 {
                     b.Property<int>("Id")
@@ -402,26 +319,6 @@ namespace Foraria.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("responsibleSector", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.ResultPoll", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Percentage")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("resultPoll", (string)null);
                 });
 
             modelBuilder.Entity("ForariaDomain.Role", b =>
@@ -523,75 +420,6 @@ namespace Foraria.Migrations
                     b.ToTable("user", (string)null);
                 });
 
-            modelBuilder.Entity("ForariaDomain.UserDocument", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Consortium_id")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("User_id")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Consortium_id");
-
-                    b.HasIndex("User_id");
-
-                    b.ToTable("userDocument", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.Vote", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("PollOption_id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Poll_id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("User_id")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("VotedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PollOption_id");
-
-                    b.HasIndex("Poll_id");
-
-                    b.HasIndex("User_id");
-
-                    b.ToTable("vote", (string)null);
-                });
-
             modelBuilder.Entity("UserEvent", b =>
                 {
                     b.Property<int>("EventId")
@@ -679,44 +507,6 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Poll", b =>
-                {
-                    b.HasOne("ForariaDomain.CategoryPoll", "CategoryPoll")
-                        .WithMany("Polls")
-                        .HasForeignKey("CategoryPoll_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.ResultPoll", "ResultPoll")
-                        .WithOne("Poll")
-                        .HasForeignKey("ForariaDomain.Poll", "ResultPoll_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.User", "User")
-                        .WithMany("Polls")
-                        .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CategoryPoll");
-
-                    b.Navigation("ResultPoll");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ForariaDomain.PollOption", b =>
-                {
-                    b.HasOne("ForariaDomain.Poll", "Poll")
-                        .WithMany("PollOptions")
-                        .HasForeignKey("Poll_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Poll");
-                });
-
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
                 {
                     b.HasOne("ForariaDomain.Place", "Place")
@@ -774,52 +564,6 @@ namespace Foraria.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("ForariaDomain.UserDocument", b =>
-                {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("UserDocuments")
-                        .HasForeignKey("Consortium_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.User", "User")
-                        .WithMany("UserDocuments")
-                        .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Consortium");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ForariaDomain.Vote", b =>
-                {
-                    b.HasOne("ForariaDomain.PollOption", "PollOption")
-                        .WithMany("Votes")
-                        .HasForeignKey("PollOption_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.Poll", "Poll")
-                        .WithMany("Votes")
-                        .HasForeignKey("Poll_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.User", "User")
-                        .WithMany("Votes")
-                        .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Poll");
-
-                    b.Navigation("PollOption");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("UserEvent", b =>
                 {
                     b.HasOne("ForariaDomain.Event", null)
@@ -850,20 +594,10 @@ namespace Foraria.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ForariaDomain.CategoryPoll", b =>
-                {
-                    b.Navigation("Polls");
-                });
-
             modelBuilder.Entity("ForariaDomain.ClaimResponse", b =>
                 {
                     b.Navigation("Claim")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ForariaDomain.Consortium", b =>
-                {
-                    b.Navigation("UserDocuments");
                 });
 
             modelBuilder.Entity("ForariaDomain.Forum", b =>
@@ -876,18 +610,6 @@ namespace Foraria.Migrations
                     b.Navigation("Reserves");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Poll", b =>
-                {
-                    b.Navigation("PollOptions");
-
-                    b.Navigation("Votes");
-                });
-
-            modelBuilder.Entity("ForariaDomain.PollOption", b =>
-                {
-                    b.Navigation("Votes");
-                });
-
             modelBuilder.Entity("ForariaDomain.Residence", b =>
                 {
                     b.Navigation("Reserves");
@@ -896,12 +618,6 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.ResponsibleSector", b =>
                 {
                     b.Navigation("ClaimsResponse");
-                });
-
-            modelBuilder.Entity("ForariaDomain.ResultPoll", b =>
-                {
-                    b.Navigation("Poll")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ForariaDomain.Role", b =>
@@ -922,15 +638,9 @@ namespace Foraria.Migrations
 
                     b.Navigation("Messages");
 
-                    b.Navigation("Polls");
-
                     b.Navigation("Reserves");
 
                     b.Navigation("Threads");
-
-                    b.Navigation("UserDocuments");
-
-                    b.Navigation("Votes");
                 });
 #pragma warning restore 612, 618
         }

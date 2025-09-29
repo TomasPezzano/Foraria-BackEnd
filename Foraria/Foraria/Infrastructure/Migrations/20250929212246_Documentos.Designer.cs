@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20250929212246_Documentos")]
+    partial class Documentos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -531,11 +534,11 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Consortium_id")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Residence_id")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -554,7 +557,7 @@ namespace Foraria.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Consortium_id");
+                    b.HasIndex("Residence_id");
 
                     b.HasIndex("User_id");
 
@@ -776,9 +779,9 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.UserDocument", b =>
                 {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
+                    b.HasOne("ForariaDomain.Residence", "Residence")
                         .WithMany("UserDocuments")
-                        .HasForeignKey("Consortium_id")
+                        .HasForeignKey("Residence_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -788,7 +791,7 @@ namespace Foraria.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Consortium");
+                    b.Navigation("Residence");
 
                     b.Navigation("User");
                 });
@@ -861,11 +864,6 @@ namespace Foraria.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ForariaDomain.Consortium", b =>
-                {
-                    b.Navigation("UserDocuments");
-                });
-
             modelBuilder.Entity("ForariaDomain.Forum", b =>
                 {
                     b.Navigation("Threads");
@@ -891,6 +889,8 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.Residence", b =>
                 {
                     b.Navigation("Reserves");
+
+                    b.Navigation("UserDocuments");
                 });
 
             modelBuilder.Entity("ForariaDomain.ResponsibleSector", b =>

@@ -8,16 +8,29 @@ using System.Threading.Tasks;
 
 namespace ForariaDomain;
 
-public class Consortium
+public class Thread
 {
+
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    public string Name { get; set; }
+    public string Theme { get; set; }
 
     public string Description { get; set; }
 
-    public ICollection<UserDocument> UserDocuments { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public string State { get; set; }
+
+    public int Forum_id { get; set; }   
+
+    public Forum Forum { get; set; }
+
+    public int User_id { get; set; }
+
+    public User User { get; set; }
+
+    public ICollection<Message> Messages { get; set; }
 
 }
