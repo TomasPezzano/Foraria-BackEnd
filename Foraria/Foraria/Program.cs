@@ -1,3 +1,5 @@
+using Foraria.Application.UseCase;
+using Foraria.Domain.Repository;
 using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +12,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ForariaContext>(options=>
+builder.Services.AddDbContext<ForariaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))
 );
+
+builder.Services.AddScoped<IClaimRepository, ImplementationClaimRepository>();
+builder.Services.AddScoped<CreateClaim>();
 
 var app = builder.Build();
 
