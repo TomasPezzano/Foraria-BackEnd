@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="Domain\Model\" />
+    <Folder Include="Infrastructure\Storage\ForumFiles\" />
   </ItemGroup>
 
 </Project>

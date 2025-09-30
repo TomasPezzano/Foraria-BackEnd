@@ -2,6 +2,7 @@
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
+using ForariaDomain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers
@@ -12,15 +13,18 @@ namespace Foraria.Interface.Controllers
     {
         private readonly CreateMessage _createMessage;
         private readonly IMessageRepository _repository;
+        private readonly IWebHostEnvironment _env;
 
-        public MessagesController(CreateMessage createMessage, IMessageRepository repository)
+        public MessagesController(CreateMessage createMessage, IMessageRepository repository, IWebHostEnvironment env)
         {
             _createMessage = createMessage;
             _repository = repository;
+            _env = env;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateMessageRequest request)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Create([FromForm] CreateMessageWithFileRequest request)
         {
             var created = await _createMessage.Execute(request);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
