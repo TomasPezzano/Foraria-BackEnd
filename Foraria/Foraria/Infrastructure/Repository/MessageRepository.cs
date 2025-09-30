@@ -1,10 +1,8 @@
-﻿using Foraria.Domain.Repository.Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
+using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Infrastructure.Persistence;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Foraria.Infrastructure.Repository
 {
@@ -24,7 +22,7 @@ namespace Foraria.Infrastructure.Repository
             return message;
         }
 
-        public async Task<Message> GetById(int id)
+        public async Task<Message?> GetById(int id)
         {
             return await _context.Messages
                 .Include(m => m.User)
@@ -32,11 +30,12 @@ namespace Foraria.Infrastructure.Repository
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public async Task<IEnumerable<Message>> GetByThreadId(int threadId)
+        public async Task<IEnumerable<Message>> GetByThread(int threadId)
         {
             return await _context.Messages
-                .Include(m => m.User)
                 .Where(m => m.Thread_id == threadId)
+                .Include(m => m.User)
+                .Include(m => m.Thread)
                 .ToListAsync();
         }
     }

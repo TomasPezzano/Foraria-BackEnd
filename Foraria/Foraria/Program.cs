@@ -1,6 +1,7 @@
 using Foraria.Application.UseCase;
-using Foraria.Application.UseCase.Foraria.Application.UseCase;
+using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
+using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +18,13 @@ builder.Services.AddSwaggerGen();
 //casos de uso
 
 builder.Services.AddScoped<CreateForum>();
+builder.Services.AddScoped<CreateThread>();
+builder.Services.AddScoped<CreateMessage>();
 
 //repos
-
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
+builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 
 builder.Services.AddDbContext<ForariaContext>(options=>

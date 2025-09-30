@@ -1,8 +1,7 @@
-﻿using Foraria.Domain.Repository;
+﻿using Foraria.Interface.DTOs;
+using Foraria.Domain.Repository;
 using ForariaDomain;
-using System;
 using System.Threading.Tasks;
-using Thread = ForariaDomain.Thread;
 
 namespace Foraria.Application.UseCase
 {
@@ -15,9 +14,20 @@ namespace Foraria.Application.UseCase
             _repository = repository;
         }
 
-        public async Task<Forum> Execute(Forum forum)
+        public async Task<ForumResponse> Execute(CreateForumRequest request)
         {
-            return await _repository.Add(forum);
+            var forum = new Forum
+            {
+                Category = request.Category
+            };
+
+            var createdForum = await _repository.Add(forum);
+
+            return new ForumResponse
+            {
+                Id = createdForum.Id,
+                Category = createdForum.Category
+            };
         }
     }
 }

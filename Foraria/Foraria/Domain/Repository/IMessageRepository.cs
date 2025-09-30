@@ -9,8 +9,8 @@
         public interface IMessageRepository
         {
             Task<Message> Add(Message message);
-            Task<Message> GetById(int id);
-            Task<IEnumerable<Message>> GetByThreadId(int threadId);
+            Task<Message?> GetById(int id);
+            Task<IEnumerable<Message>> GetByThread(int threadId);
         }
     }
 }

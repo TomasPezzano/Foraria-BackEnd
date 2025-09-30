@@ -1,6 +1,6 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
-using ForariaDomain;
+using Foraria.Interface.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers
@@ -19,9 +19,9 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Forum forum)
+        public async Task<IActionResult> Create([FromBody] CreateForumRequest request)
         {
-            var createdForum = await _createForum.Execute(forum);
+            var createdForum = await _createForum.Execute(request);
             return CreatedAtAction(nameof(GetById), new { id = createdForum.Id }, createdForum);
         }
 
@@ -30,14 +30,28 @@ namespace Foraria.Interface.Controllers
         {
             var forum = await _repository.GetById(id);
             if (forum == null) return NotFound();
-            return Ok(forum);
+
+            var response = new ForumResponse
+            {
+                Id = forum.Id,
+                Category = forum.Category
+            };
+
+            return Ok(response);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var forums = await _repository.GetAll();
-            return Ok(forums);
+
+            var response = forums.Select(f => new ForumResponse
+            {
+                Id = f.Id,
+                Category = f.Category
+            });
+
+            return Ok(response);
         }
     }
 }

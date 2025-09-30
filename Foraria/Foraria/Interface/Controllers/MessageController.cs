@@ -1,54 +1,68 @@
-﻿namespace Foraria.Interface.Controllers
-{
-    using System;
-    using ForariaDomain;
-    using Foraria.Domain.Repository;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
-    using Foraria.Infrastructure.Persistence;
+﻿using Foraria.Application.UseCase;
+using Foraria.Domain.Repository;
+using Foraria.Domain.Repository.Foraria.Domain.Repository;
+using Foraria.Interface.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
+namespace Foraria.Interface.Controllers
+{
     [ApiController]
     [Route("api/[controller]")]
     public class MessagesController : ControllerBase
     {
-        private readonly ForariaContext _context;
+        private readonly CreateMessage _createMessage;
+        private readonly IMessageRepository _repository;
 
-        public MessagesController(ForariaContext context)
+        public MessagesController(CreateMessage createMessage, IMessageRepository repository)
         {
-            _context = context;
+            _createMessage = createMessage;
+            _repository = repository;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMessage([FromBody] Message message)
+        public async Task<IActionResult> Create([FromBody] CreateMessageRequest request)
         {
-            var thread = await _context.Threads.FindAsync(message.Thread_id);
-            if (thread == null)
-                return NotFound("El hilo no existe.");
+            var created = await _createMessage.Execute(request);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
 
-            message.CreatedAt = DateTime.UtcNow;
-            message.State = "active";
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var message = await _repository.GetById(id);
+            if (message == null) return NotFound();
 
-            _context.Messages.Add(message);
-            await _context.SaveChangesAsync();
+            var response = new MessageResponse
+            {
+                Id = message.Id,
+                Content = message.Content,
+                CreatedAt = message.CreatedAt,
+                State = message.State,
+                Thread_id = message.Thread_id,
+                User_id = message.User_id,
+                optionalFile = message.optionalFile
+            };
 
-            return Ok(message);
+            return Ok(response);
         }
 
         [HttpGet("thread/{threadId}")]
-        public async Task<IActionResult> GetThreadWithMessages(int threadId)
+        public async Task<IActionResult> GetByThread(int threadId)
         {
-            var thread = await _context.Threads
-                .Include(t => t.Messages)
-                .ThenInclude(m => m.User)
-                .FirstOrDefaultAsync(t => t.Id == threadId);
+            var messages = await _repository.GetByThread(threadId);
 
-            if (thread == null) return NotFound();
+            var response = messages.Select(m => new MessageResponse
+            {
+                Id = m.Id,
+                Content = m.Content,
+                CreatedAt = m.CreatedAt,
+                State = m.State,
+                Thread_id = m.Thread_id,
+                User_id = m.User_id,
+                optionalFile = m.optionalFile
+            });
 
-            return Ok(thread);
+            return Ok(response);
         }
     }
-
-
 }
-
-
