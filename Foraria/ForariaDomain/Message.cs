@@ -18,7 +18,7 @@ public class Message
 
     public DateTime CreatedAt { get; set; }
 
-    string State { get; set; }
+    public string State { get; set; }
 
     public string optionalFile { get; set; }
 
