@@ -1,26 +1,43 @@
 ﻿using Foraria.Application.UseCase;
+using Foraria.Domain.Repository;
 using ForariaDomain;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Foraria.Interface.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ForumController : ControllerBase
+    public class ForumsController : ControllerBase
     {
         private readonly CreateForum _createForum;
+        private readonly IForumRepository _repository;
 
-        public ForumController(CreateForum createForum)
+        public ForumsController(CreateForum createForum, IForumRepository repository)
         {
             _createForum = createForum;
+            _repository = repository;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Forum>> Create([FromBody] Forum forum)
+        public async Task<IActionResult> Create([FromBody] Forum forum)
         {
-            var created = await _createForum.Execute(forum);
-            return CreatedAtAction(nameof(Create), new { id = created.Id }, created);
+            var createdForum = await _createForum.Execute(forum);
+            return CreatedAtAction(nameof(GetById), new { id = createdForum.Id }, createdForum);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var forum = await _repository.GetById(id);
+            if (forum == null) return NotFound();
+            return Ok(forum);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var forums = await _repository.GetAll();
+            return Ok(forums);
         }
     }
 }

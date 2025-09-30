@@ -16,12 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Model\" />
-    <Folder Include="Domain\Model\" />
+    <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
+    <Folder Include="Domain\Model\" />
   </ItemGroup>
 
 </Project>

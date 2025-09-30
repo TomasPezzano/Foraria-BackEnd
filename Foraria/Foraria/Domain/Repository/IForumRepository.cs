@@ -6,5 +6,7 @@
     public interface IForumRepository
     {
         Task<Forum> Add(Forum forum);
+        Task<Forum?> GetById(int id);
+        Task<IEnumerable<Forum>> GetAll();
     }
 }

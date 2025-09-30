@@ -22,5 +22,21 @@ namespace Foraria.Infrastructure.Repository
             await _context.SaveChangesAsync();
             return forum;
         }
+
+        public async Task<Forum?> GetById(int id)
+        {
+            return await _context.Forums
+                .Include(f => f.Threads)
+                .ThenInclude(t => t.Messages)
+                .FirstOrDefaultAsync(f => f.Id == id);
+        }
+
+        public async Task<IEnumerable<Forum>> GetAll()
+        {
+            return await _context.Forums
+                .Include(f => f.Threads)
+                .ThenInclude(t => t.Messages)
+                .ToListAsync();
+        }
     }
 }

@@ -17,7 +17,6 @@ namespace Foraria.Application.UseCase
 
         public async Task<Forum> Execute(Forum forum)
         {
-            forum.Threads = forum.Threads ?? new List<Thread>();
             return await _repository.Add(forum);
         }
     }

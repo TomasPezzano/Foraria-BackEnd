@@ -1,4 +1,8 @@
+using Foraria.Application.UseCase;
+using Foraria.Application.UseCase.Foraria.Application.UseCase;
+using Foraria.Domain.Repository;
 using Foraria.Infrastructure.Persistence;
+using Foraria.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +13,15 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//casos de uso
+
+builder.Services.AddScoped<CreateForum>();
+
+//repos
+
+builder.Services.AddScoped<IForumRepository, ForumRepository>();
+
 
 builder.Services.AddDbContext<ForariaContext>(options=>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))
