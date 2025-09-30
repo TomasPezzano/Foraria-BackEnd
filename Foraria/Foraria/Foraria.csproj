@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <Folder Include="Domain\Model\" />
-    <Folder Include="Domain\Repository\" />
+    <Folder Include="Domain\Model\" />
   </ItemGroup>
 
   <ItemGroup>
