@@ -1,11 +1,26 @@
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
+using Foraria.Infrastructure.Configuration;
 using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
 // Add services to the container.
+
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
+
+builder.Services.AddScoped<IRegisterUser, RegisterUser>();
+builder.Services.AddScoped<IGeneratePassword, GeneratePassword>();
+builder.Services.AddScoped<IPasswordHash, PasswordHash>();
+builder.Services.AddScoped<ISendEmail, SendEmail>();
+builder.Services.AddScoped<ICreateResidence, CreateResidence>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -13,6 +28,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 
     });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
