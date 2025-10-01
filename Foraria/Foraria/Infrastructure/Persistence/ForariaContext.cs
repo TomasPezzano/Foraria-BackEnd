@@ -206,9 +206,9 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserDocument>()
-                .HasOne(u => u.Residence)
+                .HasOne(u => u.Consortium)
                 .WithMany(r => r.UserDocuments)
-                .HasForeignKey(u => u.Residence_id)
+                .HasForeignKey(u => u.Consortium_id)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

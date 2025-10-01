@@ -18,4 +18,6 @@ public class Consortium
 
     public string Description { get; set; }
 
+    public ICollection<UserDocument> UserDocuments { get; set; }
+
 }
