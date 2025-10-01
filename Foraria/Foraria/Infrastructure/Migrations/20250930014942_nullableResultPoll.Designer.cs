@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20250930014942_nullableResultPoll")]
+    partial class nullableResultPoll
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,13 +51,14 @@ namespace Foraria.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Archive")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ClaimResponse_id")
+                    b.Property<int>("ClaimResponse_id")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -64,7 +68,7 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("LastUpdatedAt")
+                    b.Property<DateTime>("LastUpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Priority")
@@ -79,14 +83,13 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("User_id")
+                    b.Property<int>("User_id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClaimResponse_id")
-                        .IsUnique()
-                        .HasFilter("[ClaimResponse_id] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("User_id");
 
@@ -488,7 +491,7 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long?>("Dni")
+                    b.Property<long>("Dni")
                         .HasColumnType("bigint");
 
                     b.Property<string>("LastName")
@@ -511,6 +514,7 @@ namespace Foraria.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Photo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Role_id")
@@ -627,12 +631,14 @@ namespace Foraria.Migrations
                     b.HasOne("ForariaDomain.ClaimResponse", "ClaimResponse")
                         .WithOne("Claim")
                         .HasForeignKey("ForariaDomain.Claim", "ClaimResponse_id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("ForariaDomain.User", "User")
                         .WithMany("Claims")
                         .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("ClaimResponse");
 
