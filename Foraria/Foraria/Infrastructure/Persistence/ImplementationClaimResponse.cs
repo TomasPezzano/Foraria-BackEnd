@@ -3,16 +3,18 @@ using ForariaDomain;
 
 namespace Foraria.Infrastructure.Persistence;
 
-public class ImplementationClaimRepository : IClaimRepository
+public class ImplementationClaimResponse : IClaimResponseRepository
 {
+
     private readonly ForariaContext _context;
-    public ImplementationClaimRepository(ForariaContext context)
+    public ImplementationClaimResponse(ForariaContext context)
     {
         _context = context;
     }
-    public void Add(Claim claim)
+    public void Add(ClaimResponse claimResponse)
     {
-        _context.Claims.Add(claim);
+        _context.ClaimsResponse.Add(claimResponse);
         _context.SaveChanges();
     }
+    
 }

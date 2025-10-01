@@ -16,8 +16,15 @@ builder.Services.AddDbContext<ForariaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))
 );
 
-builder.Services.AddScoped<IClaimRepository, ImplementationClaimRepository>();
+builder.Services.AddScoped<IClaimRepository, ImplementationClaim>();
 builder.Services.AddScoped<CreateClaim>();
+builder.Services.AddScoped<GetClaims>();
+
+builder.Services.AddScoped<IClaimResponseRepository, ImplementationClaimResponse>();
+builder.Services.AddScoped<CreateClaimResponse>();
+
+builder.Services.AddScoped<IResponsibleSectorRepository, ImplementationResponsibleSector>();
+builder.Services.AddScoped<CreateClaimResponse>();
 
 var app = builder.Build();
 

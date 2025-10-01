@@ -1,4 +1,5 @@
 ﻿using Foraria.Domain.Repository;
+using Foraria.Interface.DTOs;
 using ForariaDomain;
 
 namespace Foraria.Application.UseCase;
@@ -9,18 +10,18 @@ public class CreateClaim
     public CreateClaim(IClaimRepository claimRepository) {
         _claimRepository = claimRepository;
     }
-    public void Execute(string Title, string Description, string Priority, string Category, string? Archive, int? User_id)
+    public void Execute(ClaimDto claimDto)
     {
         Claim claim = new Claim
         {
-            Title = Title,
-            Description = Description,
+            Title = claimDto.Title,
+            Description = claimDto.Description,
             State = "Nuevo",
-            Priority = Priority,
-            Category = Category,
+            Priority = claimDto.Priority,
+            Category = claimDto.Category,
             CreatedAt = DateTime.Now,
-            Archive = Archive,
-            User_id = User_id
+            Archive = claimDto.Archive,
+            User_id = claimDto.User_id
         };
 
         _claimRepository.Add(claim);

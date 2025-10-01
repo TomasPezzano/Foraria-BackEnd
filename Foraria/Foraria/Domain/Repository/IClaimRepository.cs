@@ -5,4 +5,12 @@ namespace Foraria.Domain.Repository;
 public interface IClaimRepository
 {
     void Add(Claim claim);
+
+    List<Claim> GetAll();
+
+    void Update(Claim claim);
+
+    void Delete(Claim claim);
+    Claim? GetById(int id);
+
 }

@@ -1,5 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
+using Foraria.Interface.DTOs;
+using ForariaDomain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,22 +13,31 @@ public class ClaimController : ControllerBase
 {
 
     public readonly CreateClaim CreateClaim;
-    public ClaimController(CreateClaim CreateClaim)
+    public readonly GetClaims GetClaims;
+    public ClaimController(CreateClaim CreateClaim, GetClaims GetClaims)
     {
         this.CreateClaim = CreateClaim;
+        this.GetClaims = GetClaims;
     }
 
     [HttpGet]
-    public IActionResult Get()
+    public IActionResult GetAll()
     {
-        return Ok("Claim Controller");
+        List<Claim> claims = GetClaims.execute();
+        return Ok(claims);
     }
 
     [HttpPost]
-    public IActionResult Add(string Description, string State, string Priority, string Category, string Title, string? Archive, int? User_id)
+    public IActionResult Add([FromBody] ClaimDto claimDto)
     {
-        CreateClaim.Execute(Title, Description, Priority, Category, Archive, User_id);
-        return Ok("Claim Controller");
+        
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        CreateClaim.Execute(claimDto);
+
+        return Ok("Claim creado correctamente");
     }
+
 
 }
