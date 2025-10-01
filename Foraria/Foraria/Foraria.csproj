@@ -7,17 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Domain\Model\**" />
+    <Content Remove="Domain\Model\**" />
+    <EmbeddedResource Remove="Domain\Model\**" />
+    <None Remove="Domain\Model\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Domain\Model\" />
-    <Folder Include="Domain\Repository\" />
   </ItemGroup>
 
   <ItemGroup>
