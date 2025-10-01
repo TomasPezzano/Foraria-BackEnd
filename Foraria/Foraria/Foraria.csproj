@@ -16,11 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Model\" />
-    <Folder Include="Domain\Repository\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
   </ItemGroup>
 
