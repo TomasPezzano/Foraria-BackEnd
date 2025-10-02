@@ -8,6 +8,9 @@ public class ClaimResponseDto
     [MinLength(5, ErrorMessage = "La descripción debe tener al menos 5 caracteres")]
     public string Description { get; set; }
 
+    [Required(ErrorMessage = "La fecha de respuesta es obligatoria")]
+    public DateTime ResponseDate { get; set; }
+
     [Required(ErrorMessage = "El ID del usuario es obligatorio")]
     public int User_id { get; set; }
 

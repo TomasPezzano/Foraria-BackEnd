@@ -31,4 +31,8 @@ public class UserRepository : IUserRepository
         return await _context.Users.AnyAsync(u => u.Mail == email);
     }
 
+    public User? GetById(int id)
+    {
+        return _context.Users.FirstOrDefault(u => u.Id == id);
+    }
 }

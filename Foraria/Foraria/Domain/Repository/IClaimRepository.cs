@@ -10,7 +10,6 @@ public interface IClaimRepository
 
     void Update(Claim claim);
 
-    void Delete(Claim claim);
     Claim? GetById(int id);
 
 }

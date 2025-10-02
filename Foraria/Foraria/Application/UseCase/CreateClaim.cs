@@ -10,9 +10,20 @@ public class CreateClaim
     public CreateClaim(IClaimRepository claimRepository) {
         _claimRepository = claimRepository;
     }
-    public void Execute(ClaimDto claimDto)
+    public Claim Execute(ClaimDto claimDto)
     {
-        Claim claim = new Claim
+        if (string.IsNullOrWhiteSpace(claimDto.Title))
+            throw new ArgumentException("El título del reclamo es obligatorio");
+        if (string.IsNullOrWhiteSpace(claimDto.Description))
+            throw new ArgumentException("La descripción del reclamo es obligatoria");
+        if (string.IsNullOrWhiteSpace(claimDto.Priority))
+            throw new ArgumentException("La prioridad es obligatoria");
+        if (string.IsNullOrWhiteSpace(claimDto.Category))
+            throw new ArgumentException("La categoría es obligatoria");
+        if (claimDto.User_id == null)
+            throw new ArgumentException("Debe asociarse un usuario al reclamo");
+
+        var claim = new Claim
         {
             Title = claimDto.Title,
             Description = claimDto.Description,
@@ -25,6 +36,7 @@ public class CreateClaim
         };
 
         _claimRepository.Add(claim);
+        return claim;
     }
 
 }

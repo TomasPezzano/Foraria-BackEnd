@@ -7,40 +7,55 @@ namespace Foraria.Application.UseCase;
 
 public class CreateClaimResponse
 {
-
+    private readonly IUserRepository _userRepository;
     private readonly IClaimResponseRepository _claimResponseRepository;
     private readonly IClaimRepository _claimRepository;
     private readonly IResponsibleSectorRepository _responsibleSectorRepository;
 
-    public CreateClaimResponse(IClaimResponseRepository claimResponseRepository , IClaimRepository claimRepository, IResponsibleSectorRepository responsibleSectorRepository)
+    public CreateClaimResponse(IClaimResponseRepository claimResponseRepository, IClaimRepository claimRepository, IResponsibleSectorRepository responsibleSectorRepository, IUserRepository userRepository)
     {
         _claimResponseRepository = claimResponseRepository;
         _claimRepository = claimRepository;
         _responsibleSectorRepository = responsibleSectorRepository;
+        _userRepository = userRepository;
     }
-    public void Execute(ClaimResponseDto claimResponseDto)
+    public ClaimResponseDto Execute(ClaimResponseDto claimResponseDto)
     {
-       
-        // var user = _userRepository.GetById(claimResponseDto.User_id);
-        var claim = _claimRepository.GetById(claimResponseDto.Claim_id) ?? throw new ArgumentException("Reclamo no existe");
-        var sector = _responsibleSectorRepository.GetById(claimResponseDto.ResponsibleSector_id) ?? throw new ArgumentException("ResponsibleSector no existe");
-        
+
+        var user = _userRepository.GetById(claimResponseDto.User_id)
+        ?? throw new ArgumentException("Usuario no existe");
+        var claim = _claimRepository.GetById(claimResponseDto.Claim_id)
+            ?? throw new ArgumentException("Reclamo no existe");
+        var sector = _responsibleSectorRepository.GetById(claimResponseDto.ResponsibleSector_id)
+            ?? throw new ArgumentException("ResponsibleSector no existe");
+
+
         var claimResponse = new ClaimResponse
         {
             Description = claimResponseDto.Description,
-            ResponseDate = DateTime.Now,
-            User = new User { Id = claimResponseDto.User_id },
-            Claim = claim,
-            ResponsibleSector_id = claimResponseDto.ResponsibleSector_id
+            ResponseDate = claimResponseDto.ResponseDate,
+            User = user,
+            ResponsibleSector_id = sector.Id
+
         };
-        
+
         _claimResponseRepository.Add(claimResponse);
 
-        if (claim != null)
-        {
-            claim.State = "En Proceso";
-            _claimRepository.Update(claim);
-        }
 
+        claim.State = "En Proceso";
+        claim.ClaimResponse = claimResponse;
+        _claimRepository.Update(claim);
+
+
+        var resultDto = new ClaimResponseDto
+        {
+            Description = claimResponse.Description,
+            ResponseDate = claimResponse.ResponseDate,
+            User_id = user.Id,
+            Claim_id = claim.Id,
+            ResponsibleSector_id = sector.Id
+        };
+
+        return resultDto;
     }
 }

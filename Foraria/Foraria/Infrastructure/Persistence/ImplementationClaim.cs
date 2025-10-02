@@ -1,5 +1,6 @@
 ﻿using Foraria.Domain.Repository;
 using ForariaDomain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Foraria.Infrastructure.Persistence;
 
@@ -18,7 +19,10 @@ public class ImplementationClaim : IClaimRepository
 
     public List<Claim> GetAll()
     {
-        return _context.Claims.ToList();
+        return _context.Claims
+                   .Include(c => c.ClaimResponse)
+                   .ThenInclude(cr => cr.User)
+                   .ToList();
     }
 
     public void Update(Claim claim)
@@ -26,13 +30,6 @@ public class ImplementationClaim : IClaimRepository
         _context.Claims.Update(claim);
         _context.SaveChanges();
     }
-
-    public void Delete(Claim claim)
-    {
-        _context.Claims.Remove(claim);
-        _context.SaveChanges();
-    }
-
     public Claim? GetById(int id)
     {
         return _context.Claims.FirstOrDefault(c => c.Id == id);

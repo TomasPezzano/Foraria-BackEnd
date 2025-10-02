@@ -12,19 +12,43 @@ namespace Foraria.Interface.Controllers;
 public class ClaimController : ControllerBase
 {
 
-    public readonly CreateClaim CreateClaim;
-    public readonly GetClaims GetClaims;
-    public ClaimController(CreateClaim CreateClaim, GetClaims GetClaims)
+    public readonly CreateClaim _createClaim;
+    public readonly GetClaims _getClaims;
+    public readonly RejectClaim _rejectClaim;
+    public ClaimController(CreateClaim CreateClaim, GetClaims GetClaims, RejectClaim rejectClaim)
     {
-        this.CreateClaim = CreateClaim;
-        this.GetClaims = GetClaims;
+        _createClaim = CreateClaim;
+        _getClaims = GetClaims;
+        _rejectClaim = rejectClaim;
     }
 
     [HttpGet]
     public IActionResult GetAll()
     {
-        List<Claim> claims = GetClaims.execute();
-        return Ok(claims);
+        List<Claim> claims = _getClaims.execute();
+        var result = claims.Select(c => new
+        {
+            claim = new ClaimDto
+            {
+                Title = c.Title,
+                Description = c.Description,
+                Priority = c.Priority,
+                Category = c.Category,
+                Archive = c.Archive,
+                User_id = c.User_id
+            },
+            
+            claimResponse = c.ClaimResponse != null ? new ClaimResponseDto
+            {
+                Description = c.ClaimResponse.Description,
+                ResponseDate = c.ClaimResponse.ResponseDate,
+                User_id = c.ClaimResponse.User.Id,
+                Claim_id = c.ClaimResponse.Claim.Id,
+                ResponsibleSector_id = c.ClaimResponse.ResponsibleSector_id
+            } : null
+        }).ToList();
+
+        return Ok(result);
     }
 
     [HttpPost]
@@ -34,9 +58,37 @@ public class ClaimController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        CreateClaim.Execute(claimDto);
+        var claim = _createClaim.Execute(claimDto);
 
-        return Ok("Claim creado correctamente");
+        var claimResult = new ClaimDto
+        {
+            Title = claim.Title,
+            Description = claim.Description,
+            Priority = claim.Priority,
+            Category = claim.Category,
+            Archive = claim.Archive,
+            User_id = claim.User_id
+        };
+
+        return CreatedAtAction(nameof(GetAll), new { id = claim.Id }, claimResult);
+    }
+
+    [HttpPut("reject/{id}")]
+    public IActionResult RejectClaimById(int id)
+    {
+        try
+        {
+            _rejectClaim.Execute(id);
+            return Ok(new { message = $"El reclamo con ID {id} fue rechazado correctamente" });
+        }
+        catch (ArgumentException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Ocurrió un error interno", details = ex.Message });
+        }
     }
 
 
