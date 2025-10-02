@@ -7,12 +7,10 @@ namespace Foraria.Application.UseCase
     public class GetPolls
     {
         private readonly IPollRepository _pollRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public GetPolls(IPollRepository pollRepository, IUnitOfWork unitOfWork)
+        public GetPolls(IPollRepository pollRepository)
         {
             _pollRepository = pollRepository;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<PollDto>> ExecuteAsync()

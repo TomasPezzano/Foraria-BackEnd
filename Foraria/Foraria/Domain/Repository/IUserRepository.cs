@@ -1,7 +1,4 @@
-﻿
-
-using Foraria.Interface.DTOs;
-using ForariaDomain;
+﻿using ForariaDomain;
 
 namespace Foraria.Domain.Repository;
 
@@ -12,3 +9,4 @@ public interface IUserRepository
     Task<bool> ExistsEmail(string email);
     Task<User?> GetById(int id);
 }
+

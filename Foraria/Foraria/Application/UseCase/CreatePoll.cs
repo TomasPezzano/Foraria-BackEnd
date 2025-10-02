@@ -1,6 +1,7 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Exceptions;
 
 namespace Foraria.Application.UseCase
 {
@@ -9,15 +10,24 @@ namespace Foraria.Application.UseCase
 
         private readonly IPollRepository _pollRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserRepository _userRepository;
 
-        public CreatePoll(IPollRepository pollRepository, IUnitOfWork unitOfWork)
+        public CreatePoll(IPollRepository pollRepository, IUnitOfWork unitOfWork, IUserRepository userRepository)
         {
             _pollRepository = pollRepository;
             _unitOfWork = unitOfWork;
+            _userRepository = userRepository;
         }
 
         public async Task<Poll> ExecuteAsync(PollDto request)
         {
+
+            var user = await _userRepository.GetById(request.UserId);
+            if (user == null)
+            {
+                throw new NotFoundException($"El usuario con ID {request.UserId} no existe.");
+            }
+
             var poll = new Poll
             {
                 Title = request.Title,
