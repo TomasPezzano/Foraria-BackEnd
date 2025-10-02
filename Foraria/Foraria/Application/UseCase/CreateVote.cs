@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
 
