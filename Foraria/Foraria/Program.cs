@@ -23,6 +23,17 @@ builder.Services.AddScoped<IPasswordHash, PasswordHash>();
 builder.Services.AddScoped<ISendEmail, SendEmail>();
 builder.Services.AddScoped<ICreateResidence, CreateResidence>();
 
+builder.Services.AddScoped<IClaimRepository, ImplementationClaim>();
+builder.Services.AddScoped<CreateClaim>();
+builder.Services.AddScoped<GetClaims>();
+builder.Services.AddScoped<RejectClaim>();
+
+builder.Services.AddScoped<IClaimResponseRepository, ImplementationClaimResponse>();
+builder.Services.AddScoped<CreateClaimResponse>();
+
+builder.Services.AddScoped<IResponsibleSectorRepository, ImplementationResponsibleSector>();
+builder.Services.AddScoped<CreateClaimResponse>();
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
