@@ -1,6 +1,8 @@
-﻿using Foraria.Domain.Repository;
+﻿using Azure.Core;
+using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Exceptions;
 
 namespace Foraria.Application.UseCase
 {
@@ -9,15 +11,23 @@ namespace Foraria.Application.UseCase
 
         private readonly IVoteRepository _voteRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserRepository _userRepository;
 
-        public CreateVote(IVoteRepository voteRepository, IUnitOfWork unitOfWork)
+        public CreateVote(IVoteRepository voteRepository, IUnitOfWork unitOfWork, IUserRepository userRepository)
         {
             _voteRepository = voteRepository;
             _unitOfWork = unitOfWork;
+            _userRepository = userRepository;
         }
 
         public async Task ExecuteAsync(int userId, int pollId, int pollOptionId)
         {
+            var user = await _userRepository.GetById(userId);
+
+            if (user == null){
+                throw new NotFoundException($"El usuario con ID {userId} no existe.");
+            }
+
             var existingVote = await _voteRepository.GetByUserAndPollAsync(userId, pollId);
             if (existingVote != null)
             {
