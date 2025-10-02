@@ -46,6 +46,7 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<CategoryPoll> CategoryPolls { get; set; }
 
         public DbSet<UserDocument> UserDocuments { get; set; }
+        public DbSet<Reaction> Reactions { get; set; }
 
 
 
@@ -70,6 +71,7 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<ResultPoll>().ToTable("resultPoll");
             modelBuilder.Entity<CategoryPoll>().ToTable("categoryPoll");
             modelBuilder.Entity<UserDocument>().ToTable("userDocument");
+            modelBuilder.Entity<Reaction>().ToTable("reaction");
 
 
             modelBuilder.Entity<User>()
@@ -210,6 +212,29 @@ namespace Foraria.Infrastructure.Persistence
                 .WithMany(r => r.UserDocuments)
                 .HasForeignKey(u => u.Consortium_id)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Reaction>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.User_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reaction>()
+                .HasOne(r => r.Message)
+                .WithMany(m => m.Reactions)
+                .HasForeignKey(r => r.Message_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reaction>()
+                .HasOne(r => r.Thread)
+                .WithMany(t => t.Reactions)
+                .HasForeignKey(r => r.Thread_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reaction>()
+                .HasIndex(r => new { r.User_id, r.Message_id, r.Thread_id })
+                .IsUnique();
 
 
         }

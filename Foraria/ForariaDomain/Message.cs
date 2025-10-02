@@ -29,6 +29,6 @@ public class Message
     public int User_id { get; set; }
 
     public User User { get; set; }
-
+    public ICollection<Reaction> Reactions { get; set; } = new List<Reaction>();
 
 }

@@ -1,5 +1,6 @@
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
+using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Infrastructure.Configuration;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
@@ -34,6 +35,16 @@ builder.Services.AddScoped<CreateClaimResponse>();
 builder.Services.AddScoped<IResponsibleSectorRepository, ImplementationResponsibleSector>();
 builder.Services.AddScoped<CreateClaimResponse>();
 
+builder.Services.AddScoped<CreateForum>();
+builder.Services.AddScoped<CreateThread>();
+builder.Services.AddScoped<CreateMessage>();
+builder.Services.AddScoped<CreateMessage>();
+
+builder.Services.AddScoped<IForumRepository, ForumRepository>();
+builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<DeleteMessage>();
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -44,18 +55,6 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-//casos de uso
-
-builder.Services.AddScoped<CreateForum>();
-builder.Services.AddScoped<CreateThread>();
-builder.Services.AddScoped<CreateMessage>();
-
-//repos
-builder.Services.AddScoped<IForumRepository, ForumRepository>();
-builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
-builder.Services.AddScoped<IMessageRepository, MessageRepository>();
-
 
 builder.Services.AddDbContext<ForariaContext>(options=>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))

@@ -38,5 +38,11 @@ namespace Foraria.Infrastructure.Repository
                 .Include(m => m.Thread)
                 .ToListAsync();
         }
+
+        public async Task Delete(Message message)
+        {
+            _context.Messages.Remove(message);
+            await _context.SaveChangesAsync();
+        }
     }
 }

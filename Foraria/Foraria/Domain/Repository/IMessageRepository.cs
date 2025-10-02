@@ -11,6 +11,7 @@
             Task<Message> Add(Message message);
             Task<Message?> GetById(int id);
             Task<IEnumerable<Message>> GetByThread(int threadId);
+            Task Delete(Message message);
         }
     }
 }

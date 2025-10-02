@@ -12,12 +12,14 @@ namespace Foraria.Interface.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly CreateMessage _createMessage;
+        private readonly DeleteMessage _deleteMessage;
         private readonly IMessageRepository _repository;
         private readonly IWebHostEnvironment _env;
 
-        public MessagesController(CreateMessage createMessage, IMessageRepository repository, IWebHostEnvironment env)
+        public MessagesController(CreateMessage createMessage, DeleteMessage deleteMessage, IMessageRepository repository, IWebHostEnvironment env)
         {
             _createMessage = createMessage;
+            _deleteMessage = deleteMessage;
             _repository = repository;
             _env = env;
         }
@@ -67,6 +69,21 @@ namespace Foraria.Interface.Controllers
             });
 
             return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            bool isAdmin = true; //temp hasta tener auth
+
+            if (!isAdmin)
+                return Forbid();
+
+            var deleted = await _deleteMessage.Execute(id);
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
         }
     }
 }
