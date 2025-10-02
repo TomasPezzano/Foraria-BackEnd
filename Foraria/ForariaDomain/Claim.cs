@@ -24,19 +24,19 @@ namespace ForariaDomain
 
         public DateTime CreatedAt { get; set; }
 
-        public DateTime LastUpdatedAt { get; set; }
+        public DateTime? LastUpdatedAt { get; set; }
 
         public string Title { get; set; }
 
-        public string Archive { get; set; }
+        public string? Archive { get; set; }
 
-        public int User_id { get; set; }
+        public int? User_id { get; set; }
 
-        public User User { get; set; }
+        public User? User { get; set; }
 
-        public int ClaimResponse_id { get; set; }
+        public int? ClaimResponse_id { get; set; }
 
-        public ClaimResponse ClaimResponse { get; set; }
+        public ClaimResponse? ClaimResponse { get; set; }
 
     }
 }

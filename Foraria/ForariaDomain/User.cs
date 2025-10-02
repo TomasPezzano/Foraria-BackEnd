@@ -17,11 +17,11 @@ namespace ForariaDomain
 
         public string Password { get; set; }
 
-        public long Dni { get; set; }
+        public long? Dni { get; set; }
 
         public long PhoneNumber { get; set; }
 
-        public string Photo { get; set; }
+        public string? Photo { get; set; }
 
         public int Role_id { get; set; }
 
