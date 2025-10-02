@@ -18,6 +18,7 @@ namespace ForariaDomain
         public string Password { get; set; }
 
         public long? Dni { get; set; }
+        public bool RequiresPasswordChange { get; set; }
 
         public long PhoneNumber { get; set; }
 

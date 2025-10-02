@@ -31,4 +31,11 @@ public class UserRepository : IUserRepository
         return await _context.Users.AnyAsync(u => u.Mail == email);
     }
 
+    public async Task<User?> GetByEmailWithRole(string email)
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Mail == email);
+    }
+
 }

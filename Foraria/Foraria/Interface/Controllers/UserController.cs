@@ -9,10 +9,12 @@ namespace Foraria.Interface.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IRegisterUser _registerUserService;
+    private readonly ILoginUser _loginUserService;
 
-    public UserController(IRegisterUser registerUserService)
+    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService)
     {
         _registerUserService = registerUserService;
+        _loginUserService = loginUserService;
     }
 
     [HttpPost("register")]
@@ -62,5 +64,23 @@ public class UserController : ControllerBase
         };
 
         return Ok(response);
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await _loginUserService.Login(request);
+
+        if (!result.Success)
+        {
+            return Unauthorized(new { message = result.Message });
+        }
+
+        return Ok(result);
     }
 }
