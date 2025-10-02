@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20250930013520_CamposNoNulosClaim")]
+    partial class CamposNoNulosClaim
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,7 +277,7 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ResultPoll_id")
+                    b.Property<int>("ResultPoll_id")
                         .HasColumnType("int");
 
                     b.Property<string>("State")
@@ -293,8 +296,7 @@ namespace Foraria.Migrations
                     b.HasIndex("CategoryPoll_id");
 
                     b.HasIndex("ResultPoll_id")
-                        .IsUnique()
-                        .HasFilter("[ResultPoll_id] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("User_id");
 
@@ -488,7 +490,7 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long?>("Dni")
+                    b.Property<long>("Dni")
                         .HasColumnType("bigint");
 
                     b.Property<string>("LastName")
@@ -511,6 +513,7 @@ namespace Foraria.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Photo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Role_id")
@@ -688,7 +691,8 @@ namespace Foraria.Migrations
                     b.HasOne("ForariaDomain.ResultPoll", "ResultPoll")
                         .WithOne("Poll")
                         .HasForeignKey("ForariaDomain.Poll", "ResultPoll_id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("ForariaDomain.User", "User")
                         .WithMany("Polls")
