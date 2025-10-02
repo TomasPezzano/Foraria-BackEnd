@@ -1,4 +1,5 @@
-﻿using Foraria.Application.UseCase;
+﻿using System.Threading.Tasks;
+using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
@@ -23,9 +24,9 @@ public class ClaimController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        List<Claim> claims = _getClaims.execute();
+        List<Claim> claims = await _getClaims.execute();
         var result = claims.Select(c => new
         {
             claim = new ClaimDto
@@ -37,7 +38,7 @@ public class ClaimController : ControllerBase
                 Archive = c.Archive,
                 User_id = c.User_id
             },
-            
+
             claimResponse = c.ClaimResponse != null ? new ClaimResponseDto
             {
                 Description = c.ClaimResponse.Description,
@@ -52,13 +53,13 @@ public class ClaimController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Add([FromBody] ClaimDto claimDto)
+     public async Task<IActionResult> Add([FromBody] ClaimDto claimDto)
     {
         
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var claim = _createClaim.Execute(claimDto);
+        var claim = await _createClaim.Execute(claimDto);
 
         var claimResult = new ClaimDto
         {
@@ -74,11 +75,11 @@ public class ClaimController : ControllerBase
     }
 
     [HttpPut("reject/{id}")]
-    public IActionResult RejectClaimById(int id)
+    public async Task<IActionResult> RejectClaimById(int id)
     {
         try
         {
-            _rejectClaim.Execute(id);
+            await _rejectClaim.Execute(id);
             return Ok(new { message = $"El reclamo con ID {id} fue rechazado correctamente" });
         }
         catch (ArgumentException ex)

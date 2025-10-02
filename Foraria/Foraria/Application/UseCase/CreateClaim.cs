@@ -10,7 +10,7 @@ public class CreateClaim
     public CreateClaim(IClaimRepository claimRepository) {
         _claimRepository = claimRepository;
     }
-    public Claim Execute(ClaimDto claimDto)
+    public async Task<Claim> Execute(ClaimDto claimDto)
     {
         if (string.IsNullOrWhiteSpace(claimDto.Title))
             throw new ArgumentException("El título del reclamo es obligatorio");
@@ -35,7 +35,7 @@ public class CreateClaim
             User_id = claimDto.User_id
         };
 
-        _claimRepository.Add(claim);
+        await _claimRepository.Add(claim);
         return claim;
     }
 

@@ -1,5 +1,6 @@
 ﻿using Foraria.Domain.Repository;
 using ForariaDomain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Foraria.Infrastructure.Persistence;
 
@@ -10,9 +11,9 @@ public class ImplementationResponsibleSector : IResponsibleSectorRepository
     {
         _context = context;
     }
-    public ResponsibleSector? GetById(int id)
+    public async Task<ResponsibleSector?> GetById(int id)
     {
-        return _context.ResponsibleSectors.FirstOrDefault(rs => rs.Id == id);
+        return await _context.ResponsibleSectors.FirstOrDefaultAsync(rs => rs.Id == id);
     }
 
 }

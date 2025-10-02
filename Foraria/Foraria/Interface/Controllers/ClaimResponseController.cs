@@ -11,22 +11,33 @@ namespace Foraria.Interface.Controllers;
 public class ClaimResponseController : ControllerBase
 {
 
-    public readonly CreateClaimResponse CreateClaimResponse;
+    public readonly CreateClaimResponse _createClaimResponse;
     public ClaimResponseController(CreateClaimResponse CreateClaimResponse)
     {
-        this.CreateClaimResponse = CreateClaimResponse;
+        _createClaimResponse = CreateClaimResponse;
     }
 
     [HttpPost]
-    public IActionResult Add([FromBody] ClaimResponseDto claimResponseDto)
+    public async Task<IActionResult> Add([FromBody] ClaimResponseDto claimResponseDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var responseResult = CreateClaimResponse.Execute(claimResponseDto);
+        try
+        {
+            var responseResult = await _createClaimResponse.Execute(claimResponseDto);
 
-        return Ok(responseResult);
+            return Ok(responseResult);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Ocurrió un error interno", details = ex.Message });
+        }
     }
+}
 
     
-}

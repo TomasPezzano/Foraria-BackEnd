@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using System.Runtime.CompilerServices;
+using Foraria.Domain.Repository;
 
 namespace Foraria.Application.UseCase;
 
@@ -10,9 +11,9 @@ public class RejectClaim
     {
         _claimRepository = claimRepository;
     }
-    public void Execute(int claimId)
+    public async Task  Execute(int claimId)
     {
-        var claim = _claimRepository.GetById(claimId);
+        var claim = await _claimRepository.GetById(claimId);
         if (claim == null)
         {
             throw new ArgumentException($"No se encontró un reclamo con ID {claimId}");
@@ -22,6 +23,6 @@ public class RejectClaim
             throw new InvalidOperationException($"El reclamo con ID {claimId} ya está rechazado");
         }
         claim.State = "Rechazado";
-        _claimRepository.Update(claim);
+        await _claimRepository.Update(claim);
     }
 }

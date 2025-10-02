@@ -4,12 +4,11 @@ namespace Foraria.Domain.Repository;
 
 public interface IClaimRepository
 {
-    void Add(Claim claim);
+    Task Add(Claim claim);
 
-    List<Claim> GetAll();
+    Task<List<Claim>> GetAll();
 
-    void Update(Claim claim);
+    Task Update(Claim claim);
 
-    Claim? GetById(int id);
-
+    Task<Claim?> GetById(int id);
 }

@@ -4,5 +4,5 @@ namespace Foraria.Domain.Repository;
 
 public interface IResponsibleSectorRepository
 {
-    ResponsibleSector? GetById(int id);
+    Task<ResponsibleSector?> GetById(int id);
 }

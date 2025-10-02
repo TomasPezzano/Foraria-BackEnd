@@ -11,8 +11,8 @@ public class GetClaims
     {
         _claimRepository = claimRepository;
     }
-    public List<Claim> execute()
+    public async Task<List<Claim>> execute()
     {
-        return _claimRepository.GetAll();
+        return await _claimRepository.GetAll();
     }
 }

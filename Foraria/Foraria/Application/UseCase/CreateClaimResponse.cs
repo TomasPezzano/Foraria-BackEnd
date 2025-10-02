@@ -19,14 +19,14 @@ public class CreateClaimResponse
         _responsibleSectorRepository = responsibleSectorRepository;
         _userRepository = userRepository;
     }
-    public ClaimResponseDto Execute(ClaimResponseDto claimResponseDto)
+    public async Task<ClaimResponseDto> Execute(ClaimResponseDto claimResponseDto)
     {
 
-        var user = _userRepository.GetById(claimResponseDto.User_id)
+        var user = await _userRepository.GetById(claimResponseDto.User_id)
         ?? throw new ArgumentException("Usuario no existe");
-        var claim = _claimRepository.GetById(claimResponseDto.Claim_id)
+        var claim = await _claimRepository.GetById(claimResponseDto.Claim_id)
             ?? throw new ArgumentException("Reclamo no existe");
-        var sector = _responsibleSectorRepository.GetById(claimResponseDto.ResponsibleSector_id)
+        var sector = await _responsibleSectorRepository.GetById(claimResponseDto.ResponsibleSector_id)
             ?? throw new ArgumentException("ResponsibleSector no existe");
 
 
@@ -39,12 +39,12 @@ public class CreateClaimResponse
 
         };
 
-        _claimResponseRepository.Add(claimResponse);
+        await _claimResponseRepository.Add(claimResponse);
 
 
         claim.State = "En Proceso";
         claim.ClaimResponse = claimResponse;
-        _claimRepository.Update(claim);
+        await _claimRepository.Update(claim);
 
 
         var resultDto = new ClaimResponseDto

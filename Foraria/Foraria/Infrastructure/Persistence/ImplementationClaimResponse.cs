@@ -11,7 +11,7 @@ public class ImplementationClaimResponse : IClaimResponseRepository
     {
         _context = context;
     }
-    public void Add(ClaimResponse claimResponse)
+    public async Task Add(ClaimResponse claimResponse)
     {
         _context.ClaimsResponse.Add(claimResponse);
         _context.SaveChanges();

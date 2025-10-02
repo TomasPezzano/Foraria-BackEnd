@@ -11,27 +11,27 @@ public class ImplementationClaim : IClaimRepository
     {
         _context = context;
     }
-    public void Add(Claim claim)
+    public async Task Add(Claim claim)
     {
         _context.Claims.Add(claim);
         _context.SaveChanges();
     }
 
-    public List<Claim> GetAll()
+    public async Task<List<Claim>> GetAll()
     {
-        return _context.Claims
+        return  await _context.Claims
                    .Include(c => c.ClaimResponse)
                    .ThenInclude(cr => cr.User)
-                   .ToList();
+                   .ToListAsync();
     }
 
-    public void Update(Claim claim)
+    public async Task Update(Claim claim)
     {
         _context.Claims.Update(claim);
         _context.SaveChanges();
     }
-    public Claim? GetById(int id)
+    public async Task<Claim?> GetById(int id)
     {
-        return _context.Claims.FirstOrDefault(c => c.Id == id);
+        return await _context.Claims.FirstOrDefaultAsync(c => c.Id == id);
     }
 }
