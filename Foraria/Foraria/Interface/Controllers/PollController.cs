@@ -1,5 +1,6 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
+using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers
@@ -18,8 +19,15 @@ namespace Foraria.Interface.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] PollDto request)
         {
-            var result = await _poll.ExecuteAsync(request);
-            return Ok(result); 
+            try
+            {
+                var result = await _poll.ExecuteAsync(request);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
 
 
