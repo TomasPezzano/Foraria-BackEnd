@@ -11,6 +11,7 @@ builder.Services.Configure<EmailSettings>(
 
 // Add services to the container.
 
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
@@ -25,7 +26,13 @@ builder.Services.AddScoped<ILoginUser, LoginUser>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+
+    });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -34,6 +41,12 @@ builder.Services.AddDbContext<ForariaContext>(options=>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))
 );
 
+builder.Services.AddScoped<IPollRepository, PollRepositoryImplementation>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<CreatePoll>();
+builder.Services.AddScoped<IVoteRepository, VoteRepositoryImplementation>();
+builder.Services.AddScoped<CreateVote>();
+builder.Services.AddScoped<GetPolls>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

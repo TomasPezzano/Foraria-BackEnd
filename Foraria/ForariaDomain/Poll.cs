@@ -37,7 +37,7 @@ public class Poll
 
     public ResultPoll ResultPoll { get; set; }
 
-    public int ResultPoll_id { get; set; }
+    public int ? ResultPoll_id { get; set; }
 
     public ICollection<Vote> Votes { get; set; }
 
