@@ -1,7 +1,9 @@
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
+using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Infrastructure.Configuration;
 using Foraria.Infrastructure.Persistence;
+using Foraria.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +34,19 @@ builder.Services.AddScoped<CreateClaimResponse>();
 
 builder.Services.AddScoped<IResponsibleSectorRepository, ImplementationResponsibleSector>();
 builder.Services.AddScoped<CreateClaimResponse>();
+
+builder.Services.AddScoped<CreateForum>();
+builder.Services.AddScoped<CreateThread>();
+builder.Services.AddScoped<CreateMessage>();
+builder.Services.AddScoped<CreateMessage>();
+
+builder.Services.AddScoped<IForumRepository, ForumRepository>();
+builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<DeleteMessage>();
+builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
+builder.Services.AddScoped<ToggleReaction>();
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

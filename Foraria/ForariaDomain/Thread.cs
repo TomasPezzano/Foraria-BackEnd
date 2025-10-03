@@ -32,5 +32,7 @@ public class Thread
     public User User { get; set; }
 
     public ICollection<Message> Messages { get; set; }
+    public ICollection<Reaction> Reactions { get; set; } = new List<Reaction>();
+
 
 }
