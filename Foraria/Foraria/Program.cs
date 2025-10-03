@@ -44,6 +44,9 @@ builder.Services.AddScoped<IForumRepository, ForumRepository>();
 builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<DeleteMessage>();
+builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
+builder.Services.AddScoped<ToggleReaction>();
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

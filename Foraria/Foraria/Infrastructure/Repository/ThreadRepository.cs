@@ -28,9 +28,5 @@ using Thread = ForariaDomain.Thread;
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        Task<ForariaDomain.Thread?> IThreadRepository.GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 
