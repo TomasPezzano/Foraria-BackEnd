@@ -1,22 +1,20 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Thread = ForariaDomain.Thread;
 
 namespace Foraria.Interface.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ThreadsController : ControllerBase
+    public class ThreadController : ControllerBase
     {
         private readonly CreateThread _createThread;
-        private readonly IThreadRepository _repository;
+        private readonly GetThreadById _getThreadById;
 
-        public ThreadsController(CreateThread createThread, IThreadRepository repository)
+        public ThreadController(CreateThread createThread, GetThreadById getThreadById)
         {
             _createThread = createThread;
-            _repository = repository;
+            _getThreadById = getThreadById;
         }
 
         [HttpPost]
@@ -29,20 +27,8 @@ namespace Foraria.Interface.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var thread = await _repository.GetById(id);
-            if (thread == null) return NotFound();
-
-            var response = new ThreadResponse
-            {
-                Id = thread.Id,
-                Theme = thread.Theme,
-                Description = thread.Description,
-                CreatedAt = thread.CreatedAt,
-                State = thread.State,
-                Forum_id = thread.Forum_id,
-                User_id = thread.User_id
-            };
-
+            var response = await _getThreadById.Execute(id);
+            if (response == null) return NotFound();
             return Ok(response);
         }
     }

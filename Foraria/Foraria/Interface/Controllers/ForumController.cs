@@ -1,5 +1,4 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,15 +6,17 @@ namespace Foraria.Interface.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ForumsController : ControllerBase
+    public class ForumController : ControllerBase
     {
         private readonly CreateForum _createForum;
-        private readonly IForumRepository _repository;
+        private readonly GetForumById _getForumById;
+        private readonly GetAllForums _getAllForums;
 
-        public ForumsController(CreateForum createForum, IForumRepository repository)
+        public ForumController(CreateForum createForum, GetForumById getForumById, GetAllForums getAllForums)
         {
             _createForum = createForum;
-            _repository = repository;
+            _getForumById = getForumById;
+            _getAllForums = getAllForums;
         }
 
         [HttpPost]
@@ -28,30 +29,16 @@ namespace Foraria.Interface.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var forum = await _repository.GetById(id);
-            if (forum == null) return NotFound();
-
-            var response = new ForumResponse
-            {
-                Id = forum.Id,
-                Category = forum.Category
-            };
-
+            var response = await _getForumById.Execute(id);
+            if (response == null) return NotFound();
             return Ok(response);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var forums = await _repository.GetAll();
-
-            var response = forums.Select(f => new ForumResponse
-            {
-                Id = f.Id,
-                Category = f.Category
-            });
-
-            return Ok(response);
+            var responses = await _getAllForums.Execute();
+            return Ok(responses);
         }
     }
 }
