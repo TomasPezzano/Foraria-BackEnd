@@ -3,7 +3,6 @@ using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Infrastructure.Configuration;
 using Foraria.Infrastructure.Persistence;
-using Foraria.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

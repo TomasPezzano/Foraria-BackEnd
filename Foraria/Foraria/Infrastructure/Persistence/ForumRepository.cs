@@ -1,11 +1,10 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Infrastructure.Persistence;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 
-namespace Foraria.Infrastructure.Repository
+namespace Foraria.Infrastructure.Persistence
 {
     public class ForumRepository : IForumRepository
     {

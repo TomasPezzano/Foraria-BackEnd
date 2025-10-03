@@ -1,8 +1,7 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Foraria.Infrastructure.Repository;
+namespace Foraria.Infrastructure.Persistence;
 using Thread = ForariaDomain.Thread;
 
 
