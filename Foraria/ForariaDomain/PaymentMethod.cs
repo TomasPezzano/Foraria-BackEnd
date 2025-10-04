@@ -8,25 +8,14 @@ using System.Threading.Tasks;
 
 namespace ForariaDomain
 {
-    public class Residence
+    public class PaymentMethod
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public int Number { get; set; }
-
-        public int Floor { get; set; }
-
-        public string Tower { get; set; }
-
-        public ICollection<User> Users { get; set; }
-
-        public ICollection<Reserve> Reserves { get; set; }
-
-        public ICollection<Expense> Expenses { get; set; }
+        public string Name { get; set; }
 
         public ICollection<Payment> payments { get; set; }
-
     }
 }
