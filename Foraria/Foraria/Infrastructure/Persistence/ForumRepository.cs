@@ -1,11 +1,11 @@
-﻿using Foraria.Domain.Repository;
-using Foraria.Infrastructure.Persistence;
+﻿using Foraria.Domain.Model;
+using Foraria.Domain.Repository;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 
-namespace Foraria.Infrastructure.Repository
+namespace Foraria.Infrastructure.Persistence
 {
     public class ForumRepository : IForumRepository
     {
@@ -37,6 +37,11 @@ namespace Foraria.Infrastructure.Repository
                 .Include(f => f.Threads)
                 .ThenInclude(t => t.Messages)
                 .ToListAsync();
+        }
+        public async Task<Forum?> GetByCategory(ForumCategory category)
+        {
+            return await _context.Forums
+                .FirstOrDefaultAsync(f => f.Category == category);
         }
     }
 }

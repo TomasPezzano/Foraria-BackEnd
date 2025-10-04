@@ -1,7 +1,6 @@
 ﻿using Foraria.Interface.DTOs;
 using Foraria.Domain.Repository;
 using ForariaDomain;
-using System.Threading.Tasks;
 
 namespace Foraria.Application.UseCase
 {
@@ -16,6 +15,10 @@ namespace Foraria.Application.UseCase
 
         public async Task<ForumResponse> Execute(CreateForumRequest request)
         {
+            var existingForum = await _repository.GetByCategory(request.Category);
+            if (existingForum != null)
+                throw new InvalidOperationException($"Ya existe un foro para la categoría '{request.Category}'.");
+
             var forum = new Forum
             {
                 Category = request.Category

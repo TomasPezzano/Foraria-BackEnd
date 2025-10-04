@@ -1,10 +1,9 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using Foraria.Infrastructure.Persistence;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Foraria.Infrastructure.Repository
+namespace Foraria.Infrastructure.Persistence
 {
     public class MessageRepository : IMessageRepository
     {
