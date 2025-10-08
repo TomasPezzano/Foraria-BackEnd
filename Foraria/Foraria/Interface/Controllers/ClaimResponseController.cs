@@ -11,8 +11,8 @@ namespace Foraria.Interface.Controllers;
 public class ClaimResponseController : ControllerBase
 {
 
-    public readonly CreateClaimResponse _createClaimResponse;
-    public ClaimResponseController(CreateClaimResponse CreateClaimResponse)
+    public readonly ICreateClaimResponse _createClaimResponse;
+    public ClaimResponseController(ICreateClaimResponse CreateClaimResponse)
     {
         _createClaimResponse = CreateClaimResponse;
     }

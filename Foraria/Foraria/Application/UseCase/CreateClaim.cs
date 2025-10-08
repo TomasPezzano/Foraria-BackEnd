@@ -3,12 +3,18 @@ using Foraria.Interface.DTOs;
 using ForariaDomain;
 
 namespace Foraria.Application.UseCase;
-
-public class CreateClaim
+public interface ICreateClaim
+{
+    Task<Claim> Execute(ClaimDto claimDto);
+}
+public class CreateClaim : ICreateClaim
 {
     private readonly IClaimRepository _claimRepository;
-    public CreateClaim(IClaimRepository claimRepository) {
+    private readonly ICreateClaim _createClaims;
+    public CreateClaim(IClaimRepository claimRepository, ICreateClaim createClaim)
+    {
         _claimRepository = claimRepository;
+        _createClaims = createClaim;
     }
     public async Task<Claim> Execute(ClaimDto claimDto)
     {

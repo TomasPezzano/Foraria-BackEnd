@@ -3,11 +3,11 @@ using ForariaDomain;
 
 namespace Foraria.Infrastructure.Persistence;
 
-public class ImplementationClaimResponse : IClaimResponseRepository
+public class ClaimResponseImplementation : IClaimResponseRepository
 {
 
     private readonly ForariaContext _context;
-    public ImplementationClaimResponse(ForariaContext context)
+    public ClaimResponseImplementation(ForariaContext context)
     {
         _context = context;
     }

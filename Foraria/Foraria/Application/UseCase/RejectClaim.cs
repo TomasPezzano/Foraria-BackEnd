@@ -1,15 +1,23 @@
 ﻿using System.Runtime.CompilerServices;
 using Foraria.Domain.Repository;
+using Foraria.Interface.DTOs;
+using ForariaDomain;
 
 namespace Foraria.Application.UseCase;
 
-public class RejectClaim
+public interface IRejectClaim
+{
+    Task Execute(int claimId);
+}
+public class RejectClaim : IRejectClaim
 {
 
     private readonly IClaimRepository _claimRepository;
-    public RejectClaim(IClaimRepository claimRepository)
+    private readonly IRejectClaim _rejectClaim;
+    public RejectClaim(IClaimRepository claimRepository, IRejectClaim rejectClaim)
     {
         _claimRepository = claimRepository;
+        _rejectClaim = rejectClaim;
     }
     public async Task  Execute(int claimId)
     {
