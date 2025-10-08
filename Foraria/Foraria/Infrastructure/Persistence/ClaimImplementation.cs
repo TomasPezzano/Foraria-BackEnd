@@ -4,17 +4,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Foraria.Infrastructure.Persistence;
 
-public class ImplementationClaim : IClaimRepository
+public class ClaimImplementation : IClaimRepository
 {
     private readonly ForariaContext _context;
-    public ImplementationClaim(ForariaContext context)
+    public ClaimImplementation(ForariaContext context)
     {
         _context = context;
     }
     public async Task Add(Claim claim)
     {
         _context.Claims.Add(claim);
-        _context.SaveChanges();
+        await  _context.SaveChangesAsync();
     }
 
     public async Task<List<Claim>> GetAll()
@@ -28,7 +28,7 @@ public class ImplementationClaim : IClaimRepository
     public async Task Update(Claim claim)
     {
         _context.Claims.Update(claim);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
     public async Task<Claim?> GetById(int id)
     {

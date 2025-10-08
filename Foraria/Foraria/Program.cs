@@ -23,16 +23,19 @@ builder.Services.AddScoped<IPasswordHash, PasswordHash>();
 builder.Services.AddScoped<ISendEmail, SendEmail>();
 builder.Services.AddScoped<ICreateResidence, CreateResidence>();
 
-builder.Services.AddScoped<IClaimRepository, ImplementationClaim>();
-builder.Services.AddScoped<CreateClaim>();
-builder.Services.AddScoped<GetClaims>();
-builder.Services.AddScoped<RejectClaim>();
+builder.Services.AddScoped<IClaimRepository, ClaimImplementation>();
+builder.Services.AddScoped<ICreateClaim, CreateClaim>();
+builder.Services.AddScoped<IGetClaims, GetClaims>();
+builder.Services.AddScoped<IRejectClaim, RejectClaim>();
 
-builder.Services.AddScoped<IClaimResponseRepository, ImplementationClaimResponse>();
-builder.Services.AddScoped<CreateClaimResponse>();
+builder.Services.AddScoped<IClaimResponseRepository, ClaimResponseImplementation>();
+builder.Services.AddScoped<ICreateClaimResponse, CreateClaimResponse>();
 
-builder.Services.AddScoped<IResponsibleSectorRepository, ImplementationResponsibleSector>();
-builder.Services.AddScoped<CreateClaimResponse>();
+builder.Services.AddScoped<IResponsibleSectorRepository, ResponsibleSectorImplementation>();
+
+builder.Services.AddScoped<IUserDocumentRepository, UserDocumentImplementation>();
+builder.Services.AddScoped<ICreateUserDocument, CreateUserDocument>();
+builder.Services.AddScoped<IGetUserDocuments, GetUserDocuments>();
 
 builder.Services.AddScoped<CreateForum>();
 builder.Services.AddScoped<CreateThread>();

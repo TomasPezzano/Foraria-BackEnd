@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Foraria.Infrastructure.Persistence;
 
-public class ImplementationResponsibleSector : IResponsibleSectorRepository
+public class ResponsibleSectorImplementation : IResponsibleSectorRepository
 {
     private readonly ForariaContext _context;
-    public ImplementationResponsibleSector(ForariaContext context)
+    public ResponsibleSectorImplementation(ForariaContext context)
     {
         _context = context;
     }

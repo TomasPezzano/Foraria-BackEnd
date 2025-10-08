@@ -13,10 +13,10 @@ namespace Foraria.Interface.Controllers;
 public class ClaimController : ControllerBase
 {
 
-    public readonly CreateClaim _createClaim;
-    public readonly GetClaims _getClaims;
-    public readonly RejectClaim _rejectClaim;
-    public ClaimController(CreateClaim CreateClaim, GetClaims GetClaims, RejectClaim rejectClaim)
+    public readonly ICreateClaim _createClaim;
+    public readonly IGetClaims _getClaims;
+    public readonly IRejectClaim _rejectClaim;
+    public ClaimController(ICreateClaim CreateClaim, IGetClaims GetClaims, IRejectClaim rejectClaim)
     {
         _createClaim = CreateClaim;
         _getClaims = GetClaims;
@@ -26,7 +26,7 @@ public class ClaimController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        List<Claim> claims = await _getClaims.execute();
+        List<Claim> claims = await _getClaims.Execute();
         var result = claims.Select(c => new
         {
             claim = new ClaimDto
