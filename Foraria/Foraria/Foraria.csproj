@@ -27,4 +27,9 @@
     <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Domain\Model\" />
+    <Folder Include="Infrastructure\Storage\ForumFiles\" />
+  </ItemGroup>
+
 </Project>

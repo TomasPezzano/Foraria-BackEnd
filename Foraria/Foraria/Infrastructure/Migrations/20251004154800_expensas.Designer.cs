@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251004154800_expensas")]
+    partial class expensas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -308,58 +311,6 @@ namespace Foraria.Migrations
                     b.HasIndex("User_id");
 
                     b.ToTable("message", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Id_Expense")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Id_PaymentMethod")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Id_Residence")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Voucher")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id_Expense");
-
-                    b.HasIndex("Id_PaymentMethod");
-
-                    b.HasIndex("Id_Residence");
-
-                    b.ToTable("payment", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.PaymentMethod", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("paymentMethod", (string)null);
                 });
 
             modelBuilder.Entity("ForariaDomain.Place", b =>
@@ -869,33 +820,6 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Payment", b =>
-                {
-                    b.HasOne("ForariaDomain.Expense", "Expense")
-                        .WithMany("payments")
-                        .HasForeignKey("Id_Expense")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.PaymentMethod", "PaymentMethod")
-                        .WithMany("payments")
-                        .HasForeignKey("Id_PaymentMethod")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.Residence", "Residence")
-                        .WithMany("payments")
-                        .HasForeignKey("Id_Residence")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Expense");
-
-                    b.Navigation("PaymentMethod");
-
-                    b.Navigation("Residence");
-                });
-
             modelBuilder.Entity("ForariaDomain.Poll", b =>
                 {
                     b.HasOne("ForariaDomain.CategoryPoll", "CategoryPoll")
@@ -1112,8 +1036,6 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.Expense", b =>
                 {
                     b.Navigation("ExpensesDetails");
-
-                    b.Navigation("payments");
                 });
 
             modelBuilder.Entity("ForariaDomain.Forum", b =>
@@ -1124,11 +1046,6 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.Message", b =>
                 {
                     b.Navigation("Reactions");
-                });
-
-            modelBuilder.Entity("ForariaDomain.PaymentMethod", b =>
-                {
-                    b.Navigation("payments");
                 });
 
             modelBuilder.Entity("ForariaDomain.Place", b =>
@@ -1153,8 +1070,6 @@ namespace Foraria.Migrations
                     b.Navigation("Expenses");
 
                     b.Navigation("Reserves");
-
-                    b.Navigation("payments");
                 });
 
             modelBuilder.Entity("ForariaDomain.ResponsibleSector", b =>

@@ -20,4 +20,6 @@ public class Consortium
 
     public ICollection<UserDocument> UserDocuments { get; set; }
 
+    public ICollection<Expense> Expenses { get; set; }
+
 }

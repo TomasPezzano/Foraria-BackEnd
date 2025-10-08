@@ -46,6 +46,16 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<CategoryPoll> CategoryPolls { get; set; }
 
         public DbSet<UserDocument> UserDocuments { get; set; }
+        public DbSet<Reaction> Reactions { get; set; }
+
+        public DbSet<Expense> Expenses { get; set; }
+
+        public DbSet<ExpenseDetail> ExpenseDetails { get; set; }
+
+        public DbSet<Payment> Payments { get; set; }
+
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
+
 
 
 
@@ -70,6 +80,13 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<ResultPoll>().ToTable("resultPoll");
             modelBuilder.Entity<CategoryPoll>().ToTable("categoryPoll");
             modelBuilder.Entity<UserDocument>().ToTable("userDocument");
+            modelBuilder.Entity<Reaction>().ToTable("reaction");
+            modelBuilder.Entity<Expense>().ToTable("expense");
+            modelBuilder.Entity<ExpenseDetail>().ToTable("expenseDetail");
+            modelBuilder.Entity<Payment>().ToTable("payment");
+            modelBuilder.Entity<PaymentMethod>().ToTable("paymentMethod");
+
+
 
 
             modelBuilder.Entity<User>()
@@ -210,6 +227,77 @@ namespace Foraria.Infrastructure.Persistence
                 .WithMany(r => r.UserDocuments)
                 .HasForeignKey(u => u.Consortium_id)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Reaction>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.User_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reaction>()
+                .HasOne(r => r.Message)
+                .WithMany(m => m.Reactions)
+                .HasForeignKey(r => r.Message_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reaction>()
+                .HasOne(r => r.Thread)
+                .WithMany(t => t.Reactions)
+                .HasForeignKey(r => r.Thread_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reaction>()
+                .HasIndex(r => new { r.User_id, r.Message_id, r.Thread_id })
+                .IsUnique();
+
+            modelBuilder.Entity<Expense>()
+                .HasOne(u => u.Consortium)
+                .WithMany(r => r.Expenses)
+                .HasForeignKey(u => u.Id_Consortium)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Expense>()
+                .HasOne(u => u.residence)
+                .WithMany(r => r.Expenses)
+                .HasForeignKey(u => u.Id_Residence)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ExpenseDetail>()
+              .HasOne(u => u.Expense)
+              .WithMany(r => r.ExpensesDetails)
+              .HasForeignKey(u => u.Id_Expense)
+              .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Expense>()
+                .Property(e => e.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ExpenseDetail>()
+                .Property(d => d.Amount)
+                .HasPrecision(18, 2);
+
+
+            modelBuilder.Entity<Payment>()
+              .HasOne(u => u.Expense)
+              .WithMany(r => r.payments)
+              .HasForeignKey(u => u.Id_Expense)
+              .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Payment>()
+              .HasOne(u => u.Residence)
+              .WithMany(r => r.payments)
+              .HasForeignKey(u => u.Id_Residence)
+              .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Payment>()
+               .HasOne(u => u.PaymentMethod)
+               .WithMany(r => r.payments)
+               .HasForeignKey(u => u.Id_PaymentMethod)
+               .OnDelete(DeleteBehavior.Restrict);
+
+
 
 
         }

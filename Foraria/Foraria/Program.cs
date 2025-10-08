@@ -1,5 +1,6 @@
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
+using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Infrastructure.Configuration;
 using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,23 @@ builder.Services.AddScoped<IResponsibleSectorRepository, ResponsibleSectorImplem
 builder.Services.AddScoped<IUserDocumentRepository, UserDocumentImplementation>();
 builder.Services.AddScoped<ICreateUserDocument, CreateUserDocument>();
 builder.Services.AddScoped<IGetUserDocuments, GetUserDocuments>();
+
+builder.Services.AddScoped<CreateForum>();
+builder.Services.AddScoped<CreateThread>();
+builder.Services.AddScoped<CreateMessage>();
+builder.Services.AddScoped<GetAllForums>();
+builder.Services.AddScoped<GetForumById>();
+builder.Services.AddScoped<GetMessageById>();
+builder.Services.AddScoped<GetMessagesByThread>();
+builder.Services.AddScoped<GetThreadById>();
+builder.Services.AddScoped<ToggleReaction>();
+builder.Services.AddScoped<DeleteMessage>();
+
+builder.Services.AddScoped<IForumRepository, ForumRepository>();
+builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
