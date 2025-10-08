@@ -49,6 +49,7 @@ namespace ForariaDomain
 
         public ICollection<UserDocument> UserDocuments { get; set; }
 
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
 
     }
 }

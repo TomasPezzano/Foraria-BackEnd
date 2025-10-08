@@ -1,29 +1,43 @@
 ﻿using Foraria.Domain.Repository;
+using Foraria.Infrastructure.Configuration;
 using Foraria.Interface.DTOs;
+using ForariaDomain;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Foraria.Application.UseCase;
 
 public interface ILoginUser
 {
-    Task<LoginResponseDto> Login(LoginRequestDto loginDto);
+    Task<LoginResponseDto> Login(LoginRequestDto loginDto, string ipAddress);
 }
+
 public class LoginUser : ILoginUser
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHash _passwordHash;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IRefreshTokenGenerator _refreshTokenGenerator;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly JwtSettings _jwtSettings;
 
     public LoginUser(
         IUserRepository userRepository,
         IPasswordHash passwordHash,
-        IJwtTokenGenerator jwtTokenGenerator)
+        IJwtTokenGenerator jwtTokenGenerator,
+        IRefreshTokenGenerator refreshTokenGenerator,
+        IRefreshTokenRepository refreshTokenRepository,
+        IOptions<JwtSettings> jwtSettings)
     {
         _userRepository = userRepository;
         _passwordHash = passwordHash;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _refreshTokenGenerator = refreshTokenGenerator;
+        _refreshTokenRepository = refreshTokenRepository;
+        _jwtSettings = jwtSettings.Value;
     }
 
-    public async Task<LoginResponseDto> Login(LoginRequestDto loginDto)
+    public async Task<LoginResponseDto> Login(LoginRequestDto loginDto, string ipAddress)
     {
         // 1. Validate user exists
         var user = await _userRepository.GetByEmailWithRole(loginDto.Email);
@@ -47,8 +61,8 @@ public class LoginUser : ILoginUser
             };
         }
 
-        // 3. Generate JWT token
-        var token = _jwtTokenGenerator.Generate(
+        // 3. Generate Access Token (JWT)
+        var accessToken = _jwtTokenGenerator.Generate(
             user.Id,
             user.Mail,
             user.Role_id,
@@ -56,12 +70,28 @@ public class LoginUser : ILoginUser
             user.RequiresPasswordChange
         );
 
-        // 4. Return success response
+        // 4. Generate Refresh Token
+        var refreshToken = _refreshTokenGenerator.Generate();
+        var refreshTokenEntity = new ForariaDomain.RefreshToken
+        {
+            UserId = user.Id,
+            Token = refreshToken,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
+            CreatedByIp = ipAddress,
+            IsRevoked = false
+        };
+
+        // 5. Save Refresh Token to database
+        await _refreshTokenRepository.Add(refreshTokenEntity);
+
+        // 6. Return success response
         return new LoginResponseDto
         {
             Success = true,
             Message = "Login successful",
-            Token = token,
+            Token = accessToken,
+            RefreshToken = refreshToken,
             RequiresPasswordChange = user.RequiresPasswordChange,
             User = new UserInfoDto
             {

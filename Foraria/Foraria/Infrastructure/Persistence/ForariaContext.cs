@@ -6,7 +6,8 @@ namespace Foraria.Infrastructure.Persistence
 {
     public class ForariaContext : DbContext
     {
-        public ForariaContext(DbContextOptions<ForariaContext> options) : base(options) { 
+        public ForariaContext(DbContextOptions<ForariaContext> options) : base(options)
+        {
 
         }
 
@@ -47,6 +48,7 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<UserDocument> UserDocuments { get; set; }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -70,7 +72,7 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<ResultPoll>().ToTable("resultPoll");
             modelBuilder.Entity<CategoryPoll>().ToTable("categoryPoll");
             modelBuilder.Entity<UserDocument>().ToTable("userDocument");
-
+            modelBuilder.Entity<RefreshToken>().ToTable("refreshToken");
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
@@ -211,11 +213,20 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(u => u.Consortium_id)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany(u => u.RefreshTokens) 
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => rt.Token)
+                .IsUnique();
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => rt.UserId);
 
         }
-
-
-
 
     }
 }

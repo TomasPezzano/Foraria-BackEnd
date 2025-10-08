@@ -29,19 +29,19 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim(ClaimTypes.Role, roleName),
-            new Claim("roleId", roleId.ToString()),
-            new Claim("requiresPasswordChange", requiresPasswordChange.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+        new Claim(JwtRegisteredClaimNames.Email, email),
+        new Claim(ClaimTypes.Role, roleName),
+        new Claim("roleId", roleId.ToString()),
+        new Claim("requiresPasswordChange", requiresPasswordChange.ToString()),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
         var token = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes), // ← Cambiado
             signingCredentials: credentials
         );
 

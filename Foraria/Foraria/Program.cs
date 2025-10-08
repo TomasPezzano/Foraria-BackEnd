@@ -23,6 +23,10 @@ builder.Services.AddScoped<ISendEmail, SendEmail>();
 builder.Services.AddScoped<ICreateResidence, CreateResidence>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<ILoginUser, LoginUser>();
+builder.Services.AddScoped<ILogoutUser, LogoutUser>();
+builder.Services.AddScoped<IRefreshTokenUseCase, RefreshToken>();
+builder.Services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 
