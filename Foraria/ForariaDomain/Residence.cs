@@ -23,5 +23,10 @@ namespace ForariaDomain
         public ICollection<User> Users { get; set; }
 
         public ICollection<Reserve> Reserves { get; set; }
+
+        public ICollection<Expense> Expenses { get; set; }
+
+        public ICollection<Payment> payments { get; set; }
+
     }
 }

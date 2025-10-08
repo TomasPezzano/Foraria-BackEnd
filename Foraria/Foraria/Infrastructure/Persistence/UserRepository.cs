@@ -31,6 +31,13 @@ public class UserRepository : IUserRepository
         return await _context.Users.AnyAsync(u => u.Mail == email);
     }
 
+    public Task<User?> GetById(int id)
+    {
+        return _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+    }
+
+
+ 
     public async Task<User?> GetByEmailWithRole(string email)
     {
         return await _context.Users

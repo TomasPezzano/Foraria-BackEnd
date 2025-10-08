@@ -48,14 +48,13 @@ namespace Foraria.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Archive")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ClaimResponse_id")
+                    b.Property<int?>("ClaimResponse_id")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -65,7 +64,7 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastUpdatedAt")
+                    b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Priority")
@@ -80,13 +79,14 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("User_id")
+                    b.Property<int?>("User_id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClaimResponse_id")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ClaimResponse_id] IS NOT NULL");
 
                     b.HasIndex("User_id");
 
@@ -185,7 +185,7 @@ namespace Foraria.Migrations
                     b.ToTable("event", (string)null);
                 });
 
-            modelBuilder.Entity("ForariaDomain.Forum", b =>
+            modelBuilder.Entity("ForariaDomain.Expense", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -196,6 +196,76 @@ namespace Foraria.Migrations
                     b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Id_Consortium")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id_Residence")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("float(18)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id_Consortium");
+
+                    b.HasIndex("Id_Residence");
+
+                    b.ToTable("expense", (string)null);
+                });
+
+            modelBuilder.Entity("ForariaDomain.ExpenseDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("float(18)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Id_Expense")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id_Expense");
+
+                    b.ToTable("expenseDetail", (string)null);
+                });
+
+            modelBuilder.Entity("ForariaDomain.Forum", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -217,6 +287,10 @@ namespace Foraria.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Thread_id")
                         .HasColumnType("int");
 
@@ -234,6 +308,58 @@ namespace Foraria.Migrations
                     b.HasIndex("User_id");
 
                     b.ToTable("message", (string)null);
+                });
+
+            modelBuilder.Entity("ForariaDomain.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Id_Expense")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id_PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id_Residence")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Voucher")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id_Expense");
+
+                    b.HasIndex("Id_PaymentMethod");
+
+                    b.HasIndex("Id_Residence");
+
+                    b.ToTable("payment", (string)null);
+                });
+
+            modelBuilder.Entity("ForariaDomain.PaymentMethod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("paymentMethod", (string)null);
                 });
 
             modelBuilder.Entity("ForariaDomain.Place", b =>
@@ -368,6 +494,42 @@ namespace Foraria.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("refreshToken", (string)null);
+                });
+
+            modelBuilder.Entity("ForariaDomain.Reaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Message_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReactionType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Thread_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("User_id")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Message_id");
+
+                    b.HasIndex("Thread_id");
+
+                    b.HasIndex("User_id", "Message_id", "Thread_id")
+                        .IsUnique()
+                        .HasFilter("[Message_id] IS NOT NULL AND [Thread_id] IS NOT NULL");
+
+                    b.ToTable("reaction", (string)null);
                 });
 
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
@@ -677,14 +839,12 @@ namespace Foraria.Migrations
                     b.HasOne("ForariaDomain.ClaimResponse", "ClaimResponse")
                         .WithOne("Claim")
                         .HasForeignKey("ForariaDomain.Claim", "ClaimResponse_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ForariaDomain.User", "User")
                         .WithMany("Claims")
                         .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ClaimResponse");
 
@@ -710,6 +870,36 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ForariaDomain.Expense", b =>
+                {
+                    b.HasOne("ForariaDomain.Consortium", "Consortium")
+                        .WithMany("Expenses")
+                        .HasForeignKey("Id_Consortium")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ForariaDomain.Residence", "residence")
+                        .WithMany("Expenses")
+                        .HasForeignKey("Id_Residence")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Consortium");
+
+                    b.Navigation("residence");
+                });
+
+            modelBuilder.Entity("ForariaDomain.ExpenseDetail", b =>
+                {
+                    b.HasOne("ForariaDomain.Expense", "Expense")
+                        .WithMany("ExpensesDetails")
+                        .HasForeignKey("Id_Expense")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Expense");
+                });
+
             modelBuilder.Entity("ForariaDomain.Message", b =>
                 {
                     b.HasOne("ForariaDomain.Thread", "Thread")
@@ -727,6 +917,33 @@ namespace Foraria.Migrations
                     b.Navigation("Thread");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ForariaDomain.Payment", b =>
+                {
+                    b.HasOne("ForariaDomain.Expense", "Expense")
+                        .WithMany("payments")
+                        .HasForeignKey("Id_Expense")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ForariaDomain.PaymentMethod", "PaymentMethod")
+                        .WithMany("payments")
+                        .HasForeignKey("Id_PaymentMethod")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ForariaDomain.Residence", "Residence")
+                        .WithMany("payments")
+                        .HasForeignKey("Id_Residence")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Expense");
+
+                    b.Navigation("PaymentMethod");
+
+                    b.Navigation("Residence");
                 });
 
             modelBuilder.Entity("ForariaDomain.Poll", b =>
@@ -764,17 +981,6 @@ namespace Foraria.Migrations
                         .IsRequired();
 
                     b.Navigation("Poll");
-                });
-
-            modelBuilder.Entity("ForariaDomain.RefreshToken", b =>
-                {
-                    b.HasOne("ForariaDomain.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
@@ -923,12 +1129,31 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Consortium", b =>
                 {
+                    b.Navigation("Expenses");
+
                     b.Navigation("UserDocuments");
+                });
+
+            modelBuilder.Entity("ForariaDomain.Expense", b =>
+                {
+                    b.Navigation("ExpensesDetails");
+
+                    b.Navigation("payments");
                 });
 
             modelBuilder.Entity("ForariaDomain.Forum", b =>
                 {
                     b.Navigation("Threads");
+                });
+
+            modelBuilder.Entity("ForariaDomain.Message", b =>
+                {
+                    b.Navigation("Reactions");
+                });
+
+            modelBuilder.Entity("ForariaDomain.PaymentMethod", b =>
+                {
+                    b.Navigation("payments");
                 });
 
             modelBuilder.Entity("ForariaDomain.Place", b =>
@@ -950,7 +1175,11 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Residence", b =>
                 {
+                    b.Navigation("Expenses");
+
                     b.Navigation("Reserves");
+
+                    b.Navigation("payments");
                 });
 
             modelBuilder.Entity("ForariaDomain.ResponsibleSector", b =>
@@ -972,6 +1201,8 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.Thread", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("Reactions");
                 });
 
             modelBuilder.Entity("ForariaDomain.User", b =>
