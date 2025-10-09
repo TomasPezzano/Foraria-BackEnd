@@ -6,7 +6,8 @@ namespace Foraria.Infrastructure.Persistence
 {
     public class ForariaContext : DbContext
     {
-        public ForariaContext(DbContextOptions<ForariaContext> options) : base(options) { 
+        public ForariaContext(DbContextOptions<ForariaContext> options) : base(options)
+        {
 
         }
 
@@ -49,6 +50,7 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<Reaction> Reactions { get; set; }
 
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         public DbSet<ExpenseDetail> ExpenseDetails { get; set; }
 
@@ -56,6 +58,11 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
 
+        public DbSet<Supplier> Suppliers { get; set; }
+
+        public DbSet<SupplierCategory> SupplierCategories { get; set; }
+
+        public DbSet<SupplierContract> SupplierContracts { get; set; }
 
 
 
@@ -85,8 +92,10 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<ExpenseDetail>().ToTable("expenseDetail");
             modelBuilder.Entity<Payment>().ToTable("payment");
             modelBuilder.Entity<PaymentMethod>().ToTable("paymentMethod");
-
-
+            modelBuilder.Entity<RefreshToken>().ToTable("refreshToken");
+            modelBuilder.Entity<Supplier>().ToTable("supplier");
+            modelBuilder.Entity<SupplierCategory>().ToTable("supplierCategory");
+            modelBuilder.Entity<SupplierContract>().ToTable("supplierContract");
 
 
             modelBuilder.Entity<User>()
@@ -297,13 +306,45 @@ namespace Foraria.Infrastructure.Persistence
                .HasForeignKey(u => u.Id_PaymentMethod)
                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => rt.Token)
+                .IsUnique();
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => rt.UserId);
+
+            modelBuilder.Entity<Supplier>()
+                .HasOne(s => s.SupplierCategory)
+                .WithMany(sc => sc.Suppliers)
+                .HasForeignKey(s => s.SupplierCategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Supplier>()
+                .HasOne(c => c.Consortium)
+                .WithMany(s => s.Suppliers)
+                .HasForeignKey(c => c.ConsortiumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SupplierContract>()
+                .HasOne(sc => sc.Supplier)
+                .WithMany(s => s.Contracts)
+                .HasForeignKey(sc => sc.SupplierId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Supplier>()
+                .Property(s => s.Rating)
+                .HasPrecision(3, 2);
 
 
         }
 
-
-
-
     }
+
 }
+

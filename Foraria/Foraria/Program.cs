@@ -22,6 +22,14 @@ builder.Services.AddScoped<IGeneratePassword, GeneratePassword>();
 builder.Services.AddScoped<IPasswordHash, PasswordHash>();
 builder.Services.AddScoped<ISendEmail, SendEmail>();
 builder.Services.AddScoped<ICreateResidence, CreateResidence>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<ILoginUser, LoginUser>();
+builder.Services.AddScoped<ILogoutUser, LogoutUser>();
+builder.Services.AddScoped<IRefreshTokenUseCase, RefreshToken>();
+builder.Services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
 
 builder.Services.AddScoped<IClaimRepository, ClaimImplementation>();
 builder.Services.AddScoped<ICreateClaim, CreateClaim>();
@@ -92,6 +100,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
