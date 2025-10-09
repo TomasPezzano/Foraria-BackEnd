@@ -8,6 +8,7 @@ namespace Foraria.Domain.Repository
         Task CreatePoll(Poll poll); 
 
         Task<List<Poll>> GetAllPolls();
+        Task<Poll?> GetById(int id);
 
     }
 }
