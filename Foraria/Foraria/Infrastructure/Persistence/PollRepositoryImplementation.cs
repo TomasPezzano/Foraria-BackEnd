@@ -26,5 +26,16 @@ namespace Foraria.Infrastructure.Persistence
                          .Include(p => p.PollOptions) 
                          .ToListAsync();
         }
+
+        public async Task<Poll?> GetById(int id)
+        {
+            return await _context.Polls
+                .Include(p => p.User)
+                .Include(p => p.ResultPoll)
+                .Include(p => p.PollOptions)
+                .Include(p => p.Votes)
+                .Include(p => p.BlockchainProof)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
     }
 }

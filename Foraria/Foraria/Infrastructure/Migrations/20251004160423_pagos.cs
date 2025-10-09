@@ -56,7 +56,7 @@ namespace Foraria.Migrations
                         column: x => x.Id_Residence,
                         principalTable: "residence",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(
