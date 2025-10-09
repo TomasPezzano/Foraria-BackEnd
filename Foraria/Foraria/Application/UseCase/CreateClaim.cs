@@ -10,11 +10,10 @@ public interface ICreateClaim
 public class CreateClaim : ICreateClaim
 {
     private readonly IClaimRepository _claimRepository;
-    private readonly ICreateClaim _createClaims;
-    public CreateClaim(IClaimRepository claimRepository, ICreateClaim createClaim)
+    
+    public CreateClaim(IClaimRepository claimRepository)
     {
         _claimRepository = claimRepository;
-        _createClaims = createClaim;
     }
     public async Task<Claim> Execute(ClaimDto claimDto)
     {

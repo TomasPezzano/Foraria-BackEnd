@@ -11,11 +11,10 @@ public class GetClaims : IGetClaims
 {
 
     private readonly IClaimRepository _claimRepository;
-    private readonly IGetClaims _getClaims;
-    public GetClaims(IClaimRepository claimRepository, IGetClaims getClaims)
+
+    public GetClaims(IClaimRepository claimRepository)
     {
         _claimRepository = claimRepository;
-        _getClaims = getClaims;
     }
     public async Task<List<Claim>> Execute()
     {

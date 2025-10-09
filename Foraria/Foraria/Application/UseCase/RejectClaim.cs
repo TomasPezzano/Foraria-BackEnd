@@ -13,11 +13,9 @@ public class RejectClaim : IRejectClaim
 {
 
     private readonly IClaimRepository _claimRepository;
-    private readonly IRejectClaim _rejectClaim;
-    public RejectClaim(IClaimRepository claimRepository, IRejectClaim rejectClaim)
+    public RejectClaim(IClaimRepository claimRepository)
     {
         _claimRepository = claimRepository;
-        _rejectClaim = rejectClaim;
     }
     public async Task  Execute(int claimId)
     {

@@ -16,15 +16,13 @@ public class CreateClaimResponse : ICreateClaimResponse
     private readonly IClaimResponseRepository _claimResponseRepository;
     private readonly IClaimRepository _claimRepository;
     private readonly IResponsibleSectorRepository _responsibleSectorRepository;
-    private readonly ICreateClaimResponse _createClaimResponse;
 
-    public CreateClaimResponse(IClaimResponseRepository claimResponseRepository, IClaimRepository claimRepository, IResponsibleSectorRepository responsibleSectorRepository, IUserRepository userRepository, ICreateClaimResponse createClaimResponse)
+    public CreateClaimResponse(IClaimResponseRepository claimResponseRepository, IClaimRepository claimRepository, IResponsibleSectorRepository responsibleSectorRepository, IUserRepository userRepository)
     {
         _claimResponseRepository = claimResponseRepository;
         _claimRepository = claimRepository;
         _responsibleSectorRepository = responsibleSectorRepository;
         _userRepository = userRepository;
-        _createClaimResponse = createClaimResponse;
     }
     public async Task<ClaimResponseDto> Execute(ClaimResponseDto claimResponseDto)
     {
