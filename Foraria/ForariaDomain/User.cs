@@ -18,7 +18,6 @@ namespace ForariaDomain
         public string Password { get; set; }
 
         public long? Dni { get; set; }
-        public bool RequiresPasswordChange { get; set; }
 
         public long PhoneNumber { get; set; }
 
@@ -48,8 +47,6 @@ namespace ForariaDomain
         public ICollection<Vote> Votes { get; set; }
 
         public ICollection<UserDocument> UserDocuments { get; set; }
-
-        public ICollection<RefreshToken> RefreshTokens { get; set; }
 
 
     }

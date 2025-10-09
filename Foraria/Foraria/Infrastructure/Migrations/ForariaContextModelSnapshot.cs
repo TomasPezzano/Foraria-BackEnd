@@ -449,53 +449,6 @@ namespace Foraria.Migrations
                     b.ToTable("pollOption", (string)null);
                 });
 
-            modelBuilder.Entity("ForariaDomain.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedByIp")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ReplacedByToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RevokedByIp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Token")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("refreshToken", (string)null);
-                });
-
             modelBuilder.Entity("ForariaDomain.Reaction", b =>
                 {
                     b.Property<int>("Id")
@@ -721,9 +674,6 @@ namespace Foraria.Migrations
 
                     b.Property<string>("Photo")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("RequiresPasswordChange")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Role_id")
                         .HasColumnType("int");
@@ -986,6 +936,31 @@ namespace Foraria.Migrations
                     b.Navigation("Poll");
                 });
 
+            modelBuilder.Entity("ForariaDomain.Reaction", b =>
+                {
+                    b.HasOne("ForariaDomain.Message", "Message")
+                        .WithMany("Reactions")
+                        .HasForeignKey("Message_id")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ForariaDomain.Thread", "Thread")
+                        .WithMany("Reactions")
+                        .HasForeignKey("Thread_id")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ForariaDomain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("User_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+
+                    b.Navigation("Thread");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
                 {
                     b.HasOne("ForariaDomain.Place", "Place")
@@ -1217,8 +1192,6 @@ namespace Foraria.Migrations
                     b.Navigation("Messages");
 
                     b.Navigation("Polls");
-
-                    b.Navigation("RefreshTokens");
 
                     b.Navigation("Reserves");
 

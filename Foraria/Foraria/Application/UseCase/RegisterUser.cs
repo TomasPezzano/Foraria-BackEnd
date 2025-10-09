@@ -115,7 +115,6 @@ public class RegisterUser : IRegisterUser
             Password = passwordHash,
             PhoneNumber = phoneNumber,
             Role_id = userDto.RoleId,
-            RequiresPasswordChange = true,
             Residence = residenceEntities  // Asignar las entidades Residence
         };
 
