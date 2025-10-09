@@ -51,5 +51,6 @@ namespace ForariaDomain
 
         public ICollection<RefreshToken> RefreshTokens { get; set; }
 
+
     }
 }
