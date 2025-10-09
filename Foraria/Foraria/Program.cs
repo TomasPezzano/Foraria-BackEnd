@@ -58,19 +58,23 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 builder.Services.AddScoped<IBlockchainProofRepository, BlockchainProofRepository>();
 
-builder.Services.AddScoped<PolygonBlockchainService>(provider =>
+builder.Services.AddScoped<IBlockchainService>(provider =>
 {
     var config = provider.GetRequiredService<IConfiguration>();
+
     var rpc = config["Blockchain:RpcUrl"];
     var pk = config["Blockchain:PrivateKey"];
     var contract = config["Blockchain:ContractAddress"];
+
     var abiPath = Path.Combine(
         AppContext.BaseDirectory,
         "Infrastructure",
         "Blockchain",
         "ForariaNotary.abi.json"
     );
+
     var abi = File.ReadAllText(abiPath);
+
     return new PolygonBlockchainService(rpc, pk, contract, abi);
 });
 

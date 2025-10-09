@@ -1,15 +1,14 @@
 ﻿using Foraria.Domain.Model;
 using Foraria.Domain.Repository;
-using Foraria.Infrastructure.Blockchain;
 
 namespace Foraria.Application.UseCase
 {
     public class NotarizePoll
     {
-        private readonly PolygonBlockchainService _blockchain;
+        private readonly IBlockchainService _blockchain;
         private readonly IBlockchainProofRepository _proofRepo;
 
-        public NotarizePoll(PolygonBlockchainService blockchain, IBlockchainProofRepository proofRepo)
+        public NotarizePoll(IBlockchainService blockchain, IBlockchainProofRepository proofRepo)
         {
             _blockchain = blockchain;
             _proofRepo = proofRepo;
