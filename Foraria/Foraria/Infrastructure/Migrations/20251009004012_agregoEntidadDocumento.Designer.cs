@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251009004012_agregoEntidadDocumento")]
+    partial class agregoEntidadDocumento
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,55 +24,6 @@ namespace Foraria.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Foraria.Domain.Model.BlockchainProof", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChainId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Contract")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DocumentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("HashHex")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Network")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PollId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TxHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Uri")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PollId")
-                        .IsUnique()
-                        .HasFilter("[PollId] IS NOT NULL");
-
-                    b.ToTable("blockchainProof", (string)null);
-                });
 
             modelBuilder.Entity("ForariaDomain.CategoryPoll", b =>
                 {
@@ -836,16 +790,6 @@ namespace Foraria.Migrations
                     b.ToTable("UserResidence");
                 });
 
-            modelBuilder.Entity("Foraria.Domain.Model.BlockchainProof", b =>
-                {
-                    b.HasOne("ForariaDomain.Poll", "Poll")
-                        .WithOne("BlockchainProof")
-                        .HasForeignKey("Foraria.Domain.Model.BlockchainProof", "PollId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Poll");
-                });
-
             modelBuilder.Entity("ForariaDomain.Claim", b =>
                 {
                     b.HasOne("ForariaDomain.ClaimResponse", "ClaimResponse")
@@ -1200,8 +1144,6 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Poll", b =>
                 {
-                    b.Navigation("BlockchainProof");
-
                     b.Navigation("PollOptions");
 
                     b.Navigation("Votes");

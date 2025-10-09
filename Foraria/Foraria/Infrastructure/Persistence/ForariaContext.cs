@@ -49,9 +49,8 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<UserDocument> UserDocuments { get; set; }
         public DbSet<Reaction> Reactions { get; set; }
 
-        public DbSet<BlockchainProof> BlockchainProofs { get; set; }
 
-
+        public DbSet<ExpenseDetail> ExpenseDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,7 +74,8 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<CategoryPoll>().ToTable("categoryPoll");
             modelBuilder.Entity<UserDocument>().ToTable("userDocument");
             modelBuilder.Entity<Reaction>().ToTable("reaction");
-            modelBuilder.Entity<BlockchainProof>().ToTable("blockchainProof");
+
+
 
 
             modelBuilder.Entity<User>()
@@ -239,12 +239,6 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<Reaction>()
                 .HasIndex(r => new { r.User_id, r.Message_id, r.Thread_id })
                 .IsUnique();
-
-            modelBuilder.Entity<BlockchainProof>()
-                .HasOne(bp => bp.Poll)
-                .WithOne(p => p.BlockchainProof)
-                .HasForeignKey<BlockchainProof>(bp => bp.PollId)
-                .OnDelete(DeleteBehavior.Restrict);
 
 
         }

@@ -5,7 +5,12 @@ using ForariaDomain;
 
 namespace Foraria.Application.UseCase;
 
-public class CreateClaimResponse
+public interface ICreateClaimResponse
+{
+    Task<ClaimResponseDto> Execute(ClaimResponseDto claimResponseDto);
+}
+
+public class CreateClaimResponse : ICreateClaimResponse
 {
     private readonly IUserRepository _userRepository;
     private readonly IClaimResponseRepository _claimResponseRepository;
