@@ -11,12 +11,11 @@ public interface ICreateUserDocument
 public class CreateUserDocument : ICreateUserDocument
 {
     private readonly IUserDocumentRepository _userDocumentRepository;
-    private readonly ICreateUserDocument _createUserDocument;
+   
 
-    public CreateUserDocument(IUserDocumentRepository userDocumentRepository, ICreateUserDocument createUserDocument)
+    public CreateUserDocument(IUserDocumentRepository userDocumentRepository)
     {
         _userDocumentRepository = userDocumentRepository;
-        _createUserDocument = createUserDocument;
     }
 
     public async Task<UserDocument> Execute(CreateUserDocumentDto documentDto)
