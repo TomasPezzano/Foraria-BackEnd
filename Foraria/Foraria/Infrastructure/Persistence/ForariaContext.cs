@@ -77,6 +77,7 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<UserDocument>().ToTable("userDocument");
             modelBuilder.Entity<Reaction>().ToTable("reaction");
             modelBuilder.Entity<BlockchainProof>().ToTable("blockchainProof");
+            modelBuilder.Entity<ExpenseDetail>().ToTable("expenseDetail");
 
 
 
@@ -250,10 +251,54 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
 
+            modelBuilder.Entity<Expense>()
+                .HasOne(e => e.Residence)
+                .WithMany(r => r.Expenses)
+                .HasForeignKey(e => e.ResidenceId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Expense>()
+                .HasOne(e => e.Consortium)
+                .WithMany(c => c.Expenses)
+                .HasForeignKey(e => e.ConsortiumId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Expense>()
+                .HasMany(e => e.ExpenseDetails)
+                .WithOne(d => d.Expense)
+                .HasForeignKey(d => d.ExpenseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Expense>()
+                .HasMany(e => e.Payments)
+                .WithOne(p => p.Expense)
+                .HasForeignKey(p => p.ExpenseId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Residence)
+                .WithMany(r => r.Payments)
+                .HasForeignKey(p => p.ResidenceId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Expense)
+                .WithMany(e => e.Payments)
+                .HasForeignKey(p => p.ExpenseId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.PaymentMethod)
+                .WithMany(pm => pm.Payments)
+                .HasForeignKey(p => p.PaymentMethodId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+{
+    if (fk.DeleteBehavior == DeleteBehavior.Cascade)
+        fk.DeleteBehavior = DeleteBehavior.Restrict;
+}
         }
-
-
-
 
     }
 }

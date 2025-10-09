@@ -14,20 +14,19 @@ namespace ForariaDomain
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string Voucher {  get; set; }
-
+        public string Voucher { get; set; } = string.Empty;
         public DateTime Date { get; set; }
 
-        public int Id_Expense { get; set; }
-
+        [ForeignKey(nameof(Expense))]
+        public int ExpenseId { get; set; }
         public Expense Expense { get; set; }
 
-        public int Id_Residence { get; set; }
-
+        [ForeignKey(nameof(Residence))]
+        public int ResidenceId { get; set; }
         public Residence Residence { get; set; }
 
-        public int Id_PaymentMethod { get; set; }
-
+        [ForeignKey(nameof(PaymentMethod))]
+        public int PaymentMethodId { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
     }
 }
