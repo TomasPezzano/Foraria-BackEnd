@@ -1,6 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Foraria.Interface.Controllers
 {
@@ -12,25 +13,41 @@ namespace Foraria.Interface.Controllers
         private readonly DeleteMessage _deleteMessage;
         private readonly GetMessageById _getMessageById;
         private readonly GetMessagesByThread _getMessagesByThread;
+        private readonly IWebHostEnvironment _env;
 
         public MessageController(
             CreateMessage createMessage,
             DeleteMessage deleteMessage,
             GetMessageById getMessageById,
-            GetMessagesByThread getMessagesByThread)
+            GetMessagesByThread getMessagesByThread,
+            IWebHostEnvironment env)
         {
             _createMessage = createMessage;
             _deleteMessage = deleteMessage;
             _getMessageById = getMessageById;
             _getMessagesByThread = getMessagesByThread;
+            _env = env;
         }
 
         [HttpPost]
-        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Create([FromForm] CreateMessageWithFileRequest request)
         {
-            var created = await _createMessage.Execute(request);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            if (request.File != null)
+            {
+                var uploadsFolder = Path.Combine(_env.ContentRootPath, "Infrastructure/Storage/ForumFiles");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}_{request.File.FileName}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await request.File.CopyToAsync(stream);
+
+                request.FilePath = Path.Combine("Infrastructure/Storage/ForumFiles", fileName);
+            }
+
+            var message = await _createMessage.Execute(request);
+            return Ok(message);
         }
 
         [HttpGet("{id}")]

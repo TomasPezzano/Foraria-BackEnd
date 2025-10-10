@@ -1,35 +1,30 @@
-﻿using Foraria.Infrastructure.Configuration;
+﻿using Foraria.Domain.Service;
+using Foraria.Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 
-namespace Foraria.Application.UseCase;
-
-public interface ISendEmail
+namespace Foraria.Infrastructure.Email
 {
-    Task SendWelcomeEmail(string toEmail, string firstName, string lastName, string temporaryPassword);
-}
-
-public class SendEmail : ISendEmail
-{
-    private readonly EmailSettings _emailSettings;
-
-    public SendEmail(IOptions<EmailSettings> emailSettings)
+    public class SmtpEmailService : ISendEmail
     {
-        _emailSettings = emailSettings.Value;
-    }
+        private readonly EmailSettings _emailSettings;
 
-    public async Task SendWelcomeEmail(string toEmail, string firstName, string lastName, string temporaryPassword)
-    {
-        var subject = "Bienvenido a Foraria - Tus Credenciales de Acceso";
-        var body = BuildWelcomeEmailBody(firstName, lastName, toEmail, temporaryPassword);
+        public SmtpEmailService(IOptions<EmailSettings> emailSettings)
+        {
+            _emailSettings = emailSettings.Value;
+        }
 
-        await SendEmailAsync(toEmail, subject, body);
-    }
+        public async Task SendWelcomeEmail(string toEmail, string firstName, string lastName, string temporaryPassword)
+        {
+            var subject = "Bienvenido a Foraria - Tus Credenciales de Acceso";
+            var body = BuildWelcomeEmailBody(toEmail, firstName, lastName, temporaryPassword);
+            await SendEmailAsync(toEmail, subject, body);
+        }
 
-    private string BuildWelcomeEmailBody(string email,string firstName, string lastName, string password)
-    {
-        return $@"
+        private string BuildWelcomeEmailBody(string email, string firstName, string lastName, string password)
+        {
+            return $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -144,29 +139,29 @@ public class SendEmail : ISendEmail
     </div>
 </body>
 </html>";
-    }
+        }
 
-    private async Task SendEmailAsync(string toEmail, string subject, string body)
-    {
-        using var smtpClient = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.SmtpPort)
+        private async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            EnableSsl = true,
-            UseDefaultCredentials = false,
-            Credentials = new NetworkCredential(
-                _emailSettings.Username,
-                _emailSettings.Password)
-        };
+            using var smtpClient = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.SmtpPort)
+            {
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(
+                    _emailSettings.Username,
+                    _emailSettings.Password)
+            };
 
-        var mailMessage = new MailMessage
-        {
-            From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = true
-        };
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
 
-        mailMessage.To.Add(toEmail);
-
-        await smtpClient.SendMailAsync(mailMessage);
+            mailMessage.To.Add(toEmail);
+            await smtpClient.SendMailAsync(mailMessage);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 
+
 namespace Foraria.Application.UseCase
 {
     public class GetAllForums

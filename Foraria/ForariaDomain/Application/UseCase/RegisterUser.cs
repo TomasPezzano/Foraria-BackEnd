@@ -1,4 +1,5 @@
 ﻿using Foraria.Domain.Repository;
+using Foraria.Domain.Service;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
 
