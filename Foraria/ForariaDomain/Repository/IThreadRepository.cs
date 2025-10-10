@@ -3,8 +3,6 @@
     using ForariaDomain;
     using Microsoft.EntityFrameworkCore;
 
-    using global::Foraria.Infrastructure.Persistence;
-
     public interface IThreadRepository
     {
         Task Add(Thread thread);

@@ -7,31 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Domain\Model\**" />
-    <Content Remove="Domain\Model\**" />
-    <EmbeddedResource Remove="Domain\Model\**" />
-    <None Remove="Domain\Model\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Nethereum.Contracts" Version="5.0.0" />
-    <PackageReference Include="Nethereum.Web3" Version="5.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Foraria.Infrastructure\Foraria.Infrastructure.csproj" />
+    <ProjectReference Include="..\Foraria.Contracts\Foraria.Contracts.csproj" />
     <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Domain\Model\" />
-    <Folder Include="Infrastructure\Storage\ForumFiles\" />
   </ItemGroup>
 
 </Project>
