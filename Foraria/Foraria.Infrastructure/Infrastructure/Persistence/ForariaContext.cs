@@ -67,8 +67,6 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<SupplierContract> SupplierContracts { get; set; }
 
-        public DbSet<ExpenseDetail> ExpenseDetails { get; set; }
-
         public DbSet<BlockchainProof> BlockchainProofs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -309,10 +307,10 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Payment>()
-               .HasOne(u => u.PaymentMethod)
-               .WithMany(r => r.payments)
-               .HasForeignKey(u => u.Id_PaymentMethod)
-               .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(p => p.PaymentMethod)
+                .WithMany(pm => pm.Payments)
+                .HasForeignKey(p => p.PaymentMethodId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<RefreshToken>()
                 .HasOne(rt => rt.User)
@@ -348,10 +346,7 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<Supplier>()
                 .Property(s => s.Rating)
                 .HasPrecision(3, 2);
-                .HasOne(p => p.PaymentMethod)
-                .WithMany(pm => pm.Payments)
-                .HasForeignKey(p => p.PaymentMethodId)
-                .OnDelete(DeleteBehavior.Restrict);
+
 
             foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
 {
