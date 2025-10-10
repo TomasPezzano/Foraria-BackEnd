@@ -26,7 +26,7 @@ public class SupplierContract
 
     [Required]
     [Column(TypeName = "decimal(18,2)")]
-    public decimal Price { get; set; }
+    public decimal MonthlyAmount { get; set; }
 
     [Required]
     public DateTime StartDate { get; set; }
