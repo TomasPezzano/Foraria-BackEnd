@@ -16,6 +16,6 @@ namespace ForariaDomain
 
         public string Name { get; set; }
 
-        public ICollection<Payment> payments { get; set; }
+        public ICollection<Payment> Payments { get; set; }
     }
 }

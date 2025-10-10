@@ -33,6 +33,9 @@ public class CreateForumTests
             Category = ForumCategory.General
         };
 
+        _mockRepo.Setup(r => r.GetByCategory(request.Category))
+            .ReturnsAsync((Forum?)null);
+
         _mockRepo.Setup(r => r.Add(It.IsAny<Forum>()))
             .ReturnsAsync(createdForum);
 
@@ -43,6 +46,7 @@ public class CreateForumTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Id);
         Assert.Equal(ForumCategory.General, result.Category);
+        _mockRepo.Verify(r => r.GetByCategory(request.Category), Times.Once);
         _mockRepo.Verify(r => r.Add(It.IsAny<Forum>()), Times.Once);
     }
 }

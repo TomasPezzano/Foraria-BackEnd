@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Foraria.Domain.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -40,6 +41,8 @@ public class Poll
     public int ? ResultPoll_id { get; set; }
 
     public ICollection<Vote> Votes { get; set; }
+    public BlockchainProof? BlockchainProof { get; set; }
+
 
 
 }

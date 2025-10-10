@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="Infrastructure\Blockchain\ForariaNotary.abi.json">
+			<Link>Blockchain\ForariaNotary.abi.json</Link>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Infrastructure\Storage\ForumFiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nethereum.Contracts" Version="5.0.0" />
+    <PackageReference Include="Nethereum.Web3" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
+  </ItemGroup>
+
+</Project>

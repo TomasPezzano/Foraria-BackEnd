@@ -1,7 +1,10 @@
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
+using Foraria.Domain.Service;
+using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Configuration;
+using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -21,31 +24,43 @@ builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
 builder.Services.AddScoped<IRegisterUser, RegisterUser>();
 builder.Services.AddScoped<IGeneratePassword, GeneratePassword>();
 builder.Services.AddScoped<IPasswordHash, PasswordHash>();
-builder.Services.AddScoped<ISendEmail, SendEmail>();
+builder.Services.AddScoped<ISendEmail, SmtpEmailService>();
 builder.Services.AddScoped<ICreateResidence, CreateResidence>();
 
-builder.Services.AddScoped<IClaimRepository, ImplementationClaim>();
-builder.Services.AddScoped<CreateClaim>();
-builder.Services.AddScoped<GetClaims>();
-builder.Services.AddScoped<RejectClaim>();
+builder.Services.AddScoped<IClaimRepository, ClaimImplementation>();
+builder.Services.AddScoped<ICreateClaim, CreateClaim>();
+builder.Services.AddScoped<IGetClaims, GetClaims>();
+builder.Services.AddScoped<IRejectClaim, RejectClaim>();
 
-builder.Services.AddScoped<IClaimResponseRepository, ImplementationClaimResponse>();
-builder.Services.AddScoped<CreateClaimResponse>();
+builder.Services.AddScoped<IClaimResponseRepository, ClaimResponseImplementation>();
+builder.Services.AddScoped<ICreateClaimResponse, CreateClaimResponse>();
 
-builder.Services.AddScoped<IResponsibleSectorRepository, ImplementationResponsibleSector>();
-builder.Services.AddScoped<CreateClaimResponse>();
+builder.Services.AddScoped<IResponsibleSectorRepository, ResponsibleSectorImplementation>();
+
+builder.Services.AddScoped<IUserDocumentRepository, UserDocumentImplementation>();
+builder.Services.AddScoped<ICreateUserDocument, CreateUserDocument>();
+builder.Services.AddScoped<IGetUserDocuments, GetUserDocuments>();
 
 builder.Services.AddScoped<CreateForum>();
 builder.Services.AddScoped<CreateThread>();
 builder.Services.AddScoped<CreateMessage>();
-builder.Services.AddScoped<CreateMessage>();
+builder.Services.AddScoped<GetAllForums>();
+builder.Services.AddScoped<GetForumById>();
+builder.Services.AddScoped<GetMessageById>();
+builder.Services.AddScoped<GetMessagesByThread>();
+builder.Services.AddScoped<GetThreadById>();
+builder.Services.AddScoped<ToggleReaction>();
+builder.Services.AddScoped<DeleteMessage>();
+builder.Services.AddScoped<NotarizePoll>();
+builder.Services.AddScoped<GetPollById>();
+
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
 builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
-builder.Services.AddScoped<DeleteMessage>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
-builder.Services.AddScoped<ToggleReaction>();
+builder.Services.AddScoped<IBlockchainProofRepository, BlockchainProofRepository>();
+builder.Services.AddScoped<IBlockchainService, PolygonBlockchainService>();
 
 
 builder.Services.AddControllers()
