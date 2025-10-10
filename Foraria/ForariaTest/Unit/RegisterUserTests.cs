@@ -4,6 +4,7 @@ using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using Foraria.Domain.Service;
 
 namespace ForariaTest.Unit;
 

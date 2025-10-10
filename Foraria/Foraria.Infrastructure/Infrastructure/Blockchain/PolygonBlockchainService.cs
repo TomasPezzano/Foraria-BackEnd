@@ -1,11 +1,13 @@
-﻿using Nethereum.Web3;
+﻿using Foraria.Domain.Service;
+using Microsoft.Extensions.Configuration;
+using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Foraria.Infrastructure.Blockchain
 {
-    public class PolygonBlockchainService
+    public class PolygonBlockchainService : IBlockchainService
     {
         private readonly string _rpcUrl;
         private readonly string _privateKey;
@@ -14,15 +16,30 @@ namespace Foraria.Infrastructure.Blockchain
         private readonly Web3 _web3;
         private readonly Account _account;
 
-        public PolygonBlockchainService(string rpcUrl, string privateKey, string contractAddress, string abi)
+        public PolygonBlockchainService(IConfiguration configuration)
         {
-            if (string.IsNullOrWhiteSpace(privateKey))
-                throw new ArgumentException("La clave privada no está configurada.");
+            var blockchainSection = configuration.GetSection("Blockchain");
 
-            _rpcUrl = rpcUrl;
-            _privateKey = privateKey;
-            _contractAddress = contractAddress;
-            _abi = abi;
+            _rpcUrl = blockchainSection["RpcUrl"]
+                ?? throw new InvalidOperationException("Falta Blockchain:RpcUrl en appsettings.json.");
+
+            _privateKey = blockchainSection["PrivateKey"]
+                ?? throw new InvalidOperationException("Falta Blockchain:PrivateKey en appsettings.json.");
+
+            _contractAddress = blockchainSection["ContractAddress"]
+                ?? throw new InvalidOperationException("Falta Blockchain:ContractAddress en appsettings.json.");
+            var abiPath = blockchainSection["AbiPath"]
+                ?? throw new InvalidOperationException("Falta Blockchain:AbiPath en appsettings.json.");
+
+            if (!Path.IsPathRooted(abiPath))
+            {
+                abiPath = Path.Combine(AppContext.BaseDirectory, abiPath);
+            }
+
+            if (!File.Exists(abiPath))
+                throw new FileNotFoundException($"No se encontró el archivo ABI en la ruta: {abiPath}");
+
+            _abi = File.ReadAllText(abiPath);
 
             _account = new Account(_privateKey);
             _web3 = new Web3(_account, _rpcUrl);
