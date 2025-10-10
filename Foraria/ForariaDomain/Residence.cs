@@ -26,7 +26,7 @@ namespace ForariaDomain
 
         public ICollection<Expense> Expenses { get; set; }
 
-        public ICollection<Payment> payments { get; set; }
+        public ICollection<Payment> Payments { get; set; }
 
     }
 }

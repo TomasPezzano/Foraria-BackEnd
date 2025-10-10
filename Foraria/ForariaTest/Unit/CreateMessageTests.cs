@@ -25,8 +25,7 @@ namespace ForariaTest.Application
             _useCase = new CreateMessage(
                 _mockMessageRepo.Object,
                 _mockThreadRepo.Object,
-                _mockUserRepo.Object,
-                Mock.Of<IWebHostEnvironment>()
+                _mockUserRepo.Object
             );
         }
 
