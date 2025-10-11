@@ -10,6 +10,7 @@ using Foraria.Infrastructure.Repository;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
+using ForariaDomain.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,8 +37,14 @@ builder.Services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ISupplierContractRepository, SupplierContractRepository>();
 builder.Services.AddScoped<ICreateSupplier, CreateSupplier>();
 builder.Services.AddScoped<IDeleteSupplier, DeleteSupplier>();
+builder.Services.AddScoped<ICreateSupplierContract, CreateSupplierContract>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IContractExpirationService, ContractExpirationService>();
+builder.Services.AddScoped<IGetAllSupplier, GetAllSupplier>();
+
 
 
 builder.Services.AddScoped<IClaimRepository, ClaimImplementation>();
@@ -67,6 +74,8 @@ builder.Services.AddScoped<DeleteMessage>();
 builder.Services.AddScoped<NotarizePoll>();
 builder.Services.AddScoped<GetPollById>();
 builder.Services.AddScoped<GetSupplierById>();
+builder.Services.AddScoped<GetSupplierContractById>();
+builder.Services.AddScoped<GetSupplierContractsById>();
 
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();

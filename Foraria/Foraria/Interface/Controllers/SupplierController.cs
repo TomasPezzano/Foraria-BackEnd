@@ -12,11 +12,13 @@ public class SupplierController : ControllerBase
     private readonly ICreateSupplier _createSupplier;
     private readonly IDeleteSupplier _deleteSupplier;
     private readonly GetSupplierById _getSupplierById;
-    public SupplierController(ICreateSupplier createSupplier, IDeleteSupplier deleteSupplier, GetSupplierById getSupplierById)
+    private readonly IGetAllSupplier _getAllSupplier;
+    public SupplierController(ICreateSupplier createSupplier, IDeleteSupplier deleteSupplier, GetSupplierById getSupplierById, IGetAllSupplier getAllSupplier)
     {
         _createSupplier = createSupplier;
         _deleteSupplier = deleteSupplier;
         _getSupplierById = getSupplierById;
+        _getAllSupplier = getAllSupplier;
     }
 
     [HttpPost]
@@ -98,7 +100,8 @@ public class SupplierController : ControllerBase
     {
         var supplier = _getSupplierById.Execute(id);
 
-        if (supplier == null) {
+        if (supplier == null)
+        {
             return NotFound(new { message = $"Proveedor con ID {id} no encontrado." });
         }
 
@@ -118,6 +121,29 @@ public class SupplierController : ControllerBase
             RegistrationDate = supplier.RegistrationDate,
         };
 
+        return Ok(response);
+
+    }
+
+    [HttpGet]
+    public IActionResult GetAllSuppliers()
+    {
+        var suppliers = _getAllSupplier.Execute();
+        var response = suppliers.Select(s => new SupplierResponseDto
+        {
+            Id = s.Id,
+            BusinessName = s.BusinessName,
+            Observations = s.Observations,
+            Cuit = s.Cuit,
+            CommercialName = s.CommercialName,
+            SupplierCategory = s.SupplierCategory,
+            Active = s.Active,
+            Phone = s.Phone,
+            Email = s.Email,
+            Address = s.Address,
+            ContactPerson = s.ContactPerson,
+            RegistrationDate = s.RegistrationDate,
+        }).ToList();
         return Ok(response);
 
     }
