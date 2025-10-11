@@ -1,4 +1,5 @@
-﻿using ForariaDomain;
+﻿using Foraria.Application.UseCase;
+using ForariaDomain;
 
 namespace Foraria.Domain.Repository;
 
