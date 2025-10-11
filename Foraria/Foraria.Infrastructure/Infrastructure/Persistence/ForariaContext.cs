@@ -1,5 +1,4 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Domain.Model;
+﻿using Foraria.Domain.Model;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 using Thread = ForariaDomain.Thread;
