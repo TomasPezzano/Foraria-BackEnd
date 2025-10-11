@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using Foraria.Application.UseCase;
+using Foraria.Domain.Repository;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 

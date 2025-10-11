@@ -275,7 +275,7 @@ namespace Foraria.Migrations
 
                     b.HasIndex("ResidenceId");
 
-                    b.ToTable("Expenses");
+                    b.ToTable("Expense");
                 });
 
             modelBuilder.Entity("ForariaDomain.ExpenseDetail", b =>
@@ -389,7 +389,7 @@ namespace Foraria.Migrations
 
                     b.HasIndex("ResidenceId");
 
-                    b.ToTable("payment", (string)null);
+                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("ForariaDomain.PaymentMethod", b =>
@@ -406,7 +406,7 @@ namespace Foraria.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("paymentMethod", (string)null);
+                    b.ToTable("PaymentMethod");
                 });
 
             modelBuilder.Entity("ForariaDomain.Place", b =>
@@ -532,53 +532,6 @@ namespace Foraria.Migrations
                     b.ToTable("reaction", (string)null);
                 });
 
-            modelBuilder.Entity("ForariaDomain.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedByIp")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ReplacedByToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RevokedByIp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Token")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("refreshToken", (string)null);
-                });
-
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
                 {
                     b.Property<int>("Id")
@@ -698,148 +651,6 @@ namespace Foraria.Migrations
                     b.ToTable("role", (string)null);
                 });
 
-            modelBuilder.Entity("ForariaDomain.Supplier", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("BusinessName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("CommercialName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("ConsortiumId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContactPerson")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Cuit")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastInteraction")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Observations")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal?>("Rating")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("decimal(3,2)");
-
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SupplierCategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
-
-                    b.HasIndex("SupplierCategoryId");
-
-                    b.ToTable("supplier", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.SupplierCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("supplierCategory", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.SupplierContract", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ContractType")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FilePath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("MonthlyAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SupplierId");
-
-                    b.ToTable("supplierContract", (string)null);
-                });
-
             modelBuilder.Entity("ForariaDomain.Thread", b =>
                 {
                     b.Property<int>("Id")
@@ -910,9 +721,6 @@ namespace Foraria.Migrations
 
                     b.Property<string>("Photo")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("RequiresPasswordChange")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Role_id")
                         .HasColumnType("int");
@@ -1210,17 +1018,6 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ForariaDomain.RefreshToken", b =>
-                {
-                    b.HasOne("ForariaDomain.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
                 {
                     b.HasOne("ForariaDomain.Place", "Place")
@@ -1246,36 +1043,6 @@ namespace Foraria.Migrations
                     b.Navigation("Residence");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ForariaDomain.Supplier", b =>
-                {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("Suppliers")
-                        .HasForeignKey("ConsortiumId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ForariaDomain.SupplierCategory", "SupplierCategory")
-                        .WithMany("Suppliers")
-                        .HasForeignKey("SupplierCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Consortium");
-
-                    b.Navigation("SupplierCategory");
-                });
-
-            modelBuilder.Entity("ForariaDomain.SupplierContract", b =>
-                {
-                    b.HasOne("ForariaDomain.Supplier", "Supplier")
-                        .WithMany("Contracts")
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("ForariaDomain.Thread", b =>
@@ -1399,8 +1166,6 @@ namespace Foraria.Migrations
                 {
                     b.Navigation("Expenses");
 
-                    b.Navigation("Suppliers");
-
                     b.Navigation("UserDocuments");
                 });
 
@@ -1470,16 +1235,6 @@ namespace Foraria.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Supplier", b =>
-                {
-                    b.Navigation("Contracts");
-                });
-
-            modelBuilder.Entity("ForariaDomain.SupplierCategory", b =>
-                {
-                    b.Navigation("Suppliers");
-                });
-
             modelBuilder.Entity("ForariaDomain.Thread", b =>
                 {
                     b.Navigation("Messages");
@@ -1496,8 +1251,6 @@ namespace Foraria.Migrations
                     b.Navigation("Messages");
 
                     b.Navigation("Polls");
-
-                    b.Navigation("RefreshTokens");
 
                     b.Navigation("Reserves");
 

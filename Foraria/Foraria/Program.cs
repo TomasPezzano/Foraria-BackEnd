@@ -3,10 +3,10 @@ using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 using Foraria.Infrastructure.Blockchain;
+using Foraria.Infrastructure.Configuration;
 using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
-using ForariaDomain.Aplication.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

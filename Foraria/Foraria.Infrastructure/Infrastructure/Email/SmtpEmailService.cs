@@ -1,5 +1,5 @@
 ﻿using Foraria.Domain.Service;
-using ForariaDomain.Aplication.Configuration;
+using Foraria.Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
