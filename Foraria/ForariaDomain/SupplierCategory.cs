@@ -8,20 +8,19 @@ using System.Threading.Tasks;
 
 namespace ForariaDomain;
 
-public class Consortium
+public class SupplierCategory
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
+    [Required]
+    [MaxLength(100)]
     public string Name { get; set; }
 
-    public string Description { get; set; }
+    [MaxLength(500)]
+    public string? Description { get; set; }
 
-    public ICollection<UserDocument> UserDocuments { get; set; }
-
-    public ICollection<Expense> Expenses { get; set; }
-
+    public bool Active { get; set; } = true;
     public ICollection<Supplier> Suppliers { get; set; }
-
 }

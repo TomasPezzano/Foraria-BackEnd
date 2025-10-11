@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Foraria.Contracts\Foraria.Contracts.csproj" />
     <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
   </ItemGroup>
 

@@ -3,10 +3,10 @@ using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 using Foraria.Infrastructure.Blockchain;
-using Foraria.Infrastructure.Configuration;
 using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
+using ForariaDomain.Aplication.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +26,14 @@ builder.Services.AddScoped<IGeneratePassword, GeneratePassword>();
 builder.Services.AddScoped<IPasswordHash, PasswordHash>();
 builder.Services.AddScoped<ISendEmail, SmtpEmailService>();
 builder.Services.AddScoped<ICreateResidence, CreateResidence>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<ILoginUser, LoginUser>();
+builder.Services.AddScoped<ILogoutUser, LogoutUser>();
+builder.Services.AddScoped<IRefreshTokenUseCase, RefreshToken>();
+builder.Services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
 
 builder.Services.AddScoped<IClaimRepository, ClaimImplementation>();
 builder.Services.AddScoped<ICreateClaim, CreateClaim>();
@@ -101,6 +109,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
