@@ -4,9 +4,12 @@ using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
+using Foraria.Infrastructure.Infrastructure.Persistence;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using ForariaDomain.Aplication.Configuration;
+using ForariaDomain.Application.UseCase;
+using ForariaDomain.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +36,9 @@ builder.Services.AddScoped<IRefreshTokenUseCase, RefreshToken>();
 builder.Services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ICreateSupplier, CreateSupplier>();
+builder.Services.AddScoped<IDeleteSupplier, DeleteSupplier>();
 
 
 builder.Services.AddScoped<IClaimRepository, ClaimImplementation>();
