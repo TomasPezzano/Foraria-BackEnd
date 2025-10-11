@@ -1,4 +1,4 @@
-﻿using Foraria.Infrastructure.Configuration;
+﻿using ForariaDomain.Aplication.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

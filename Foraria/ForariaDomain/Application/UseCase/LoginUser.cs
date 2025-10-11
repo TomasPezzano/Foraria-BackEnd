@@ -1,8 +1,6 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Infrastructure.Configuration;
 using Foraria.Interface.DTOs;
-using ForariaDomain;
-using Microsoft.AspNetCore.Http;
+using ForariaDomain.Aplication.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace Foraria.Application.UseCase;

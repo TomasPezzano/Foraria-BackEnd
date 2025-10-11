@@ -4,8 +4,8 @@ using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
-using Foraria.Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
+using ForariaDomain.Aplication.Configuration;
 
 namespace ForariaTest.Unit;
 
