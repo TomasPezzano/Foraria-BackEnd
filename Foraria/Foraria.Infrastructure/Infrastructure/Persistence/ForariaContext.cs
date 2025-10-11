@@ -63,8 +63,6 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<Supplier> Suppliers { get; set; }
 
-        public DbSet<SupplierCategory> SupplierCategories { get; set; }
-
         public DbSet<SupplierContract> SupplierContracts { get; set; }
 
         public DbSet<BlockchainProof> BlockchainProofs { get; set; }
@@ -97,7 +95,6 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<PaymentMethod>().ToTable("paymentMethod");
             modelBuilder.Entity<RefreshToken>().ToTable("refreshToken");
             modelBuilder.Entity<Supplier>().ToTable("supplier");
-            modelBuilder.Entity<SupplierCategory>().ToTable("supplierCategory");
             modelBuilder.Entity<SupplierContract>().ToTable("supplierContract");
 
 
@@ -325,17 +322,11 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<RefreshToken>()
                 .HasIndex(rt => rt.UserId);
 
-            modelBuilder.Entity<Supplier>()
-                .HasOne(s => s.SupplierCategory)
-                .WithMany(sc => sc.Suppliers)
-                .HasForeignKey(s => s.SupplierCategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Supplier>()
-                .HasOne(c => c.Consortium)
-                .WithMany(s => s.Suppliers)
-                .HasForeignKey(c => c.ConsortiumId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<Supplier>()
+            //    .HasOne(c => c.Consortium)
+            //    .WithMany(s => s.Suppliers)
+            //    .HasForeignKey(c => c.ConsortiumId)
+            //    .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<SupplierContract>()
                 .HasOne(sc => sc.Supplier)
