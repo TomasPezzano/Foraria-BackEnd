@@ -11,10 +11,12 @@ public class SupplierController : ControllerBase
 {
     private readonly ICreateSupplier _createSupplier;
     private readonly IDeleteSupplier _deleteSupplier;
-    public SupplierController(ICreateSupplier createSupplier, IDeleteSupplier deleteSupplier)
+    private readonly GetSupplierById _getSupplierById;
+    public SupplierController(ICreateSupplier createSupplier, IDeleteSupplier deleteSupplier, GetSupplierById getSupplierById)
     {
         _createSupplier = createSupplier;
         _deleteSupplier = deleteSupplier;
+        _getSupplierById = getSupplierById;
     }
 
     [HttpPost]
@@ -91,5 +93,33 @@ public class SupplierController : ControllerBase
         }
     }
 
+    [HttpGet("{id}")]
+    public IActionResult GetSupplierById(int id)
+    {
+        var supplier = _getSupplierById.Execute(id);
+
+        if (supplier == null) {
+            return NotFound(new { message = $"Proveedor con ID {id} no encontrado." });
+        }
+
+        var response = new SupplierResponseDto
+        {
+            Id = supplier.Id,
+            BusinessName = supplier.BusinessName,
+            Observations = supplier.Observations,
+            Cuit = supplier.Cuit,
+            CommercialName = supplier.CommercialName,
+            SupplierCategory = supplier.SupplierCategory,
+            Active = supplier.Active,
+            Phone = supplier.Phone,
+            Email = supplier.Email,
+            Address = supplier.Address,
+            ContactPerson = supplier.ContactPerson,
+            RegistrationDate = supplier.RegistrationDate,
+        };
+
+        return Ok(response);
+
+    }
 
 }

@@ -19,7 +19,6 @@ builder.Services.Configure<EmailSettings>(
 
 // Add services to the container.
 
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
@@ -67,6 +66,7 @@ builder.Services.AddScoped<ToggleReaction>();
 builder.Services.AddScoped<DeleteMessage>();
 builder.Services.AddScoped<NotarizePoll>();
 builder.Services.AddScoped<GetPollById>();
+builder.Services.AddScoped<GetSupplierById>();
 
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
