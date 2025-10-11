@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251011112659_necesaryMigration")]
+    partial class necesaryMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -710,20 +713,24 @@ namespace Foraria.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("BusinessName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("CommercialName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("ConsortiumId")
+                    b.Property<int>("ConsortiumId")
                         .HasColumnType("int");
 
                     b.Property<string>("ContactPerson")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Cuit")
                         .IsRequired()
@@ -736,10 +743,12 @@ namespace Foraria.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Observations")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal?>("Rating")
                         .HasPrecision(3, 2)
@@ -748,15 +757,41 @@ namespace Foraria.Migrations
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SupplierCategory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("SupplierCategoryId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ConsortiumId");
 
+                    b.HasIndex("SupplierCategoryId");
+
                     b.ToTable("supplier", (string)null);
+                });
+
+            modelBuilder.Entity("ForariaDomain.SupplierCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("supplierCategory", (string)null);
                 });
 
             modelBuilder.Entity("ForariaDomain.SupplierContract", b =>
@@ -1218,9 +1253,21 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Supplier", b =>
                 {
-                    b.HasOne("ForariaDomain.Consortium", null)
+                    b.HasOne("ForariaDomain.Consortium", "Consortium")
                         .WithMany("Suppliers")
-                        .HasForeignKey("ConsortiumId");
+                        .HasForeignKey("ConsortiumId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ForariaDomain.SupplierCategory", "SupplierCategory")
+                        .WithMany("Suppliers")
+                        .HasForeignKey("SupplierCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Consortium");
+
+                    b.Navigation("SupplierCategory");
                 });
 
             modelBuilder.Entity("ForariaDomain.SupplierContract", b =>
@@ -1429,6 +1476,11 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.Supplier", b =>
                 {
                     b.Navigation("Contracts");
+                });
+
+            modelBuilder.Entity("ForariaDomain.SupplierCategory", b =>
+                {
+                    b.Navigation("Suppliers");
                 });
 
             modelBuilder.Entity("ForariaDomain.Thread", b =>

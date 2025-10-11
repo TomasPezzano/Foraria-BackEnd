@@ -1,4 +1,4 @@
-﻿namespace Foraria.Infrastructure.Configuration;
+﻿namespace ForariaDomain.Aplication.Configuration;
 
 public class EmailSettings
 {
