@@ -10,5 +10,6 @@ public interface ISupplierRepository
 {
     Supplier Create(Supplier supplier);
     void Delete(int supplierId);
+    List <Supplier> GetAll();
     Supplier? GetById(int supplierId);
 }
