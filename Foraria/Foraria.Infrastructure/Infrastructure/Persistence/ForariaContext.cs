@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Model;
+﻿using Foraria.Application.UseCase;
+using Foraria.Domain.Model;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 using Thread = ForariaDomain.Thread;
@@ -340,13 +341,12 @@ namespace Foraria.Infrastructure.Persistence
 
 
             foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
-{
-    if (fk.DeleteBehavior == DeleteBehavior.Cascade)
-        fk.DeleteBehavior = DeleteBehavior.Restrict;
-}
+            {
+                if (fk.DeleteBehavior == DeleteBehavior.Cascade)
+                    fk.DeleteBehavior = DeleteBehavior.Restrict;
+            }
         }
 
     }
 
 }
-
