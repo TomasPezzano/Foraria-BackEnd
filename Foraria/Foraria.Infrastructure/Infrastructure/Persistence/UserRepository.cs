@@ -44,5 +44,17 @@ public class UserRepository : IUserRepository
             .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Mail == email);
     }
+    public async Task<int> GetTotalUsersAsync(int? consortiumId = null)
+    {
+        var query = _context.Users.AsQueryable();
 
+        if (consortiumId.HasValue)
+        {
+            query = query
+                .Include(u => u.Residences)
+                .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId.Value));
+        }
+
+        return await query.CountAsync();
+    }
 }

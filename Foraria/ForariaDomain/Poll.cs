@@ -42,6 +42,8 @@ public class Poll
 
     public ICollection<Vote> Votes { get; set; }
     public BlockchainProof? BlockchainProof { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 
 
 

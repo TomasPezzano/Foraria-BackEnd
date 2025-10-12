@@ -10,7 +10,6 @@ using Foraria.Infrastructure.Repository;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
-using ForariaDomain.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,10 +19,10 @@ builder.Services.Configure<EmailSettings>(
 
 // Add services to the container.
 
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
-
 builder.Services.AddScoped<IRegisterUser, RegisterUser>();
 builder.Services.AddScoped<IGeneratePassword, GeneratePassword>();
 builder.Services.AddScoped<IPasswordHash, PasswordHash>();
@@ -37,13 +36,8 @@ builder.Services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
-builder.Services.AddScoped<ISupplierContractRepository, SupplierContractRepository>();
 builder.Services.AddScoped<ICreateSupplier, CreateSupplier>();
 builder.Services.AddScoped<IDeleteSupplier, DeleteSupplier>();
-builder.Services.AddScoped<ICreateSupplierContract, CreateSupplierContract>();
-builder.Services.AddScoped<IFileStorageService, FileStorageService>();
-builder.Services.AddScoped<IContractExpirationService, ContractExpirationService>();
-builder.Services.AddScoped<IGetAllSupplier, GetAllSupplier>();
 
 
 
@@ -73,9 +67,17 @@ builder.Services.AddScoped<ToggleReaction>();
 builder.Services.AddScoped<DeleteMessage>();
 builder.Services.AddScoped<NotarizePoll>();
 builder.Services.AddScoped<GetPollById>();
-builder.Services.AddScoped<GetSupplierById>();
-builder.Services.AddScoped<GetSupplierContractById>();
-builder.Services.AddScoped<GetSupplierContractsById>();
+builder.Services.AddScoped<GetMonthlyExpenseTotal>();
+builder.Services.AddScoped<GetExpenseByCategory>();
+builder.Services.AddScoped<GetActivePollCount>();
+builder.Services.AddScoped<GetPendingExpenses>();
+builder.Services.AddScoped<GetUserExpenseSummary>();
+builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
+builder.Services.AddScoped<GetTotalUsers>();
+builder.Services.AddScoped<GetLatestPendingClaim>();
+builder.Services.AddScoped<GetPendingClaimsCount>();    
+builder.Services.AddScoped<GetCollectedExpensesPercentage>();
+builder.Services.AddScoped<GetUpcomingReserves>();
 
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
@@ -84,6 +86,11 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 builder.Services.AddScoped<IBlockchainProofRepository, BlockchainProofRepository>();
 builder.Services.AddScoped<IBlockchainService, PolygonBlockchainService>();
+builder.Services.Configure<BlockchainSettings>(
+    builder.Configuration.GetSection("Blockchain"));
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IReserveRepository, ReserveRepository>();
+
 
 
 builder.Services.AddControllers()

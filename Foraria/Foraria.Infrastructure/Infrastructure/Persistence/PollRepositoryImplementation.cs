@@ -37,5 +37,18 @@ namespace Foraria.Infrastructure.Persistence
                 .Include(p => p.BlockchainProof)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
+        public async Task<IEnumerable<Poll>> GetActivePolls(int consortiumId, DateTime now)
+        {
+            return await _context.Polls
+                .Include(p => p.User)
+                    .ThenInclude(u => u.Residences)
+                        .ThenInclude(r => r.Consortium)
+                .Where(p =>
+                    p.State == "Active" &&
+                    p.StartDate <= now &&
+                    p.EndDate >= now &&
+                    p.User.Residences.Any(r => r.Consortium.Id == consortiumId))
+                .ToListAsync();
+        }
     }
 }

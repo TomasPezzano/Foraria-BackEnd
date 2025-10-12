@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Policy;
 
 namespace Foraria.Interface.DTOs;
 
@@ -21,4 +22,6 @@ public class ClaimDto
     public string Category { get; set; }
     public string? Archive { get; set;}
     public int? User_id { get; set; }
+
+    public int ResidenceId { get; set; }
 }

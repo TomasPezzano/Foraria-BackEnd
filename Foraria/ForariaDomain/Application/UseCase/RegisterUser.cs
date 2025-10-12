@@ -117,7 +117,7 @@ public class RegisterUser : IRegisterUser
             PhoneNumber = phoneNumber,
             Role_id = userDto.RoleId,
             RequiresPasswordChange = true,
-            Residence = residenceEntities  // Asignar las entidades Residence
+            Residences = residenceEntities  // Asignar las entidades Residence
         };
 
         // 7. Save to database

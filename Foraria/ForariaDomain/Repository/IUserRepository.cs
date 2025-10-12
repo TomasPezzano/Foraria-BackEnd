@@ -9,6 +9,8 @@ public interface IUserRepository
     Task<bool> ExistsEmail(string email);
     Task<User?> GetById(int id);
     Task<User?> GetByEmailWithRole(string email);
+    Task<int> GetTotalUsersAsync(int? consortiumId = null);
+
 
 }
 
