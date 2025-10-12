@@ -68,6 +68,11 @@ builder.Services.AddScoped<DeleteMessage>();
 builder.Services.AddScoped<NotarizePoll>();
 builder.Services.AddScoped<GetPollById>();
 builder.Services.AddScoped<GetMonthlyExpenseTotal>();
+builder.Services.AddScoped<GetExpenseByCategory>();
+builder.Services.AddScoped<GetActivePollCount>();
+builder.Services.AddScoped<GetPendingExpenses>();
+builder.Services.AddScoped<GetUserExpenseSummary>();
+builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
 
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
