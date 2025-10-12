@@ -6,5 +6,7 @@ namespace Foraria.Domain.Repository
     {
         Task<BlockchainProof> AddAsync(BlockchainProof proof);
         Task<BlockchainProof?> GetByPollIdAsync(int pollId);
+        Task<BlockchainProof?> GetByDocumentIdAsync(Guid documentId);
+        Task<BlockchainProof?> GetByHashAsync(string hashHex);
     }
 }

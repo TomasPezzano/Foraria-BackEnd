@@ -38,5 +38,9 @@ namespace ForariaDomain
 
         public ClaimResponse? ClaimResponse { get; set; }
 
+        [ForeignKey("Residence")]
+        public int ResidenceId { get; set; }
+        public Residence Residence { get; set; }
+
     }
 }

@@ -9,6 +9,8 @@ namespace Foraria.Domain.Repository
 
         Task<List<Poll>> GetAllPolls();
         Task<Poll?> GetById(int id);
+        Task<IEnumerable<Poll>> GetActivePolls(int consortiumId, DateTime now);
+
 
     }
 }
