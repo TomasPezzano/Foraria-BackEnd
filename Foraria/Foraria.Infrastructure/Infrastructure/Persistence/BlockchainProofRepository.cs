@@ -24,7 +24,22 @@ namespace Foraria.Infrastructure.Repository
         public async Task<BlockchainProof?> GetByPollIdAsync(int pollId)
         {
             return await _context.BlockchainProofs
+                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.PollId == pollId);
+        }
+
+        public async Task<BlockchainProof?> GetByDocumentIdAsync(Guid documentId)
+        {
+            return await _context.BlockchainProofs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.DocumentId == documentId);
+        }
+
+        public async Task<BlockchainProof?> GetByHashAsync(string hashHex)
+        {
+            return await _context.BlockchainProofs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.HashHex == hashHex);
         }
     }
 }

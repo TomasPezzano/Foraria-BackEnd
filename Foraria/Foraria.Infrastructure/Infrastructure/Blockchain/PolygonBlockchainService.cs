@@ -1,7 +1,9 @@
 ﻿using Foraria.Domain.Service;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -16,15 +18,18 @@ namespace Foraria.Infrastructure.Blockchain
         private readonly Web3 _web3;
         private readonly Account _account;
 
-        public PolygonBlockchainService(IConfiguration configuration)
+
+
+
+        public PolygonBlockchainService(IConfiguration configuration, IOptions<BlockchainSettings> settings)
         {
             var blockchainSection = configuration.GetSection("Blockchain");
 
             _rpcUrl = blockchainSection["RpcUrl"]
                 ?? throw new InvalidOperationException("Falta Blockchain:RpcUrl en appsettings.json.");
 
-            _privateKey = blockchainSection["PrivateKey"]
-                ?? throw new InvalidOperationException("Falta Blockchain:PrivateKey en appsettings.json.");
+            _privateKey = settings.Value.PrivateKey
+                ?? throw new InvalidOperationException("Private Keysin configurar");
 
             _contractAddress = blockchainSection["ContractAddress"]
                 ?? throw new InvalidOperationException("Falta Blockchain:ContractAddress en appsettings.json.");
@@ -45,13 +50,13 @@ namespace Foraria.Infrastructure.Blockchain
             _web3 = new Web3(_account, _rpcUrl);
         }
 
-        public static byte[] ComputeSha256(string input)
+        public byte[] ComputeSha256(string input)
         {
             using var sha = SHA256.Create();
             return sha.ComputeHash(Encoding.UTF8.GetBytes(input));
         }
 
-        public static string BytesToHex(byte[] bytes)
+        public string BytesToHex(byte[] bytes)
             => "0x" + BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
 
         public async Task<(string TxHash, string HashHex)> NotarizeAsync(string text, string uri)
@@ -78,5 +83,38 @@ namespace Foraria.Infrastructure.Blockchain
             return (receipt.TransactionHash, hashHex);
         }
 
+        public byte[] ComputeSha256FromFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("No se encontró el archivo especificado.", filePath);
+
+            using var sha = SHA256.Create();
+            using var stream = File.OpenRead(filePath);
+            return sha.ComputeHash(stream);
+        }
+
+        public async Task<bool> VerifyFileAsync(string filePath, string expectedHashHex)
+        {
+            var hashBytes = ComputeSha256FromFile(filePath);
+            var hashHex = BytesToHex(hashBytes);
+
+            if (!string.Equals(hashHex, expectedHashHex, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var contract = _web3.Eth.GetContract(_abi, _contractAddress);
+            var getRecord = contract.GetFunction("getRecord");
+
+            var record = await getRecord.CallDeserializingToObjectAsync<RecordDto>(hashBytes);
+
+            if (record == null || record.Timestamp == 0)
+                return false;
+
+            return true;
+        }
+
+        public Task<bool> VerifyAsync(string text, string expectedHashHex)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

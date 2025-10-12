@@ -23,7 +23,6 @@ builder.Services.Configure<EmailSettings>(
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
-
 builder.Services.AddScoped<IRegisterUser, RegisterUser>();
 builder.Services.AddScoped<IGeneratePassword, GeneratePassword>();
 builder.Services.AddScoped<IPasswordHash, PasswordHash>();
@@ -75,6 +74,8 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 builder.Services.AddScoped<IBlockchainProofRepository, BlockchainProofRepository>();
 builder.Services.AddScoped<IBlockchainService, PolygonBlockchainService>();
+builder.Services.Configure<BlockchainSettings>(
+    builder.Configuration.GetSection("Blockchain"));
 
 
 builder.Services.AddControllers()

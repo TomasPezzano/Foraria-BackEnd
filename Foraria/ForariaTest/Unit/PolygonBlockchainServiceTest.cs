@@ -1,9 +1,14 @@
-﻿using Foraria.Infrastructure.Blockchain;
-using Xunit;
+﻿using Foraria.Domain.Repository;
+using Foraria.Domain.Service;
+using Foraria.Infrastructure.Blockchain;
 using System.Text;
+using Xunit;
 
 public class PolygonBlockchainServiceTests
 {
+
+    private readonly PolygonBlockchainService _service;
+
     [Fact]
     public void ComputeSha256_ShouldGenerate_ExpectedHash()
     {
@@ -15,8 +20,8 @@ public class PolygonBlockchainServiceTests
             .ToLowerInvariant();
 
         // Act
-        var hashBytes = PolygonBlockchainService.ComputeSha256(text);
-        var hashHex = PolygonBlockchainService.BytesToHex(hashBytes);
+        var hashBytes = _service.ComputeSha256(text);
+        var hashHex = _service.BytesToHex(hashBytes);
 
         // Assert
         Assert.Equal(expected, hashHex);

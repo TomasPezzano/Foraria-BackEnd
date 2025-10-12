@@ -417,3 +417,4 @@ FodyWeavers.xsd
 *.msm
 *.msp
 Foraria/Foraria/appsettings.json
+Foraria/Foraria.Contracts/DTOs/.editorconfig
