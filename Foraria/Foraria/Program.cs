@@ -40,6 +40,7 @@ builder.Services.AddScoped<ICreateSupplier, CreateSupplier>();
 builder.Services.AddScoped<IDeleteSupplier, DeleteSupplier>();
 
 
+
 builder.Services.AddScoped<IClaimRepository, ClaimImplementation>();
 builder.Services.AddScoped<ICreateClaim, CreateClaim>();
 builder.Services.AddScoped<IGetClaims, GetClaims>();
@@ -66,6 +67,7 @@ builder.Services.AddScoped<ToggleReaction>();
 builder.Services.AddScoped<DeleteMessage>();
 builder.Services.AddScoped<NotarizePoll>();
 builder.Services.AddScoped<GetPollById>();
+builder.Services.AddScoped<GetMonthlyExpenseTotal>();
 
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
@@ -76,6 +78,8 @@ builder.Services.AddScoped<IBlockchainProofRepository, BlockchainProofRepository
 builder.Services.AddScoped<IBlockchainService, PolygonBlockchainService>();
 builder.Services.Configure<BlockchainSettings>(
     builder.Configuration.GetSection("Blockchain"));
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+
 
 
 builder.Services.AddControllers()
