@@ -9,6 +9,8 @@ public interface IUserRepository
     Task<bool> ExistsEmail(string email);
     Task<User?> GetById(int id);
     Task<User?> GetByEmailWithRole(string email);
+    Task<User?> GetByIdWithRole(int id);
+    Task Update(User user);
 
 }
 

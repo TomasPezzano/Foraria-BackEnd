@@ -7,13 +7,13 @@ public interface IRefreshTokenUseCase
 {
     Task<RefreshTokenResponseDto> Refresh(string refreshToken, string ipAddress);
 }
-public class RefreshToken : IRefreshTokenUseCase
+public class RefreshTokenUseCase : IRefreshTokenUseCase
 {
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IRefreshTokenGenerator _refreshTokenGenerator;
 
-    public RefreshToken(
+    public RefreshTokenUseCase(
         IRefreshTokenRepository refreshTokenRepository,
         IJwtTokenGenerator jwtTokenGenerator,
         IRefreshTokenGenerator refreshTokenGenerator)
@@ -25,10 +25,8 @@ public class RefreshToken : IRefreshTokenUseCase
 
     public async Task<RefreshTokenResponseDto> Refresh(string refreshToken, string ipAddress)
     {
-        // 1. Get refresh token from database
         var storedToken = await _refreshTokenRepository.GetByToken(refreshToken);
 
-        // 2. Validate refresh token exists
         if (storedToken == null)
         {
             return new RefreshTokenResponseDto
@@ -38,7 +36,6 @@ public class RefreshToken : IRefreshTokenUseCase
             };
         }
 
-        // 3. Validate refresh token is active
         if (!storedToken.IsActive)
         {
             return new RefreshTokenResponseDto
@@ -48,7 +45,6 @@ public class RefreshToken : IRefreshTokenUseCase
             };
         }
 
-        // 4. Generate new access token
         var newAccessToken = _jwtTokenGenerator.Generate(
             storedToken.User.Id,
             storedToken.User.Mail,
@@ -57,7 +53,6 @@ public class RefreshToken : IRefreshTokenUseCase
             storedToken.User.RequiresPasswordChange
         );
 
-        // 5. (OPCIONAL) Refresh Token Rotation - Generar nuevo refresh token
         var newRefreshToken = _refreshTokenGenerator.Generate();
         var newRefreshTokenEntity = new ForariaDomain.RefreshToken
         {
@@ -69,7 +64,6 @@ public class RefreshToken : IRefreshTokenUseCase
             IsRevoked = false
         };
 
-        // 6. Revocar el refresh token viejo (rotation)
         storedToken.IsRevoked = true;
         storedToken.RevokedAt = DateTime.UtcNow;
         storedToken.RevokedByIp = ipAddress;
@@ -78,7 +72,6 @@ public class RefreshToken : IRefreshTokenUseCase
         await _refreshTokenRepository.Update(storedToken);
         await _refreshTokenRepository.Add(newRefreshTokenEntity);
 
-        // 7. Return new tokens
         return new RefreshTokenResponseDto
         {
             Success = true,
