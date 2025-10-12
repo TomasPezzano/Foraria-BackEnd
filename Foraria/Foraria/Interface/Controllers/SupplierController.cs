@@ -11,10 +11,14 @@ public class SupplierController : ControllerBase
 {
     private readonly ICreateSupplier _createSupplier;
     private readonly IDeleteSupplier _deleteSupplier;
-    public SupplierController(ICreateSupplier createSupplier, IDeleteSupplier deleteSupplier)
+    private readonly GetSupplierById _getSupplierById;
+    private readonly IGetAllSupplier _getAllSupplier;
+    public SupplierController(ICreateSupplier createSupplier, IDeleteSupplier deleteSupplier, GetSupplierById getSupplierById, IGetAllSupplier getAllSupplier)
     {
         _createSupplier = createSupplier;
         _deleteSupplier = deleteSupplier;
+        _getSupplierById = getSupplierById;
+        _getAllSupplier = getAllSupplier;
     }
 
     [HttpPost]
@@ -91,5 +95,57 @@ public class SupplierController : ControllerBase
         }
     }
 
+    [HttpGet("{id}")]
+    public IActionResult GetSupplierById(int id)
+    {
+        var supplier = _getSupplierById.Execute(id);
+
+        if (supplier == null)
+        {
+            return NotFound(new { message = $"Proveedor con ID {id} no encontrado." });
+        }
+
+        var response = new SupplierResponseDto
+        {
+            Id = supplier.Id,
+            BusinessName = supplier.BusinessName,
+            Observations = supplier.Observations,
+            Cuit = supplier.Cuit,
+            CommercialName = supplier.CommercialName,
+            SupplierCategory = supplier.SupplierCategory,
+            Active = supplier.Active,
+            Phone = supplier.Phone,
+            Email = supplier.Email,
+            Address = supplier.Address,
+            ContactPerson = supplier.ContactPerson,
+            RegistrationDate = supplier.RegistrationDate,
+        };
+
+        return Ok(response);
+
+    }
+
+    [HttpGet]
+    public IActionResult GetAllSuppliers()
+    {
+        var suppliers = _getAllSupplier.Execute();
+        var response = suppliers.Select(s => new SupplierResponseDto
+        {
+            Id = s.Id,
+            BusinessName = s.BusinessName,
+            Observations = s.Observations,
+            Cuit = s.Cuit,
+            CommercialName = s.CommercialName,
+            SupplierCategory = s.SupplierCategory,
+            Active = s.Active,
+            Phone = s.Phone,
+            Email = s.Email,
+            Address = s.Address,
+            ContactPerson = s.ContactPerson,
+            RegistrationDate = s.RegistrationDate,
+        }).ToList();
+        return Ok(response);
+
+    }
 
 }
