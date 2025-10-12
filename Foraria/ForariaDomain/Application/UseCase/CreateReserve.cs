@@ -21,10 +21,11 @@ public class CreateReserve : ICreateReserve
         _reserveRepository = reserveRepository;
     }
 
-    public Task<Reserve> Execute(Reserve reserve)
+    public async Task<Reserve> Execute(Reserve reserve)
     {
-        
-        _reserveRepository.Add(reserve);
-        return Task.FromResult(reserve);
+
+        reserve.DeletedAt = reserve.CreatedAt.AddHours(1);
+        await _reserveRepository.Add(reserve);
+        return reserve;
     }
 }

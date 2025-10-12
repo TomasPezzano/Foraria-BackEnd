@@ -61,6 +61,12 @@ builder.Services.AddScoped<IUserDocumentRepository, UserDocumentImplementation>(
 builder.Services.AddScoped<ICreateUserDocument, CreateUserDocument>();
 builder.Services.AddScoped<IGetUserDocuments, GetUserDocuments>();
 
+builder.Services.AddScoped<IReserveRepository, ReserveImplementation>();
+builder.Services.AddScoped<ICreateReserve, CreateReserve>();
+builder.Services.AddScoped<IGetAllReserve, GetAllReserve>();
+builder.Services.AddScoped<IUpdateOldReserves, UpdateOldReserves>();
+builder.Services.AddHostedService<OldReserveBackgroundService>();
+
 builder.Services.AddScoped<CreateForum>();
 builder.Services.AddScoped<CreateThread>();
 builder.Services.AddScoped<CreateMessage>();

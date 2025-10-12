@@ -9,4 +9,7 @@ namespace ForariaDomain.Repository;
 public interface IReserveRepository
 {
     Task Add(Reserve reserve);
+    Task<List<Reserve>> GetAll();
+    Task UpdateRange(List<Reserve> reserves);
+
 }

@@ -12,16 +12,24 @@ public class ReserveController : ControllerBase
 {
 
     public readonly ICreateReserve _createReserve;
+    public readonly IGetAllReserve _getAllReserve;
+    private readonly IUpdateOldReserves _updateOldReserves;
 
-    public ReserveController(ICreateReserve createReserve)
+    public ReserveController(
+        ICreateReserve createReserve,
+        IGetAllReserve getAllReserve,
+        IUpdateOldReserves updateOldReserves)
     {
         _createReserve = createReserve;
+        _getAllReserve = getAllReserve;
+        _updateOldReserves = updateOldReserves;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return Ok("GetAll no implementado");
+        var reserves = await _getAllReserve.Execute();
+        return Ok(reserves);
     }
 
     [HttpPost]
@@ -43,14 +51,9 @@ public class ReserveController : ControllerBase
 
             };
 
-            var createdSupplier = _createReserve.Execute(reserve);
+            var created = await _createReserve.Execute(reserve);
 
-            var response = new SupplierResponseDto
-            {
-
-            };
-
-            return Ok(response);
+            return Ok(created);
 
         }
         catch (ArgumentException ex)
@@ -62,6 +65,13 @@ public class ReserveController : ControllerBase
             return StatusCode(500, new { message = "Ocurrió un error al crear el proveedor." });
         }
 
+    }
+
+    [HttpPost("update-old")]
+    public async Task<IActionResult> UpdateOldReserves()
+    {
+        await _updateOldReserves.Execute();
+        return Ok("Reservas viejas actualizadas correctamente.");
     }
 
 }
