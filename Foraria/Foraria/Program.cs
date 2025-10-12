@@ -40,6 +40,7 @@ builder.Services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ISupplierContractRepository, SupplierContractRepository>();
 builder.Services.AddScoped<ICreateSupplier, CreateSupplier>();
 builder.Services.AddScoped<IDeleteSupplier, DeleteSupplier>();
 builder.Services.AddScoped<ICreateSupplierContract, CreateSupplierContract>();

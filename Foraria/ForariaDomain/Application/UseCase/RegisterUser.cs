@@ -109,7 +109,7 @@ public class RegisterUser : IRegisterUser
             PhoneNumber = phoneNumber,
             Role_id = userDto.RoleId,
             RequiresPasswordChange = true,
-            Residence = residenceEntities 
+            Residences = residenceEntities 
         };
 
         var savedUser = await _userRepository.Add(newUser);
