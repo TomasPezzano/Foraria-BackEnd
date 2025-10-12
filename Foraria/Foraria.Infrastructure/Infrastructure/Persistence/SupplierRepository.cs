@@ -43,4 +43,9 @@ public class SupplierRepository : ISupplierRepository
             _context.SaveChanges();
         }
     }
+
+    public List<Supplier> GetAll()
+    {
+        return _context.Suppliers.ToList();
+    }
 }
