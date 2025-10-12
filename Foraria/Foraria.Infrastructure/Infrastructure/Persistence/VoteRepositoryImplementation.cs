@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using Foraria.Contracts.DTOs;
+using Foraria.Domain.Repository;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,17 @@ namespace Foraria.Infrastructure.Persistence
                 .FirstOrDefaultAsync(v => v.User_id == userId && v.Poll_id == pollId);
         }
 
-
+        public async Task<IEnumerable<PollResultDto>> GetPollResultsAsync(int pollId)
+        {
+            return await _context.Votes
+                .Where(v => v.Poll_id == pollId)
+                .GroupBy(v => v.PollOption_id)
+                .Select(g => new PollResultDto
+                {
+                    PollOptionId = g.Key,
+                    VotesCount = g.Count()
+                })
+                .ToListAsync();
+        }
     }
 }
