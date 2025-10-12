@@ -1,13 +1,39 @@
-﻿using Foraria.Domain.Repository;
-using Foraria.Domain.Service;
-using Foraria.Infrastructure.Blockchain;
+﻿using Foraria.Infrastructure.Blockchain;
+using ForariaDomain.Aplication.Configuration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Text;
 using Xunit;
 
 public class PolygonBlockchainServiceTests
 {
-
     private readonly PolygonBlockchainService _service;
+
+    public PolygonBlockchainServiceTests()
+    {
+        var inMemorySettings = new Dictionary<string, string>
+        {
+            { "Blockchain:RpcUrl", "https://fake-url" },
+            { "Blockchain:ContractAddress", "0x0000000000000000000000000000000000000000" },
+            { "Blockchain:AbiPath", "Blockchain/ForariaNotary.abi.json" }
+        };
+
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings!)
+            .Build();
+
+        var settings = Options.Create(new BlockchainSettings
+        {
+            PrivateKey = "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefab"
+        });
+
+        var abiPath = Path.Combine(AppContext.BaseDirectory, "Blockchain/ForariaNotary.abi.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(abiPath)!);
+        if (!File.Exists(abiPath))
+            File.WriteAllText(abiPath, "{}");
+
+        _service = new PolygonBlockchainService(configuration, settings);
+    }
 
     [Fact]
     public void ComputeSha256_ShouldGenerate_ExpectedHash()
