@@ -73,6 +73,11 @@ builder.Services.AddScoped<GetActivePollCount>();
 builder.Services.AddScoped<GetPendingExpenses>();
 builder.Services.AddScoped<GetUserExpenseSummary>();
 builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
+builder.Services.AddScoped<GetTotalUsers>();
+builder.Services.AddScoped<GetLatestPendingClaim>();
+builder.Services.AddScoped<GetPendingClaimsCount>();    
+builder.Services.AddScoped<GetCollectedExpensesPercentage>();
+builder.Services.AddScoped<GetUpcomingReserves>();
 
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
@@ -84,6 +89,7 @@ builder.Services.AddScoped<IBlockchainService, PolygonBlockchainService>();
 builder.Services.Configure<BlockchainSettings>(
     builder.Configuration.GetSection("Blockchain"));
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IReserveRepository, ReserveRepository>();
 
 
 

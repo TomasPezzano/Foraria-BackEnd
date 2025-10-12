@@ -34,4 +34,36 @@ public class ClaimImplementation : IClaimRepository
     {
         return await _context.Claims.FirstOrDefaultAsync(c => c.Id == id);
     }
+    public async Task<int> GetPendingCountAsync(int? consortiumId = null)
+    {
+        var query = _context.Claims
+            .Include(c => c.Residence)
+            .AsQueryable();
+
+        if (consortiumId.HasValue)
+        {
+            query = query.Where(c => c.Residence.ConsortiumId == consortiumId.Value);
+        }
+
+        return await query.CountAsync(c => c.State == "Pending");
+    }
+
+    public async Task<Claim?> GetLatestPendingAsync(int? consortiumId = null)
+    {
+        var query = _context.Claims
+            .Include(c => c.User)
+            .Include(c => c.Residence)
+                .ThenInclude(r => r.Consortium)
+            .AsQueryable();
+
+        if (consortiumId.HasValue)
+        {
+            query = query.Where(c => c.Residence.ConsortiumId == consortiumId.Value);
+        }
+
+        return await query
+            .Where(c => c.State == "Pending")
+            .OrderByDescending(c => c.CreatedAt)
+            .FirstOrDefaultAsync();
+    }
 }

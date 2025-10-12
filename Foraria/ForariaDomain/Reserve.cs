@@ -35,5 +35,6 @@ namespace ForariaDomain
         public int User_id { get; set; }
 
         public User User { get; set; }
+        public DateTime Date { get; set; }
     }
 }
