@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using Foraria.Contracts.DTOs;
+using Foraria.Domain.Repository;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,5 +38,25 @@ namespace Foraria.Infrastructure.Persistence
                 .Include(p => p.BlockchainProof)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+
+        public async Task<Poll?> GetPollWithResultsAsync(int pollId)
+        {
+            return await _context.Polls
+                .Where(p => p.Id == pollId)
+                .Include(p => p.PollOptions)
+                .Include(p => p.Votes)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Poll>> GetAllPollsWithResultsAsync()
+        {
+            return await _context.Polls
+                .Include(p => p.PollOptions)
+                .Include(p => p.Votes)
+                .ToListAsync();
+        }
+
+
     }
 }

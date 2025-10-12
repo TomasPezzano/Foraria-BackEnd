@@ -1,6 +1,8 @@
 ﻿using Foraria.Application.UseCase;
+using Foraria.Contracts.DTOs;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,12 +16,16 @@ namespace Foraria.Interface.Controllers
         private readonly GetPolls _polls;
         private readonly NotarizePoll _notarizePoll; 
         private readonly GetPollById _getPollById;
-        public PollController(CreatePoll poll, GetPolls polls, GetPollById getPollById, NotarizePoll notarizePoll)
+        private readonly GetPollWithResults _getPollWithResults;
+        private readonly GetAllPollsWithResults _getAllPollsWithResults;
+        public PollController(CreatePoll poll, GetPolls polls, GetPollById getPollById, NotarizePoll notarizePoll,GetPollWithResults getPollWithResults, GetAllPollsWithResults getAllPollsWithResults)
         {
             _createPoll = poll;
             _polls = polls;
             _getPollById = getPollById;
             _notarizePoll = notarizePoll;
+            _getPollWithResults = getPollWithResults;
+            _getAllPollsWithResults = getAllPollsWithResults;
         }
 
         [HttpPost]
@@ -74,6 +80,82 @@ namespace Foraria.Interface.Controllers
                            ? p.PollOptions.Select(o => o.Text).ToList()
                            : new List<string>()
             }).ToList();
+            return Ok(pollsDto);
+        }
+
+        [HttpGet("with-results/{id}")]
+        public async Task<IActionResult> GetPollWithResults(int id)
+        {
+            var poll = await _getPollWithResults.ExecuteAsync(id);
+
+            if (poll == null)
+            {
+                return NotFound(new { error = "Encuesta no encontrada" });
+            }
+
+            var pollResults = poll.Votes
+                .GroupBy(v => v.PollOption_id)
+                .Select(g => new PollResultDto
+                {
+                    PollOptionId = g.Key,
+                    VotesCount = g.Count()
+                })
+                .ToList();
+
+            var pollDto = new PollWithResultsDto
+            {
+                Id = poll.Id,
+                Title = poll.Title,
+                Description = poll.Description,
+                CreatedAt = poll.CreatedAt,
+                DeletedAt = poll.DeletedAt,
+                State = poll.State,
+                CategoryPollId = poll.CategoryPoll_id,
+                PollOptions = poll.PollOptions.Select(option => new PollOptionDto
+                {
+                    Id = option.Id,
+                    Text = option.Text
+                }).ToList(),
+                PollResults = pollResults
+            };
+
+            return Ok(pollDto);
+        }
+
+
+        [HttpGet("with-results")]
+        public async Task<IActionResult> GetAllPollsWithResults()
+        {
+            var polls = await _getAllPollsWithResults.ExecuteAsync();
+
+            if (polls == null || !polls.Any())
+            {
+                return NotFound(new { error = "No se encontraron encuestas." });
+            }
+
+            var pollsDto = polls.Select(poll => new PollWithResultsDto
+            {
+                Id = poll.Id,
+                Title = poll.Title,
+                Description = poll.Description,
+                CreatedAt = poll.CreatedAt,
+                DeletedAt = poll.DeletedAt,
+                State = poll.State,
+                CategoryPollId = poll.CategoryPoll_id,
+                PollOptions = poll.PollOptions.Select(option => new PollOptionDto
+                {
+                    Id = option.Id,
+                    Text = option.Text
+                }).ToList(),
+                PollResults = poll.Votes
+                    .GroupBy(v => v.PollOption_id)
+                    .Select(g => new PollResultDto
+                    {
+                        PollOptionId = g.Key,
+                        VotesCount = g.Count()
+                    }).ToList()
+            }).ToList();
+
             return Ok(pollsDto);
         }
 

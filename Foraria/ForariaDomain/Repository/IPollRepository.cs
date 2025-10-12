@@ -1,4 +1,5 @@
-﻿using ForariaDomain;
+﻿using Foraria.Contracts.DTOs;
+using ForariaDomain;
 
 namespace Foraria.Domain.Repository
 {
@@ -9,6 +10,10 @@ namespace Foraria.Domain.Repository
 
         Task<List<Poll>> GetAllPolls();
         Task<Poll?> GetById(int id);
+        Task<Poll?> GetPollWithResultsAsync(int pollId);
+
+        Task<List<Poll>> GetAllPollsWithResultsAsync();
+
 
     }
 }

@@ -77,6 +77,9 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 builder.Services.AddScoped<IBlockchainProofRepository, BlockchainProofRepository>();
 builder.Services.AddScoped<IBlockchainService, PolygonBlockchainService>();
+builder.Services.AddScoped<GetPollWithResults>();
+builder.Services.AddScoped<GetAllPollsWithResults>();
+builder.Services.AddScoped<GetAllPollsWithResults>();
 
 
 builder.Services.AddCors(options =>

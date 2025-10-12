@@ -38,5 +38,7 @@ namespace Foraria.Infrastructure.Persistence
                 })
                 .ToListAsync();
         }
+
+      
     }
 }
