@@ -11,6 +11,8 @@ public interface IUserRepository
     Task<User?> GetByEmailWithRole(string email);
     Task<int> GetTotalUsersAsync(int? consortiumId = null);
 
+    Task<User?> GetByIdWithRole(int id);
+    Task Update(User user);
 
 }
 

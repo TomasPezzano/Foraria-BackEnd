@@ -57,4 +57,17 @@ public class UserRepository : IUserRepository
 
         return await query.CountAsync();
     }
+    public async Task<User?> GetByIdWithRole(int id)
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
+
+    public async Task Update(User user)
+    {
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+    }
+
 }

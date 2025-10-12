@@ -1,4 +1,4 @@
-using Foraria.Application.UseCase;
+﻿using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
@@ -10,7 +10,11 @@ using Foraria.Infrastructure.Repository;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
+using ForariaDomain.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,13 +35,19 @@ builder.Services.AddScoped<ICreateResidence, CreateResidence>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<ILoginUser, LoginUser>();
 builder.Services.AddScoped<ILogoutUser, LogoutUser>();
-builder.Services.AddScoped<IRefreshTokenUseCase, RefreshToken>();
+builder.Services.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
 builder.Services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ISupplierContractRepository, SupplierContractRepository>();
 builder.Services.AddScoped<ICreateSupplier, CreateSupplier>();
 builder.Services.AddScoped<IDeleteSupplier, DeleteSupplier>();
+builder.Services.AddScoped<ICreateSupplierContract, CreateSupplierContract>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IContractExpirationService, ContractExpirationService>();
+builder.Services.AddScoped<IGetAllSupplier, GetAllSupplier>();
+builder.Services.AddScoped<IUpdateUserFirstTime, UpdateUserFirstTime>();
 
 
 
@@ -100,11 +110,46 @@ builder.Services.AddControllers()
 
     });
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+        var secretKey = jwtSettings["SecretKey"];
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(secretKey)
+            ),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("OnlyConsortium", policy =>
+        policy.RequireRole("Consorcio"));
+    options.AddPolicy("ConsortiumAndAdmin", policy =>
+        policy.RequireRole("Consorcio", "Administrador"));
+    options.AddPolicy("Owner", policy =>
+        policy.RequireRole("Propietario"));
+    options.AddPolicy("Tenant", policy =>
+        policy.RequireRole("Inquilino"));
+    options.AddPolicy("All", policy =>
+        policy.RequireRole("Consorcio", "Administrador", "Popietario", "Inquilino"));
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ForariaContext>(options=>
+builder.Services.AddDbContext<ForariaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))
 );
 
