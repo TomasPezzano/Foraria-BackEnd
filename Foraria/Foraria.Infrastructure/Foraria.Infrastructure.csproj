@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <PackageReference Include="Nethereum.Contracts" Version="5.0.0" />
+    <PackageReference Include="Nethereum.Hex" Version="5.0.0" />
+    <PackageReference Include="Nethereum.RPC" Version="5.0.0" />
     <PackageReference Include="Nethereum.Web3" Version="5.0.0" />
   </ItemGroup>
 

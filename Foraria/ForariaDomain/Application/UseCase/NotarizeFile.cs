@@ -32,11 +32,13 @@ namespace Foraria.Application.UseCase
                 HashHex = hashHex,
                 Uri = uri,
                 TxHash = txHash,
-                Contract = "0xA8a7BcAb69C858929e03f5f93986F65195aE935C",
+                Contract = "0x1183232529d3973C31943739E5D76f32001eF03A",
                 Network = "polygon",
                 ChainId = 80002,
                 CreatedAtUtc = DateTime.UtcNow
             };
+
+
 
             await _proofRepo.AddAsync(proof);
             return proof;

@@ -39,16 +39,22 @@ namespace Foraria.Interface.Controllers
 
             try
             {
-                var proof = await _notarizeFile.ExecuteAsync(request.DocumentId, tempPath);
+                var documentId = Guid.NewGuid();
+
+                var proof = await _notarizeFile.ExecuteAsync(documentId, tempPath);
+
                 System.IO.File.Delete(tempPath);
 
                 return Ok(new
                 {
                     message = "Archivo notarizado correctamente.",
                     proof.Id,
+                    proof.DocumentId,
                     proof.HashHex,
                     proof.TxHash,
                     proof.Uri,
+                    proof.Network,
+                    proof.ChainId,
                     proof.CreatedAtUtc
                 });
             }
@@ -58,6 +64,7 @@ namespace Foraria.Interface.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
 
 
         [HttpPost("verify-file")]
