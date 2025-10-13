@@ -95,6 +95,9 @@ builder.Services.AddScoped<GetAllThreads>();
 builder.Services.AddScoped<CloseThread>();
 builder.Services.AddScoped<GetThreadWithMessages>();
 builder.Services.AddScoped<UpdateThread>();
+builder.Services.AddScoped<GetMessagesByUser>();
+builder.Services.AddScoped<UpdateMessage>();
+builder.Services.AddScoped<HideMessage>();
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
 builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
