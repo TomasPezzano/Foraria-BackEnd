@@ -46,6 +46,7 @@ builder.Services.AddScoped<ICreateSupplierContract, CreateSupplierContract>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IContractExpirationService, ContractExpirationService>();
 builder.Services.AddScoped<IGetAllSupplier, GetAllSupplier>();
+builder.Services.AddHostedService<PollExpirationService>();
 
 
 

@@ -40,6 +40,7 @@ namespace Foraria.Interface.Controllers
                     CategoryPoll_id = request.CategoryPollId,
                     User_id = request.UserId,
                     CreatedAt = DateTime.UtcNow,
+                    DeletedAt = DateTime.UtcNow.AddDays(7),
                     State = "Activa",
                     PollOptions = request.Options.Select(optionText => new PollOption
                     {

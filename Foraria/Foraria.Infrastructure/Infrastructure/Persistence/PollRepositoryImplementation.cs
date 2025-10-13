@@ -57,6 +57,16 @@ namespace Foraria.Infrastructure.Persistence
                 .ToListAsync();
         }
 
+        public async Task UpdatePoll(Poll poll)
+        {
+            var existingPoll = await _context.Polls.FindAsync(poll.Id);
+            if (existingPoll == null)
+                return;
+
+            _context.Entry(existingPoll).CurrentValues.SetValues(poll);
+
+        }
+
 
     }
 }

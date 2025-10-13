@@ -13,6 +13,7 @@ namespace Foraria.Domain.Repository
         Task<Poll?> GetPollWithResultsAsync(int pollId);
 
         Task<List<Poll>> GetAllPollsWithResultsAsync();
+        Task UpdatePoll(Poll poll);
 
 
     }
