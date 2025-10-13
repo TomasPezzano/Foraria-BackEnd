@@ -90,6 +90,11 @@ builder.Services.AddScoped<GetCollectedExpensesPercentage>();
 builder.Services.AddScoped<GetUpcomingReserves>();
 builder.Services.AddScoped<GetForumWithThreads>();
 builder.Services.AddScoped<DeleteForum>();
+builder.Services.AddScoped<DeleteThread>();
+builder.Services.AddScoped<GetAllThreads>();
+builder.Services.AddScoped<CloseThread>();
+builder.Services.AddScoped<GetThreadWithMessages>();
+builder.Services.AddScoped<UpdateThread>();
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
 builder.Services.AddScoped<IThreadRepository, ThreadRepository>();

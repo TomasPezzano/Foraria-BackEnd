@@ -26,6 +26,45 @@ using Thread = ForariaDomain.Thread;
                 .Include(t => t.Messages)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
-
+    public async Task<IEnumerable<Thread>> GetAllAsync()
+    {
+        return await _context.Threads
+            .Include(t => t.User)
+            .Include(t => t.Forum)
+            .ToListAsync();
     }
+
+    public async Task<IEnumerable<Thread>> GetByForumIdAsync(int forumId)
+    {
+        return await _context.Threads
+            .Where(t => t.Forum_id == forumId)
+            .Include(t => t.User)
+            .Include(t => t.Forum)
+            .ToListAsync();
+    }
+
+    public async Task UpdateAsync(Thread thread)
+    {
+        _context.Threads.Update(thread);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var thread = await _context.Threads.FindAsync(id);
+        if (thread != null)
+        {
+            _context.Threads.Remove(thread);
+            await _context.SaveChangesAsync();
+        }
+    }
+    public async Task<Thread?> GetByIdWithMessagesAsync(int id)
+    {
+        return await _context.Threads
+            .Include(t => t.Messages)
+                .ThenInclude(m => m.User)
+            .FirstOrDefaultAsync(t => t.Id == id);
+    }
+
+}
 
