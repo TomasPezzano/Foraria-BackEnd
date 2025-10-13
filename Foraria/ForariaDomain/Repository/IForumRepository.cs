@@ -10,6 +10,9 @@
         Task<Forum?> GetById(int id);
         Task<IEnumerable<Forum>> GetAll();
         Task<Forum?> GetByCategory(ForumCategory category);
+        Task<Forum?> GetByIdWithThreadsAsync(int id);
+        Task Delete(int id);
+
 
     }
 }

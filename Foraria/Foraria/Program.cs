@@ -88,7 +88,8 @@ builder.Services.AddScoped<GetLatestPendingClaim>();
 builder.Services.AddScoped<GetPendingClaimsCount>();    
 builder.Services.AddScoped<GetCollectedExpensesPercentage>();
 builder.Services.AddScoped<GetUpcomingReserves>();
-
+builder.Services.AddScoped<GetForumWithThreads>();
+builder.Services.AddScoped<DeleteForum>();
 
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
 builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
