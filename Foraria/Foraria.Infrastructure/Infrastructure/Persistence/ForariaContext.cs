@@ -142,7 +142,7 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>()
-                 .HasMany(u => u.Residence)
+                 .HasMany(u => u.Residences)
                  .WithMany(r => r.Users)
                  .UsingEntity<Dictionary<string, object>>(
                      "UserResidence",

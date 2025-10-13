@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Interface.DTOs
 {
+    public class ForumDto
+    {
+        public int Id { get; set; }
+        public ForumCategory Category { get; set; }
+        public List<ThreadDto>? Threads { get; set; }
+    }
     public class CreateForumRequest
     {
         [Required(ErrorMessage = "La categoría del foro es obligatoria.")]

@@ -12,6 +12,8 @@
             Task<Message?> GetById(int id);
             Task<IEnumerable<Message>> GetByThread(int threadId);
             Task Delete(Message message);
+            Task Update(Message message);
+            Task<IEnumerable<Message>> GetByUserIdAsync (int userId);
         }
     }
 }

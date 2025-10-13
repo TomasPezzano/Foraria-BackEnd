@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ForariaDomain;
 
-namespace ForariaDomain.Repository;
-
-public interface IReserveRepository
+namespace Foraria.Domain.Repository
 {
-    Task Add(Reserve reserve);
-    Task<List<Reserve>> GetAll();
-    Task UpdateRange(List<Reserve> reserves);
-
+    public interface IReserveRepository
+    {
+        Task<IEnumerable<Reserve>> GetUpcomingReservationsAsync(int consortiumId, DateTime fromDate, int limit = 5);
+    }
 }

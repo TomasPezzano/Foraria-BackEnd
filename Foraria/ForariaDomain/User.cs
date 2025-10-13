@@ -33,7 +33,7 @@ namespace ForariaDomain
 
         public ICollection<ClaimResponse> ClaimsResponse { get; set; }
 
-        public ICollection<Residence> Residence { get; set; }
+        public ICollection<Residence> Residences { get; set; }
 
         public ICollection<Reserve> Reserves { get; set; }
 

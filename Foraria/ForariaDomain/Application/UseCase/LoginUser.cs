@@ -37,7 +37,6 @@ public class LoginUser : ILoginUser
 
     public async Task<LoginResponseDto> Login(LoginRequestDto loginDto, string ipAddress)
     {
-        // 1. Validate user exists
         var user = await _userRepository.GetByEmailWithRole(loginDto.Email);
         if (user == null)
         {
@@ -48,7 +47,6 @@ public class LoginUser : ILoginUser
             };
         }
 
-        // 2. Validate password
         var isPasswordValid = _passwordHash.VerifyPassword(loginDto.Password, user.Password);
         if (!isPasswordValid)
         {
@@ -59,7 +57,6 @@ public class LoginUser : ILoginUser
             };
         }
 
-        // 3. Generate Access Token (JWT)
         var accessToken = _jwtTokenGenerator.Generate(
             user.Id,
             user.Mail,
@@ -68,7 +65,6 @@ public class LoginUser : ILoginUser
             user.RequiresPasswordChange
         );
 
-        // 4. Generate Refresh Token
         var refreshToken = _refreshTokenGenerator.Generate();
         var refreshTokenEntity = new ForariaDomain.RefreshToken
         {
@@ -80,10 +76,8 @@ public class LoginUser : ILoginUser
             IsRevoked = false
         };
 
-        // 5. Save Refresh Token to database
         await _refreshTokenRepository.Add(refreshTokenEntity);
 
-        // 6. Return success response
         return new LoginResponseDto
         {
             Success = true,

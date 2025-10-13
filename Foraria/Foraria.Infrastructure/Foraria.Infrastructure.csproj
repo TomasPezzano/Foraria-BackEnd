@@ -5,6 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>d76d1a7d-c729-4804-85f7-ad5da32e0a2a</UserSecretsId>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -20,6 +21,8 @@
 
   <ItemGroup>
     <PackageReference Include="Nethereum.Contracts" Version="5.0.0" />
+    <PackageReference Include="Nethereum.Hex" Version="5.0.0" />
+    <PackageReference Include="Nethereum.RPC" Version="5.0.0" />
     <PackageReference Include="Nethereum.Web3" Version="5.0.0" />
   </ItemGroup>
 
