@@ -43,5 +43,19 @@ namespace Foraria.Infrastructure.Persistence
             _context.Messages.Remove(message);
             await _context.SaveChangesAsync();
         }
+
+        public async Task Update(Message message)
+        {
+            _context.Messages.Update(message);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Message>> GetByUserIdAsync(int userId)
+        {
+            return await _context.Messages
+                .Where(m => m.User_id == userId)
+                .OrderByDescending(m => m.CreatedAt)
+                .ToListAsync();
+        }
     }
 }

@@ -8,7 +8,5 @@ namespace Foraria.Interface.DTOs
         [Required]
         public IFormFile File { get; set; }
 
-        [Required]
-        public Guid DocumentId { get; set; }
     }
 }

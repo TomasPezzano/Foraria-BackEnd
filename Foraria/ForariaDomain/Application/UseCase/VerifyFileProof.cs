@@ -16,9 +16,12 @@ namespace Foraria.Application.UseCase
 
         public async Task<bool> ExecuteAsync(Guid documentId, string filePath)
         {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("No se encontró el archivo a verificar.", filePath);
+
             var proof = await _proofRepo.GetByDocumentIdAsync(documentId);
             if (proof == null)
-                throw new InvalidOperationException($"No se encontró una prueba para el documento {documentId}");
+                throw new InvalidOperationException($"No se encontró una prueba registrada para el documento {documentId}.");
 
             return await _blockchain.VerifyFileAsync(filePath, proof.HashHex);
         }
