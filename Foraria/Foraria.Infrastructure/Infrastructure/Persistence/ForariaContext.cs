@@ -117,6 +117,13 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey<Claim>(u => u.ClaimResponse_id)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Claim>()
+               .HasOne(c => c.Residence)
+               .WithMany(r => r.Claims)
+               .HasForeignKey(c => c.ResidenceId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+
             modelBuilder.Entity<ClaimResponse>()
                 .HasOne(u => u.ResponsibleSector)
                 .WithMany(r => r.ClaimsResponse)
