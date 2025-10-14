@@ -32,6 +32,7 @@ namespace ForariaDomain
         public int ConsortiumId { get; set; }
         public Consortium Consortium { get; set; }
 
+        public ICollection<Claim> Claims { get; set; }
 
     }
 }

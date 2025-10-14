@@ -37,7 +37,8 @@ public class CreateClaim : ICreateClaim
             Category = claimDto.Category,
             CreatedAt = DateTime.Now,
             Archive = claimDto.Archive,
-            User_id = claimDto.User_id
+            User_id = claimDto.User_id,
+            ResidenceId = claimDto.ResidenceId
         };
 
         await _claimRepository.Add(claim);

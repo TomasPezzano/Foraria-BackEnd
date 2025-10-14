@@ -68,7 +68,8 @@ public class ClaimController : ControllerBase
             Priority = claim.Priority,
             Category = claim.Category,
             Archive = claim.Archive,
-            User_id = claim.User_id
+            User_id = claim.User_id,
+            ResidenceId = claim.ResidenceId
         };
 
         return CreatedAtAction(nameof(GetAll), new { id = claim.Id }, claimResult);
