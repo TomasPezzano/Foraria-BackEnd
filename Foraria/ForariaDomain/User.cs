@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Foraria.Application.UseCase;
 
 namespace ForariaDomain
 {
@@ -13,7 +14,7 @@ namespace ForariaDomain
 
         public string LastName { get; set; }
 
-        public string Mail {  get; set; }
+        public string Mail { get; set; }
 
         public string Password { get; set; }
 

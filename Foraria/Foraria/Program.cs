@@ -109,6 +109,10 @@ builder.Services.Configure<BlockchainSettings>(
     builder.Configuration.GetSection("Blockchain"));
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IReserveRepository, ReserveRepository>();
+builder.Services.AddScoped<ICreateReserve, CreateReserve>();
+builder.Services.AddScoped<IGetAllReserve, GetAllReserve>();
+builder.Services.AddScoped<IUpdateOldReserves, UpdateOldReserves>();
+builder.Services.AddHostedService<OldReserveBackgroundService>();
 
 
 

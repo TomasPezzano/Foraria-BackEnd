@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251011162815_NuevaBD")]
+    partial class NuevaBD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,9 +123,6 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ResidenceId")
-                        .HasColumnType("int");
-
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -139,8 +139,6 @@ namespace Foraria.Migrations
                     b.HasIndex("ClaimResponse_id")
                         .IsUnique()
                         .HasFilter("[ClaimResponse_id] IS NOT NULL");
-
-                    b.HasIndex("ResidenceId");
 
                     b.HasIndex("User_id");
 
@@ -452,14 +450,8 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int?>("ResultPoll_id")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -601,10 +593,7 @@ namespace Foraria.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
+                    b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -643,9 +632,6 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ConsortiumId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Floor")
                         .HasColumnType("int");
 
@@ -657,8 +643,6 @@ namespace Foraria.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
 
                     b.ToTable("residence", (string)null);
                 });
@@ -738,9 +722,6 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ConsortiumId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ContactPerson")
                         .HasColumnType("nvarchar(max)");
 
@@ -772,8 +753,6 @@ namespace Foraria.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
 
                     b.ToTable("supplier", (string)null);
                 });
@@ -1030,20 +1009,12 @@ namespace Foraria.Migrations
                         .HasForeignKey("ForariaDomain.Claim", "ClaimResponse_id")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("ForariaDomain.Residence", "Residence")
-                        .WithMany()
-                        .HasForeignKey("ResidenceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("ForariaDomain.User", "User")
                         .WithMany("Claims")
                         .HasForeignKey("User_id")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ClaimResponse");
-
-                    b.Navigation("Residence");
 
                     b.Navigation("User");
                 });
@@ -1243,24 +1214,6 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Residence", b =>
-                {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("Residences")
-                        .HasForeignKey("ConsortiumId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Consortium");
-                });
-
-            modelBuilder.Entity("ForariaDomain.Supplier", b =>
-                {
-                    b.HasOne("ForariaDomain.Consortium", null)
-                        .WithMany("Suppliers")
-                        .HasForeignKey("ConsortiumId");
-                });
-
             modelBuilder.Entity("ForariaDomain.SupplierContract", b =>
                 {
                     b.HasOne("ForariaDomain.Supplier", "Supplier")
@@ -1392,10 +1345,6 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.Consortium", b =>
                 {
                     b.Navigation("Expenses");
-
-                    b.Navigation("Residences");
-
-                    b.Navigation("Suppliers");
 
                     b.Navigation("UserDocuments");
                 });
