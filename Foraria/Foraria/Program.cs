@@ -2,11 +2,13 @@
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
+using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Infrastructure.Persistence;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
+using Foraria.SignalRImplementation;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
@@ -47,24 +49,18 @@ builder.Services.AddScoped<ICreateSupplierContract, CreateSupplierContract>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IContractExpirationService, ContractExpirationService>();
 builder.Services.AddScoped<IGetAllSupplier, GetAllSupplier>();
+builder.Services.AddHostedService<PollExpirationService>();
 builder.Services.AddScoped<IUpdateUserFirstTime, UpdateUserFirstTime>();
-
-
-
 builder.Services.AddScoped<IClaimRepository, ClaimImplementation>();
 builder.Services.AddScoped<ICreateClaim, CreateClaim>();
 builder.Services.AddScoped<IGetClaims, GetClaims>();
 builder.Services.AddScoped<IRejectClaim, RejectClaim>();
-
 builder.Services.AddScoped<IClaimResponseRepository, ClaimResponseImplementation>();
 builder.Services.AddScoped<ICreateClaimResponse, CreateClaimResponse>();
-
 builder.Services.AddScoped<IResponsibleSectorRepository, ResponsibleSectorImplementation>();
-
 builder.Services.AddScoped<IUserDocumentRepository, UserDocumentImplementation>();
 builder.Services.AddScoped<ICreateUserDocument, CreateUserDocument>();
 builder.Services.AddScoped<IGetUserDocuments, GetUserDocuments>();
-
 builder.Services.AddScoped<CreateForum>();
 builder.Services.AddScoped<CreateThread>();
 builder.Services.AddScoped<CreateMessage>();
@@ -77,6 +73,10 @@ builder.Services.AddScoped<ToggleReaction>();
 builder.Services.AddScoped<DeleteMessage>();
 builder.Services.AddScoped<NotarizePoll>();
 builder.Services.AddScoped<GetPollById>();
+builder.Services.AddScoped<ISignalRNotification, SignalRNotification>();
+builder.Services.AddScoped<GetSupplierById>();
+builder.Services.AddScoped<GetSupplierContractById>();
+builder.Services.AddScoped<GetSupplierContractsById>();
 builder.Services.AddScoped<GetMonthlyExpenseTotal>();
 builder.Services.AddScoped<GetExpenseByCategory>();
 builder.Services.AddScoped<GetActivePollCount>();
@@ -98,13 +98,15 @@ builder.Services.AddScoped<UpdateThread>();
 builder.Services.AddScoped<GetMessagesByUser>();
 builder.Services.AddScoped<UpdateMessage>();
 builder.Services.AddScoped<HideMessage>();
-
 builder.Services.AddScoped<IForumRepository, ForumRepository>();
 builder.Services.AddScoped<IThreadRepository, ThreadRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 builder.Services.AddScoped<IBlockchainProofRepository, BlockchainProofRepository>();
 builder.Services.AddScoped<IBlockchainService, PolygonBlockchainService>();
+builder.Services.AddScoped<GetPollWithResults>();
+builder.Services.AddScoped<GetAllPollsWithResults>();
+builder.Services.AddScoped<GetAllPollsWithResults>();
 builder.Services.Configure<BlockchainSettings>(
     builder.Configuration.GetSection("Blockchain"));
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
@@ -115,6 +117,19 @@ builder.Services.AddScoped<IUpdateOldReserves, UpdateOldReserves>();
 builder.Services.AddHostedService<OldReserveBackgroundService>();
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+builder.Services.AddSignalR();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -187,6 +202,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowReactApp");
+
+app.MapHub<PollHub>("/pollHub");
 
 app.UseHttpsRedirection();
 

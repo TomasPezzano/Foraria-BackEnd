@@ -1,5 +1,6 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
+using ForariaDomain;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,18 +16,26 @@ namespace Foraria.Interface.Controllers
         {
             _createVoteUseCase = createVoteUseCase;
         }
-
         [HttpPost]
         public async Task<IActionResult> PostVote([FromBody] VoteDto request)
         {
             try
             {
-                await _createVoteUseCase.ExecuteAsync(request.User_Id, request.Poll_Id, request.PollOption_Id);
+                var vote = new Vote
+                {
+                    User_id = request.User_Id,
+                    Poll_id = request.Poll_Id,
+                    PollOption_id = request.PollOption_Id,
+                    VotedDate = DateTime.UtcNow
+                };
+
+                await _createVoteUseCase.ExecuteAsync(vote);
+
                 return Ok(new { message = "Voto registrado correctamente" });
             }
             catch (NotFoundException ex)
             {
-                return NotFound(new { error = ex.Message }); 
+                return NotFound(new { error = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
@@ -37,6 +46,6 @@ namespace Foraria.Interface.Controllers
                 return StatusCode(500, new { error = "Ocurrió un error inesperado", detail = ex.Message });
             }
         }
-    }
 
+    }
 }

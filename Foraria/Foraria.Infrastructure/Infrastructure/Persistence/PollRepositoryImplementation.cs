@@ -37,6 +37,37 @@ namespace Foraria.Infrastructure.Persistence
                 .Include(p => p.BlockchainProof)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+
+
+        public async Task<Poll?> GetPollWithResultsAsync(int pollId)
+        {
+            return await _context.Polls
+                .Where(p => p.Id == pollId)
+                .Include(p => p.PollOptions)
+                .Include(p => p.Votes)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Poll>> GetAllPollsWithResultsAsync()
+        {
+            return await _context.Polls
+                .Include(p => p.PollOptions)
+                .Include(p => p.Votes)
+                .ToListAsync();
+        }
+
+        public async Task UpdatePoll(Poll poll)
+        {
+            var existingPoll = await _context.Polls.FindAsync(poll.Id);
+            if (existingPoll == null)
+                return;
+
+            _context.Entry(existingPoll).CurrentValues.SetValues(poll);
+
+        }
+
+
         public async Task<IEnumerable<Poll>> GetActivePolls(int consortiumId, DateTime now)
         {
             return await _context.Polls
@@ -50,5 +81,6 @@ namespace Foraria.Infrastructure.Persistence
                     p.User.Residences.Any(r => r.Consortium.Id == consortiumId))
                 .ToListAsync();
         }
+
     }
 }

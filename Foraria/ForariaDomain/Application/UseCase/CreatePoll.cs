@@ -1,5 +1,4 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
 
@@ -19,31 +18,18 @@ namespace Foraria.Application.UseCase
             _userRepository = userRepository;
         }
 
-        public async Task<Poll> ExecuteAsync(PollDto request)
+        public async Task<Poll> ExecuteAsync(Poll poll)
         {
-
-            var user = await _userRepository.GetById(request.UserId);
+            var user = await _userRepository.GetById(poll.User_id);
             if (user == null)
             {
-                throw new NotFoundException($"El usuario con ID {request.UserId} no existe.");
+                throw new NotFoundException($"El usuario con ID {poll.User_id} no existe.");
             }
 
-            var poll = new Poll
-            {
-                Title = request.Title,
-                Description = request.Description,
-                CategoryPoll_id = request.CategoryPollId,
-                User_id = request.UserId,
-                CreatedAt = DateTime.UtcNow,
-                State = "Activa", 
-                PollOptions = request.Options.Select(optionText => new PollOption
-                {
-                    Text = optionText
-                }).ToList()
-            };
-
             await _pollRepository.CreatePoll(poll);
+
             await _unitOfWork.SaveChangesAsync();
+
             return poll;
         }
     }

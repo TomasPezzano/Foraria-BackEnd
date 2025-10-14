@@ -17,31 +17,31 @@ namespace ForariaTest.Unit
         }
 
         [Fact]
-        public async Task ExecuteAsync_ShouldReturnMappedPollDtoList()
+        public async Task ExecuteAsync_ShouldReturnPollList()
         {
             var polls = new List<Poll>
+    {
+        new Poll
+        {
+            Title = "Encuesta 1",
+            Description = "Descripción 1",
+            CategoryPoll_id = 1,
+            User_id = 101,
+            PollOptions = new List<PollOption>
             {
-                new Poll
-                {
-                    Title = "Encuesta 1",
-                    Description = "Descripción 1",
-                    CategoryPoll_id = 1,
-                    User_id = 101,
-                    PollOptions = new List<PollOption>
-                    {
-                        new PollOption { Text = "Opción A" },
-                        new PollOption { Text = "Opción B" }
-                    }
-                },
-                new Poll
-                {
-                    Title = "Encuesta 2",
-                    Description = "Descripción 2",
-                    CategoryPoll_id = 2,
-                    User_id = 102,
-                    PollOptions = null 
-                }
-            };
+                new PollOption { Text = "Opción A" },
+                new PollOption { Text = "Opción B" }
+            }
+        },
+        new Poll
+        {
+            Title = "Encuesta 2",
+            Description = "Descripción 2",
+            CategoryPoll_id = 2,
+            User_id = 102,
+            PollOptions = null
+        }
+    };
 
             _pollRepoMock.Setup(repo => repo.GetAllPolls()).ReturnsAsync(polls);
 
@@ -53,14 +53,16 @@ namespace ForariaTest.Unit
             var firstPoll = result[0];
             Assert.Equal("Encuesta 1", firstPoll.Title);
             Assert.Equal("Descripción 1", firstPoll.Description);
-            Assert.Equal(1, firstPoll.CategoryPollId);
-            Assert.Equal(101, firstPoll.UserId);
-            Assert.Equal(2, firstPoll.Options.Count);
-            Assert.Contains("Opción A", firstPoll.Options);
+            Assert.Equal(1, firstPoll.CategoryPoll_id);
+            Assert.Equal(101, firstPoll.User_id);
+            Assert.Equal(2, firstPoll.PollOptions.Count);
 
             var secondPoll = result[1];
             Assert.Equal("Encuesta 2", secondPoll.Title);
-            Assert.Empty(secondPoll.Options); 
+            Assert.Equal(102, secondPoll.User_id);
+            Assert.Null(secondPoll.PollOptions);
         }
+
+
     }
 }

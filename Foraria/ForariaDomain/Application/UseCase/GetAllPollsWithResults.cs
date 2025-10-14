@@ -1,23 +1,21 @@
 ﻿using Foraria.Domain.Repository;
-using ForariaDomain;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase
 {
-    public class GetPolls
+    public class GetAllPollsWithResults
     {
         private readonly IPollRepository _pollRepository;
 
-        public GetPolls(IPollRepository pollRepository)
+        public GetAllPollsWithResults(IPollRepository pollRepository)
         {
             _pollRepository = pollRepository;
         }
 
         public async Task<List<Poll>> ExecuteAsync()
         {
-            List<Poll> polls = await _pollRepository.GetAllPolls();
-
+            var polls = await _pollRepository.GetAllPollsWithResultsAsync();
             return polls;
-
         }
+
     }
 }
