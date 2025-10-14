@@ -1,8 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain.Exceptions;
 using ForariaDomain;
+using ForariaDomain.Exceptions;
 using Moq;
 
 namespace ForariaTest.Unit
@@ -31,26 +30,32 @@ namespace ForariaTest.Unit
         [Fact]
         public async Task ExecuteAsync_ShouldCreatePoll_WhenUserExists()
         {
-            var request = new PollDto
+            var poll = new Poll
             {
                 Title = "Encuesta de prueba",
                 Description = "Descripción de la encuesta",
-                CategoryPollId = 1,
-                UserId = 123,
-                Options = new List<string> { "Opción 1", "Opción 2" }
+                CategoryPoll_id = 1,
+                User_id = 123,
+                State = "Activa",
+                PollOptions = new List<PollOption>
+                {
+                    new PollOption { Text = "Opción 1" },
+                    new PollOption { Text = "Opción 2" }
+                }
             };
 
             var user = new User { Id = 123, Name = "Usuario Prueba" };
 
-            _userRepoMock.Setup(repo => repo.GetById(request.UserId)).ReturnsAsync(user);
+            _userRepoMock.Setup(repo => repo.GetById(poll.User_id)).ReturnsAsync(user);
             _pollRepoMock.Setup(repo => repo.CreatePoll(It.IsAny<Poll>())).Returns(Task.CompletedTask);
             _unitOfWorkMock.Setup(uow => uow.SaveChangesAsync()).ReturnsAsync(1);
-            var result = await _createPoll.ExecuteAsync(request);
+
+            var result = await _createPoll.ExecuteAsync(poll);
 
             Assert.NotNull(result);
-            Assert.Equal(request.Title, result.Title);
-            Assert.Equal(request.Description, result.Description);
-            Assert.Equal(request.UserId, result.User_id);
+            Assert.Equal(poll.Title, result.Title);
+            Assert.Equal(poll.Description, result.Description);
+            Assert.Equal(poll.User_id, result.User_id);
             Assert.Equal("Activa", result.State);
             Assert.Equal(2, result.PollOptions.Count);
 
@@ -61,20 +66,25 @@ namespace ForariaTest.Unit
         [Fact]
         public async Task ExecuteAsync_ShouldThrowNotFoundException_WhenUserDoesNotExist()
         {
-            var request = new PollDto
+            var poll = new Poll
             {
                 Title = "Encuesta inválida",
                 Description = "No debería crearse",
-                CategoryPollId = 2,
-                UserId = 999,
-                Options = new List<string> { "A", "B" }
+                CategoryPoll_id = 2,
+                User_id = 999,
+                State = "Activa",
+                PollOptions = new List<PollOption>
+                {
+                    new PollOption { Text = "A" },
+                    new PollOption { Text = "B" }
+                }
             };
 
-            _userRepoMock.Setup(repo => repo.GetById(request.UserId)).ReturnsAsync((User?)null);
+            _userRepoMock.Setup(repo => repo.GetById(poll.User_id)).ReturnsAsync((User?)null);
 
-            var ex = await Assert.ThrowsAsync<NotFoundException>(() => _createPoll.ExecuteAsync(request));
+            var ex = await Assert.ThrowsAsync<NotFoundException>(() => _createPoll.ExecuteAsync(poll));
 
-            Assert.Equal("El usuario con ID 999 no existe.", ex.Message);
+            Assert.Equal($"El usuario con ID {poll.User_id} no existe.", ex.Message);
 
             _pollRepoMock.Verify(repo => repo.CreatePoll(It.IsAny<Poll>()), Times.Never);
             _unitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
