@@ -14,19 +14,28 @@ namespace Foraria.Interface.Controllers
         private readonly GetMessageById _getMessageById;
         private readonly GetMessagesByThread _getMessagesByThread;
         private readonly IWebHostEnvironment _env;
+        private readonly UpdateMessage _updateMessage;
+        private readonly HideMessage _hideMessage;
+        private readonly GetMessagesByUser _getMessagesByUser;
 
         public MessageController(
             CreateMessage createMessage,
             DeleteMessage deleteMessage,
             GetMessageById getMessageById,
             GetMessagesByThread getMessagesByThread,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            UpdateMessage updateMessage,
+            HideMessage hideMessage,
+            GetMessagesByUser getMessagesByUser)
         {
             _createMessage = createMessage;
             _deleteMessage = deleteMessage;
             _getMessageById = getMessageById;
             _getMessagesByThread = getMessagesByThread;
             _env = env;
+            _updateMessage = updateMessage;
+            _hideMessage = hideMessage;
+            _getMessagesByUser = getMessagesByUser;
         }
 
         [HttpPost]
@@ -71,6 +80,48 @@ namespace Foraria.Interface.Controllers
             var deleted = await _deleteMessage.Execute(id);
             if (!deleted) return NotFound();
             return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateMessageRequest request)
+        {
+            if (request.File != null)
+            {
+                var uploadsFolder = Path.Combine(_env.ContentRootPath, "Infrastructure/Storage/ForumFiles");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}_{request.File.FileName}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await request.File.CopyToAsync(stream);
+
+                request.FilePathToUpdate = Path.Combine("Infrastructure/Storage/ForumFiles", fileName);
+            }
+
+            var updated = await _updateMessage.ExecuteAsync(id, request);
+            return Ok(updated);
+        }
+
+        [HttpPatch("{id}/hide")]
+        public async Task<IActionResult> Hide(int id)
+        {
+            try
+            {
+                await _hideMessage.ExecuteAsync(id);
+                return Ok(new { message = "Mensaje ocultado correctamente" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetByUser(int userId)
+        {
+            var messages = await _getMessagesByUser.ExecuteAsync(userId);
+            return Ok(messages);
         }
     }
 }

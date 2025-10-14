@@ -22,7 +22,7 @@ namespace ForariaDomain
 
         public DateTime CreatedAt { get; set; }
 
-        public DateTime DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         public int Place_id { get; set; }
 
@@ -35,5 +35,6 @@ namespace ForariaDomain
         public int User_id { get; set; }
 
         public User User { get; set; }
+        public DateTime Date { get; set; }
     }
 }

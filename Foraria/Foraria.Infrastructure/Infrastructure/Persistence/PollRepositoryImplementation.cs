@@ -1,5 +1,4 @@
-﻿using Foraria.Contracts.DTOs;
-using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,6 +39,7 @@ namespace Foraria.Infrastructure.Persistence
         }
 
 
+
         public async Task<Poll?> GetPollWithResultsAsync(int pollId)
         {
             return await _context.Polls
@@ -67,6 +67,20 @@ namespace Foraria.Infrastructure.Persistence
 
         }
 
+
+        public async Task<IEnumerable<Poll>> GetActivePolls(int consortiumId, DateTime now)
+        {
+            return await _context.Polls
+                .Include(p => p.User)
+                    .ThenInclude(u => u.Residences)
+                        .ThenInclude(r => r.Consortium)
+                .Where(p =>
+                    p.State == "Active" &&
+                    p.StartDate <= now &&
+                    p.EndDate >= now &&
+                    p.User.Residences.Any(r => r.Consortium.Id == consortiumId))
+                .ToListAsync();
+        }
 
     }
 }

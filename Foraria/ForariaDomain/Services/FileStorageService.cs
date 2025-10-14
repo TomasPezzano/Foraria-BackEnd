@@ -15,6 +15,20 @@ public interface IFileStorageService
     Task <string> GetFileUrlAsync(string filePath);
 
     Task <bool> ValidateFileAsync(IFormFile file, string[] allowedExtensions, long maxSizeInBytes);
+
+    Task<FileStorageResult> SavePhotoAsync(
+    IFormFile file,
+    string folder,
+    string[] allowedExtensions,
+    long maxFileSize);
+
+}
+
+public class FileStorageResult
+{
+    public bool Success { get; set; }
+    public string? FilePath { get; set; }
+    public string? ErrorMessage { get; set; }
 }
 
 public class FileStorageService : IFileStorageService
@@ -28,6 +42,59 @@ public class FileStorageService : IFileStorageService
         if (!Directory.Exists(_baseUploadPath))
         {
             Directory.CreateDirectory(_baseUploadPath);
+        }
+    }
+
+    public async Task<FileStorageResult> SavePhotoAsync(IFormFile file, string folder, string[] allowedExtensions, long maxFileSize)
+    {
+        try
+        {
+            var isValid = await ValidateFileAsync(file, allowedExtensions, maxFileSize);
+
+            if (!isValid)
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return new FileStorageResult
+                    {
+                        Success = false,
+                        ErrorMessage = "No se proporcionó ningún archivo"
+                    };
+                }
+
+                if (file.Length > maxFileSize)
+                {
+                    var maxSizeMB = maxFileSize / (1024.0 * 1024.0);
+                    return new FileStorageResult
+                    {
+                        Success = false,
+                        ErrorMessage = $"El archivo excede el tamaño máximo de {maxSizeMB:F2} MB"
+                    };
+                }
+
+                var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                return new FileStorageResult
+                {
+                    Success = false,
+                    ErrorMessage = $"Extensión no permitida. Solo se aceptan: {string.Join(", ", allowedExtensions)}"
+                };
+            }
+
+            var filePath = await SaveFileAsync(file, folder);
+
+            return new FileStorageResult
+            {
+                Success = true,
+                FilePath = filePath
+            };
+        }
+        catch (Exception ex)
+        {
+            return new FileStorageResult
+            {
+                Success = false,
+                ErrorMessage = $"Error al guardar la foto: {ex.Message}"
+            };
         }
     }
 

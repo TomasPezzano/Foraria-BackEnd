@@ -18,7 +18,8 @@ namespace Foraria.Interface.Controllers
         private readonly GetPollById _getPollById;
         private readonly GetPollWithResults _getPollWithResults;
         private readonly GetAllPollsWithResults _getAllPollsWithResults;
-        public PollController(CreatePoll poll, GetPolls polls, GetPollById getPollById, NotarizePoll notarizePoll,GetPollWithResults getPollWithResults, GetAllPollsWithResults getAllPollsWithResults)
+        private readonly GetActivePollCount _getActivePollCount;
+        public PollController(CreatePoll poll, GetPolls polls, GetPollById getPollById, NotarizePoll notarizePoll,GetPollWithResults getPollWithResults, GetAllPollsWithResults getAllPollsWithResults, GetActivePollCount getActivePollCount)
         {
             _createPoll = poll;
             _polls = polls;
@@ -26,6 +27,7 @@ namespace Foraria.Interface.Controllers
             _notarizePoll = notarizePoll;
             _getPollWithResults = getPollWithResults;
             _getAllPollsWithResults = getAllPollsWithResults;
+            _getActivePollCount = getActivePollCount;
         }
 
         [HttpPost]
@@ -202,6 +204,19 @@ namespace Foraria.Interface.Controllers
                 txHash = proof.TxHash,
                 hashHex = proof.HashHex,
                 link = $"https://amoy.polygonscan.com/tx/{proof.TxHash}"
+            });
+        }
+
+        [HttpGet("polls/active-count")]
+        public async Task<IActionResult> GetActivePollCount(
+    [FromQuery] int consortiumId,
+    [FromQuery] DateTime? dateTime = null)
+        {
+            var count = await _getActivePollCount.ExecuteAsync(consortiumId, dateTime);
+            return Ok(new
+            {
+                activePolls = count,
+                checkedAt = (dateTime ?? DateTime.UtcNow).ToString("yyyy-MM-dd HH:mm:ss")
             });
         }
     }

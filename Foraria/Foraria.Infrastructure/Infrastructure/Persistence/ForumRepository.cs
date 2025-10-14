@@ -43,5 +43,21 @@ namespace Foraria.Infrastructure.Persistence
             return await _context.Forums
                 .FirstOrDefaultAsync(f => f.Category == category);
         }
+        public async Task<Forum?> GetByIdWithThreadsAsync(int id)
+        {
+            return await _context.Forums
+                .Include(f => f.Threads)
+                .ThenInclude(t => t.User)
+                .FirstOrDefaultAsync(f => f.Id == id);
+        }
+        public async Task Delete(int id)
+        {
+            var forum = await _context.Forums.FindAsync(id);
+            if (forum != null)
+            {
+                _context.Forums.Remove(forum);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

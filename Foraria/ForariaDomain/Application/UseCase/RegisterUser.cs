@@ -37,7 +37,6 @@ public class RegisterUser : IRegisterUser
 
     public async Task<UserDto> Register(UserDto userDto)
     {
-        // 1. Validate email doesn't exist
         if (await _userRepository.ExistsEmail(userDto.Email))
         {
             return new UserDto
@@ -47,7 +46,6 @@ public class RegisterUser : IRegisterUser
             };
         }
 
-        // 2. Validate role exists
         var roleExists = await _roleRepository.Exists(userDto.RoleId);
         if (!roleExists)
         {
@@ -58,13 +56,11 @@ public class RegisterUser : IRegisterUser
             };
         }
 
-        // 3. Validate and get residences (if provided)
         List<Residence> residenceEntities = new List<Residence>();
         if (userDto.Residences != null && userDto.Residences.Any())
         {
             foreach (var residenceDto in userDto.Residences)
             {
-                // Validar que la residencia existe
                 if (!residenceDto.Id.HasValue)
                 {
                     return new UserDto
@@ -84,7 +80,6 @@ public class RegisterUser : IRegisterUser
                     };
                 }
 
-                // Obtener la entidad Residence de la base de datos
                 var residence = await _residenceRepository.GetById(residenceDto.Id.Value);
                 if (residence != null)
                 {
@@ -93,11 +88,9 @@ public class RegisterUser : IRegisterUser
             }
         }
 
-        // 4. Generate temporary password
         var temporaryPassword = await _generatePasswordUseCase.Generate();
         var passwordHash = _passwordHashUseCase.HashPassword(temporaryPassword);
 
-        // 5. Parse phone number
         if (!long.TryParse(userDto.Phone.Replace(" ", "").Replace("-", ""), out long phoneNumber))
         {
             return new UserDto
@@ -107,7 +100,6 @@ public class RegisterUser : IRegisterUser
             };
         }
 
-        // 6. Create user with residences
         var newUser = new User
         {
             Name = userDto.FirstName,
@@ -117,13 +109,11 @@ public class RegisterUser : IRegisterUser
             PhoneNumber = phoneNumber,
             Role_id = userDto.RoleId,
             RequiresPasswordChange = true,
-            Residence = residenceEntities  // Asignar las entidades Residence
+            Residences = residenceEntities 
         };
 
-        // 7. Save to database
         var savedUser = await _userRepository.Add(newUser);
 
-        // 8. Send email with credentials 
         try
         {
             await _emailUseCase.SendWelcomeEmail(
@@ -134,11 +124,9 @@ public class RegisterUser : IRegisterUser
         }
         catch (Exception ex)
         {
-            // TODO: Implement proper logging
             Console.WriteLine($"Failed to send email: {ex.Message}");
         }
 
-        // 9. Convert residences back to DTOs for response
         var residenceDtos = residenceEntities.Select(r => new ResidenceDto
         {
             Id = r.Id,

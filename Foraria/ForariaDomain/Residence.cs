@@ -28,5 +28,10 @@ namespace ForariaDomain
 
         public ICollection<Payment> Payments { get; set; }
 
+        [ForeignKey("Consortium")]
+        public int ConsortiumId { get; set; }
+        public Consortium Consortium { get; set; }
+
+
     }
 }

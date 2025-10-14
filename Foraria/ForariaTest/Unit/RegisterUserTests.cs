@@ -154,7 +154,7 @@ public class RegisterUserTests
         _mockResidenceRepo.Verify(r => r.GetById(1), Times.Once);
         _mockResidenceRepo.Verify(r => r.GetById(2), Times.Once);
         _mockPasswordHash.Verify(s => s.HashPassword("TempPass123!"), Times.Once);
-        _mockUserRepo.Verify(r => r.Add(It.Is<User>(u => u.Residence.Count == 2)), Times.Once);
+        _mockUserRepo.Verify(r => r.Add(It.Is<User>(u => u.Residences.Count == 2)), Times.Once);
         _mockEmailService.Verify(s => s.SendWelcomeEmail(
             "juan@test.com",
             "Juan",
@@ -215,7 +215,7 @@ public class RegisterUserTests
 
         _mockResidenceRepo.Verify(r => r.Exists(5), Times.Once);
         _mockResidenceRepo.Verify(r => r.GetById(5), Times.Once);
-        _mockUserRepo.Verify(r => r.Add(It.Is<User>(u => u.Residence.Count == 1)), Times.Once);
+        _mockUserRepo.Verify(r => r.Add(It.Is<User>(u => u.Residences.Count == 1)), Times.Once);
     }
 
 
@@ -333,7 +333,7 @@ public class RegisterUserTests
 
         // Assert
         Assert.True(result.Success);
-        _mockUserRepo.Verify(r => r.Add(It.Is<User>(u => u.Residence.Count == 0)), Times.Once);
+        _mockUserRepo.Verify(r => r.Add(It.Is<User>(u => u.Residences.Count == 0)), Times.Once);
         _mockResidenceRepo.Verify(r => r.Exists(It.IsAny<int>()), Times.Never);
         _mockResidenceRepo.Verify(r => r.GetById(It.IsAny<int>()), Times.Never);
     }

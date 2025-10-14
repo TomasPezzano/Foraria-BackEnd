@@ -1,7 +1,10 @@
 ﻿using Foraria.Application.UseCase;
+using Foraria.Contracts.DTOs;
 using Foraria.Interface.DTOs;
+using ForariaDomain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Foraria.Interface.Controllers;
 
@@ -13,17 +16,17 @@ public class UserController : ControllerBase
     private readonly ILoginUser _loginUserService;
     private readonly ILogoutUser _logoutUserService;
     private readonly IRefreshTokenUseCase _refreshTokenUseCase;
+    private readonly IUpdateUserFirstTime _updateUserFirstTime;
+    private readonly IFileStorageService _fileStorageService;
 
-    public UserController(
-        IRegisterUser registerUserService,
-        ILoginUser loginUserService,
-        ILogoutUser logoutUserService,
-        IRefreshTokenUseCase refreshTokenUseCase)
+    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, IFileStorageService fileStorageService)
     {
         _registerUserService = registerUserService;
         _loginUserService = loginUserService;
         _logoutUserService = logoutUserService;
         _refreshTokenUseCase = refreshTokenUseCase;
+        _updateUserFirstTime = updateUserFirstTime;
+        _fileStorageService = fileStorageService;
     }
 
     [HttpPost("register")]
@@ -94,6 +97,79 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize] 
+    [HttpPost("update-first-time")]
+    public async Task<IActionResult> UpdateFirstTime([FromForm] UpdateUserFirstTimeRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized(new { message = "Token inválido" });
+        }
+
+        if (request.NewPassword != request.ConfirmNewPassword)
+        {
+            return BadRequest(new { message = "Las contraseñas nuevas no coinciden" });
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Dni) || !long.TryParse(request.Dni, out long dniNumber))
+        {
+            return BadRequest(new { message = "El DNI es inválido" });
+        }
+
+        string? photoPath = null;
+        if (request.Photo != null)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+            var maxFileSize = 5 * 1024 * 1024; // 5 MB
+
+            var photoResult = await _fileStorageService.SavePhotoAsync(
+                request.Photo,
+                "user-photos",
+                allowedExtensions,
+                maxFileSize);
+
+            if (!photoResult.Success)
+            {
+                return BadRequest(new { message = photoResult.ErrorMessage ?? "Error al guardar la foto" });
+            }
+
+            photoPath = photoResult.FilePath;
+        }
+
+        var ipAddress = GetIpAddress();
+        var result = await _updateUserFirstTime.Update(
+            userId: userId,
+            currentPassword: request.CurrentPassword,
+            newPassword: request.NewPassword,
+            firstName: request.FirstName,
+            lastName: request.LastName,
+            dni: dniNumber,
+            photoPath: photoPath,
+            ipAddress: ipAddress
+        );
+
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+
+        var response = new UpdateUserFirstTimeResponseDto
+        {
+            Success = result.Success,
+            Message = result.Message,
+            Token = result.AccessToken,
+            RefreshToken = result.RefreshToken
+        };
+
+        return Ok(response);
+    }
+
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
     {
@@ -141,4 +217,6 @@ public class UserController : ControllerBase
         }
         return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
     }
+
+
 }

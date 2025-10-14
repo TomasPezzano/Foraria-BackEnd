@@ -3,6 +3,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Interface.DTOs
 {
+
+    namespace Foraria.Interface.DTOs
+    {
+        public class MessageDto
+        {
+            public int Id { get; set; }
+            public string Content { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public string State { get; set; }
+            public string? OptionalFile { get; set; }
+            public int UserId { get; set; }
+        }
+    }
+
     public class CreateMessageRequest
     {
         [Required(ErrorMessage = "El contenido del mensaje es obligatorio.")]
