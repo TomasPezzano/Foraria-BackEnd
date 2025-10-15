@@ -7,6 +7,7 @@ namespace Foraria.Application.UseCase;
 
 public interface IRegisterUser
 {
+    Task GetAllUsers();
     Task<UserDto> Register(UserDto userDto);
 }
 
@@ -148,5 +149,10 @@ public class RegisterUser : IRegisterUser
             TemporaryPassword = temporaryPassword,
             Residences = residenceDtos
         };
+    }
+
+    public async Task GetAllUsers()
+    {
+        await _userRepository.GetAll();
     }
 }
