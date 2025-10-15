@@ -1,6 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Contracts.DTOs;
 using Foraria.Interface.DTOs;
+using ForariaDomain;
 using ForariaDomain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -206,6 +207,13 @@ public class UserController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    [HttpGet("getAll")]
+    public async Task<IActionResult> GetAll()
+    {
+        await _registerUserService.GetAllUsers();
+        return Ok();
     }
 
     // Helper method to get client IP address

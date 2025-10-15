@@ -70,4 +70,9 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task GetAll()
+    {
+        await _context.Users.ToListAsync();
+    }
+
 }
