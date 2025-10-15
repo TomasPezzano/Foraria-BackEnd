@@ -209,11 +209,18 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("getAll")]
-    public async Task<IActionResult> GetAll()
+    [HttpGet("count")]
+    public async Task<IActionResult> GetUsersCount()
     {
-        await _registerUserService.GetAllUsers();
-        return Ok();
+        try
+        {
+            var totalUsers = await _registerUserService.GetAllUsersInNumber();
+            return Ok(new { totalUsers });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error al obtener cantidad de usuarios", detail = ex.Message });
+        }
     }
 
     // Helper method to get client IP address

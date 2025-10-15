@@ -7,7 +7,7 @@ namespace Foraria.Application.UseCase;
 
 public interface IRegisterUser
 {
-    Task GetAllUsers();
+    Task<int> GetAllUsersInNumber();
     Task<UserDto> Register(UserDto userDto);
 }
 
@@ -151,8 +151,9 @@ public class RegisterUser : IRegisterUser
         };
     }
 
-    public async Task GetAllUsers()
+    public async Task<int> GetAllUsersInNumber()
     {
-        await _userRepository.GetAll();
+        var totalUsers = await _userRepository.GetAllInNumber();
+        return totalUsers; 
     }
 }
