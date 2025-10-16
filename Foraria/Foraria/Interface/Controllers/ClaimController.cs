@@ -55,24 +55,82 @@ public class ClaimController : ControllerBase
     [HttpPost]
      public async Task<IActionResult> Add([FromBody] ClaimDto claimDto)
     {
-        
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
 
-        var claim = await _createClaim.Execute(claimDto);
-
-        var claimResult = new ClaimDto
+        try
         {
-            Title = claim.Title,
-            Description = claim.Description,
-            Priority = claim.Priority,
-            Category = claim.Category,
-            Archive = claim.Archive,
-            User_id = claim.User_id,
-            ResidenceId = claim.ResidenceId
-        };
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        return CreatedAtAction(nameof(GetAll), new { id = claim.Id }, claimResult);
+            string? filePath = null;
+
+            // Si viene un archivo en Base64, lo guardamos físicamente
+            if (!string.IsNullOrEmpty(claimDto.Archive))
+            {
+                // Ejemplo: data:image/png;base64,iVBORw0KGgoAAAANS...
+                var base64Parts = claimDto.Archive.Split(',');
+
+                if (base64Parts.Length == 2)
+                {
+                    var base64Data = base64Parts[1];
+                    var bytes = Convert.FromBase64String(base64Data);
+
+                    // Detectar tipo de archivo por el prefijo
+                    var extension = ".png"; // valor por defecto
+                    if (base64Parts[0].Contains("jpeg")) extension = ".jpg";
+                    else if (base64Parts[0].Contains("pdf")) extension = ".pdf";
+                    else if (base64Parts[0].Contains("mp4")) extension = ".mp4";
+
+                    // Crear carpeta
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "claims");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    // Nombre único
+                    var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+                    var fullPath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    // Guardar el archivo
+                    await System.IO.File.WriteAllBytesAsync(fullPath, bytes);
+
+                    // Guardar ruta relativa en BD
+                    filePath = $"/uploads/claims/{uniqueFileName}";
+                }
+            }
+
+            // Crear entidad Claim
+            var claim = new Claim
+            {
+                Title = claimDto.Title,
+                Description = claimDto.Description,
+                Priority = claimDto.Priority,
+                Category = claimDto.Category,
+                Archive = filePath, // ruta donde quedó el archivo
+                User_id = claimDto.User_id,
+                ResidenceId = claimDto.ResidenceId
+            };
+
+            var createdClaim = await _createClaim.Execute(claim);
+
+            var response = new
+            {
+                createdClaim.Id,
+                createdClaim.Title,
+                createdClaim.Description,
+                createdClaim.Priority,
+                createdClaim.Category,
+                ArchiveUrl = filePath
+            };
+
+            return CreatedAtAction(nameof(GetAll), new { id = createdClaim.Id }, response);
+        }
+        catch (FormatException)
+        {
+            return BadRequest(new { message = "El formato del archivo Base64 no es válido." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
+        }
     }
 
     [HttpPut("reject/{id}")]
