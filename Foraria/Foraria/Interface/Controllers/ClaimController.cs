@@ -104,9 +104,11 @@ public class ClaimController : ControllerBase
                 Description = claimDto.Description,
                 Priority = claimDto.Priority,
                 Category = claimDto.Category,
-                Archive = filePath, // ruta donde quedó el archivo
-                User_id = claimDto.User_id,
-                ResidenceId = claimDto.ResidenceId
+                Archive = filePath,                // opcional
+                User_id = claimDto.User_id,        // opcional
+                ResidenceId = claimDto.ResidenceId,
+                CreatedAt = DateTime.UtcNow,       // obligatorio
+                State = "Nuevo"                // obligatorio
             };
 
             var createdClaim = await _createClaim.Execute(claim);
