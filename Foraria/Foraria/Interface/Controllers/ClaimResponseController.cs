@@ -2,6 +2,7 @@
 using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -11,20 +12,20 @@ namespace Foraria.Interface.Controllers;
 public class ClaimResponseController : ControllerBase
 {
     private readonly ICreateClaimResponse _createClaimResponse;
-    private readonly IUserRepository _userRepository;
-    private readonly IClaimRepository _claimRepository;
-    private readonly IResponsibleSectorRepository _responsibleSectorRepository;
+    private readonly IGetUserById _getUserById;
+    private readonly IGetClaimById _getClaimById;
+    private readonly IGetResponsibleSectorById _getResponsibleSectorById;
 
     public ClaimResponseController(
         ICreateClaimResponse createClaimResponse,
-        IUserRepository userRepository,
-        IClaimRepository claimRepository,
-        IResponsibleSectorRepository responsibleSectorRepository)
+        IGetUserById getUserById,
+        IGetClaimById getClaimById,
+        IGetResponsibleSectorById getResponsibleSectorById)
     {
         _createClaimResponse = createClaimResponse;
-        _userRepository = userRepository;
-        _claimRepository = claimRepository;
-        _responsibleSectorRepository = responsibleSectorRepository;
+        _getUserById = getUserById;
+        _getClaimById = getClaimById;
+        _getResponsibleSectorById = getResponsibleSectorById;
     }
 
     [HttpPost]
@@ -35,15 +36,15 @@ public class ClaimResponseController : ControllerBase
 
         try
         {
-            var user = await _userRepository.GetById(claimResponseDto.User_id);
+            var user = await _getUserById.Execute(claimResponseDto.User_id);
             if (user == null)
                 return BadRequest(new { error = "Usuario no encontrado" });
 
-            var claim = await _claimRepository.GetById(claimResponseDto.Claim_id);
+            var claim = await _getClaimById.Execute(claimResponseDto.Claim_id);
             if (claim == null)
                 return BadRequest(new { error = "Reclamo no encontrado" });
 
-            var sector = await _responsibleSectorRepository.GetById(claimResponseDto.ResponsibleSector_id);
+            var sector = await _getResponsibleSectorById.Execute(claimResponseDto.ResponsibleSector_id);
             if (sector == null)
                 return BadRequest(new { error = "Sector responsable no encontrado" });
 
