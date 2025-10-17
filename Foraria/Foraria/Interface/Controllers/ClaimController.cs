@@ -34,6 +34,7 @@ public class ClaimController : ControllerBase
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
+                State = c.State,
                 Priority = c.Priority,
                 Category = c.Category,
                 Archive = c.Archive,

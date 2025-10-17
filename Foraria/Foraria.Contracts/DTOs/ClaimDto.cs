@@ -28,4 +28,5 @@ public class ClaimDto
 
     public int ResidenceId { get; set; }
     public DateTime? CreatedAt { get; set; }
+    public string? State { get; set; }
 }
