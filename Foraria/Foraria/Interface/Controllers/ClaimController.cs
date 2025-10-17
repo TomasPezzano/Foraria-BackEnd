@@ -31,6 +31,7 @@ public class ClaimController : ControllerBase
         {
             claim = new ClaimDto
             {
+                Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
                 Priority = c.Priority,
