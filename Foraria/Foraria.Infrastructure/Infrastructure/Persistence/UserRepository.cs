@@ -2,6 +2,7 @@
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
+using System.Diagnostics.Contracts;
 
 namespace Foraria.Infrastructure.Persistence;
 
@@ -70,9 +71,8 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task GetAll()
+    public async Task<int> GetAllInNumber()
     {
-        await _context.Users.ToListAsync();
+        return await _context.Users.CountAsync();
     }
-
 }
