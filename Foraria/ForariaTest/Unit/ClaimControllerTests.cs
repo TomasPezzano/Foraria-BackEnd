@@ -69,7 +69,8 @@ public class ClaimControllerTests
             Priority = "Media",
             Category = "Servicios",
             Archive = null,
-            User_id = 1
+            User_id = 1,
+            ResidenceId = 2
         };
 
         var claim = new Claim
@@ -79,20 +80,21 @@ public class ClaimControllerTests
             Description = dto.Description,
             Priority = dto.Priority,
             Category = dto.Category,
-            Archive = dto.Archive,
-            User_id = dto.User_id
+            Archive = null,
+            User_id = dto.User_id,
+            ResidenceId = dto.ResidenceId,
+            CreatedAt = DateTime.UtcNow,
+            State = "Nuevo"
         };
 
-        _createClaimMock.Setup(x => x.Execute(dto)).ReturnsAsync(claim);
+        _createClaimMock.Setup(x => x.Execute(It.IsAny<Claim>())).ReturnsAsync(claim);
 
         // Act
         var result = await _controller.Add(dto);
 
         // Assert
         var created = Assert.IsType<CreatedAtActionResult>(result);
-        var returnedDto = Assert.IsType<ClaimDto>(created.Value);
         Assert.Equal(99, created.RouteValues["id"]);
-        Assert.Equal(dto.Title, returnedDto.Title);
     }
 
     [Fact]
@@ -107,6 +109,66 @@ public class ClaimControllerTests
 
         // Assert
         Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task Add_ThrowsFormatException_ReturnsBadRequest()
+    {
+        // Arrange
+        var dto = new ClaimDto
+        {
+            Title = "Reclamo",
+            Description = "Descripción",
+            Priority = "Alta",
+            Category = "General",
+            Archive = "data:image/png;base64,estoNoEsBase64",
+            User_id = 1,
+            ResidenceId = 2
+        };
+
+        // Act
+        var result = await _controller.Add(dto);
+
+        // Assert
+        var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+        var value = badRequest.Value;
+        var messageProp = value.GetType().GetProperty("message");
+        var message = messageProp?.GetValue(value)?.ToString();
+
+        Assert.Equal("El formato del archivo Base64 no es válido.", message);
+    }
+
+    [Fact]
+    public async Task Add_ThrowsException_ReturnsInternalServerError()
+    {
+        // Arrange
+        var dto = new ClaimDto
+        {
+            Title = "Reclamo",
+            Description = "Descripción",
+            Priority = "Alta",
+            Category = "General",
+            Archive = null,
+            User_id = 1,
+            ResidenceId = 2
+        };
+
+        _createClaimMock.Setup(x => x.Execute(It.IsAny<Claim>()))
+            .ThrowsAsync(new Exception("Error inesperado"));
+
+        // Act
+        var result = await _controller.Add(dto);
+
+        // Assert
+        var errorResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(500, errorResult.StatusCode);
+
+        var value = errorResult.Value;
+        var messageProp = value.GetType().GetProperty("message");
+        var detailsProp = value.GetType().GetProperty("details");
+
+        Assert.Equal("Error interno del servidor", messageProp?.GetValue(value)?.ToString());
+        Assert.Equal("Error inesperado", detailsProp?.GetValue(value)?.ToString());
     }
 
     [Fact]

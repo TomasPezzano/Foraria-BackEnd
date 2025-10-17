@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure.Core;
-using Foraria.Application.UseCase;
+﻿using Foraria.Application.UseCase;
+using Foraria.Domain.Repository;
 using Foraria.Interface.Controllers;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
@@ -16,12 +11,24 @@ namespace ForariaTest.Unit;
 public class ClaimResponseControllerTests
 {
     private readonly Mock<ICreateClaimResponse> _createClaimResponseMock;
+    private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly Mock<IClaimRepository> _claimRepositoryMock;
+    private readonly Mock<IResponsibleSectorRepository> _sectorRepositoryMock;
     private readonly ClaimResponseController _controller;
 
     public ClaimResponseControllerTests()
     {
         _createClaimResponseMock = new Mock<ICreateClaimResponse>();
-        _controller = new ClaimResponseController(_createClaimResponseMock.Object);
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _claimRepositoryMock = new Mock<IClaimRepository>();
+        _sectorRepositoryMock = new Mock<IResponsibleSectorRepository>();
+
+        _controller = new ClaimResponseController(
+            _createClaimResponseMock.Object,
+            _userRepositoryMock.Object,
+            _claimRepositoryMock.Object,
+            _sectorRepositoryMock.Object
+        );
     }
 
     [Fact]
@@ -37,6 +44,20 @@ public class ClaimResponseControllerTests
             ResponsibleSector_id = 3
         };
 
+        var user = new User { Id = dto.User_id };
+        var claim = new Claim { Id = dto.Claim_id };
+        var sector = new ResponsibleSector { Id = dto.ResponsibleSector_id };
+
+        var claimResponse = new ClaimResponse
+        {
+            Description = dto.Description,
+            ResponseDate = dto.ResponseDate,
+            User = user,
+            Claim = claim,
+            ResponsibleSector_id = sector.Id,
+            ResponsibleSector = sector
+        };
+
         var expectedResponse = new ClaimResponseDto
         {
             Description = dto.Description,
@@ -46,7 +67,10 @@ public class ClaimResponseControllerTests
             ResponsibleSector_id = dto.ResponsibleSector_id
         };
 
-        _createClaimResponseMock.Setup(x => x.Execute(dto)).ReturnsAsync(expectedResponse);
+        _userRepositoryMock.Setup(x => x.GetById(dto.User_id)).ReturnsAsync(user);
+        _claimRepositoryMock.Setup(x => x.GetById(dto.Claim_id)).ReturnsAsync(claim);
+        _sectorRepositoryMock.Setup(x => x.GetById(dto.ResponsibleSector_id)).ReturnsAsync(sector);
+        _createClaimResponseMock.Setup(x => x.Execute(It.IsAny<ClaimResponse>())).ReturnsAsync(expectedResponse);
 
         // Act
         var result = await _controller.Add(dto);
@@ -80,14 +104,21 @@ public class ClaimResponseControllerTests
         // Arrange
         var dto = new ClaimResponseDto
         {
-            Description = "", // inválido
+            Description = "Inválido",
             ResponseDate = DateTime.UtcNow,
             User_id = 1,
             Claim_id = 2,
             ResponsibleSector_id = 3
         };
 
-        _createClaimResponseMock.Setup(x => x.Execute(dto))
+        var user = new User { Id = dto.User_id };
+        var claim = new Claim { Id = dto.Claim_id };
+        var sector = new ResponsibleSector { Id = dto.ResponsibleSector_id };
+
+        _userRepositoryMock.Setup(x => x.GetById(dto.User_id)).ReturnsAsync(user);
+        _claimRepositoryMock.Setup(x => x.GetById(dto.Claim_id)).ReturnsAsync(claim);
+        _sectorRepositoryMock.Setup(x => x.GetById(dto.ResponsibleSector_id)).ReturnsAsync(sector);
+        _createClaimResponseMock.Setup(x => x.Execute(It.IsAny<ClaimResponse>()))
             .ThrowsAsync(new ArgumentException("La descripción es obligatoria."));
 
         // Act
@@ -115,7 +146,14 @@ public class ClaimResponseControllerTests
             ResponsibleSector_id = 3
         };
 
-        _createClaimResponseMock.Setup(x => x.Execute(dto))
+        var user = new User { Id = dto.User_id };
+        var claim = new Claim { Id = dto.Claim_id };
+        var sector = new ResponsibleSector { Id = dto.ResponsibleSector_id };
+
+        _userRepositoryMock.Setup(x => x.GetById(dto.User_id)).ReturnsAsync(user);
+        _claimRepositoryMock.Setup(x => x.GetById(dto.Claim_id)).ReturnsAsync(claim);
+        _sectorRepositoryMock.Setup(x => x.GetById(dto.ResponsibleSector_id)).ReturnsAsync(sector);
+        _createClaimResponseMock.Setup(x => x.Execute(It.IsAny<ClaimResponse>()))
             .ThrowsAsync(new Exception("Error inesperado"));
 
         // Act
