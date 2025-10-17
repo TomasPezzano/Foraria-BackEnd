@@ -36,8 +36,17 @@ public class ClaimController : ControllerBase
                 Priority = c.Priority,
                 Category = c.Category,
                 Archive = c.Archive,
-                User_id = c.User_id
+                User_id = c.User_id,
+                CreatedAt = c.CreatedAt
             },
+            
+            user = c.User != null ? new UserDto
+            {
+                Id = c.User.Id,
+                FirstName = c.User.Name,
+                LastName = c.User.LastName,
+                Residences = (List<ResidenceDto>)c.User.Residences
+            } : null,
 
             claimResponse = c.ClaimResponse != null ? new ClaimResponseDto
             {

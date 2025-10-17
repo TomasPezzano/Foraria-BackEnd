@@ -24,4 +24,5 @@ public class ClaimDto
     public int? User_id { get; set; }
 
     public int ResidenceId { get; set; }
+    public DateTime? CreatedAt { get; set; }
 }
