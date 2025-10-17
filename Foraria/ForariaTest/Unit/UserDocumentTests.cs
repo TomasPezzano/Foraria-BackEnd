@@ -1,24 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Foraria.Application.UseCase;
-using Foraria.Interface.Controllers;
+﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace ForariaTest.Unit;
-
-public class UserDocumentControllerTests
+public class UserDocumentTests
 {
     private readonly Mock<ICreateUserDocument> _createUserDocumentMock;
     private readonly Mock<IGetUserDocuments> _getUserDocumentsMock;
     private readonly UserDocumentController _controller;
 
-    public UserDocumentControllerTests()
+    public UserDocumentTests()
     {
         _createUserDocumentMock = new Mock<ICreateUserDocument>();
         _getUserDocumentsMock = new Mock<IGetUserDocuments>();
@@ -59,7 +51,7 @@ public class UserDocumentControllerTests
             Consortium_id = 1
         };
 
-        var createdDoc = new UserDocument
+        var document = new UserDocument
         {
             Id = 99,
             Title = dto.Title,
@@ -70,7 +62,7 @@ public class UserDocumentControllerTests
             CreatedAt = DateTime.UtcNow
         };
 
-        _createUserDocumentMock.Setup(x => x.Execute(dto)).ReturnsAsync(createdDoc);
+        _createUserDocumentMock.Setup(x => x.Execute(It.IsAny<UserDocument>())).ReturnsAsync(document);
 
         // Act
         var result = await _controller.Add(dto);
@@ -79,6 +71,8 @@ public class UserDocumentControllerTests
         var createdResult = Assert.IsType<CreatedAtActionResult>(result);
         var returnedDto = Assert.IsType<UserDocumentDto>(createdResult.Value);
         Assert.Equal(99, returnedDto.Id);
+        Assert.Equal(dto.Title, returnedDto.Title);
+        Assert.Equal(dto.Category, returnedDto.Category);
     }
 
     [Fact]
@@ -108,7 +102,7 @@ public class UserDocumentControllerTests
             Consortium_id = 1
         };
 
-        _createUserDocumentMock.Setup(x => x.Execute(dto))
+        _createUserDocumentMock.Setup(x => x.Execute(It.IsAny<UserDocument>()))
             .ThrowsAsync(new ArgumentException("El título del documento es obligatorio."));
 
         // Act
@@ -116,8 +110,6 @@ public class UserDocumentControllerTests
 
         // Assert
         var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-
-        // Usar reflexión para acceder a la propiedad "message"
         var value = badRequest.Value;
         var messageProp = value.GetType().GetProperty("message");
         var message = messageProp?.GetValue(value)?.ToString();

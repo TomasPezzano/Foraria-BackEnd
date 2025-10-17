@@ -8,7 +8,7 @@ using Moq;
 
 namespace ForariaTest.Unit;
 
-public class ClaimResponseControllerTests
+public class ClaimResponseTests
 {
     private readonly Mock<ICreateClaimResponse> _createClaimResponseMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
@@ -16,7 +16,7 @@ public class ClaimResponseControllerTests
     private readonly Mock<IResponsibleSectorRepository> _sectorRepositoryMock;
     private readonly ClaimResponseController _controller;
 
-    public ClaimResponseControllerTests()
+    public ClaimResponseTests()
     {
         _createClaimResponseMock = new Mock<ICreateClaimResponse>();
         _userRepositoryMock = new Mock<IUserRepository>();

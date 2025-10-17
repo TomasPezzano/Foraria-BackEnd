@@ -7,14 +7,14 @@ using Moq;
 
 namespace ForariaTest.Unit;
 
-public class ClaimControllerTests
+public class ClaimTests
 {
     private readonly Mock<ICreateClaim> _createClaimMock;
     private readonly Mock<IGetClaims> _getClaimsMock;
     private readonly Mock<IRejectClaim> _rejectClaimMock;
     private readonly ClaimController _controller;
 
-    public ClaimControllerTests()
+    public ClaimTests()
     {
         _createClaimMock = new Mock<ICreateClaim>();
         _getClaimsMock = new Mock<IGetClaims>();
