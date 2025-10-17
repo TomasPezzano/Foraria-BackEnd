@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <Folder Include="Domain\Model\" />
+    <Folder Include="wwwroot\uploads\claims\" />
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>

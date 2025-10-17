@@ -5,7 +5,7 @@ using ForariaDomain;
 namespace Foraria.Application.UseCase;
 public interface ICreateClaim
 {
-    Task<Claim> Execute(ClaimDto claimDto);
+    Task<Claim> Execute(Claim claim);
 }
 public class CreateClaim : ICreateClaim
 {
@@ -15,31 +15,18 @@ public class CreateClaim : ICreateClaim
     {
         _claimRepository = claimRepository;
     }
-    public async Task<Claim> Execute(ClaimDto claimDto)
+    public async Task<Claim> Execute(Claim claim)
     {
-        if (string.IsNullOrWhiteSpace(claimDto.Title))
+        if (string.IsNullOrWhiteSpace(claim.Title))
             throw new ArgumentException("El título del reclamo es obligatorio");
-        if (string.IsNullOrWhiteSpace(claimDto.Description))
+        if (string.IsNullOrWhiteSpace(claim.Description))
             throw new ArgumentException("La descripción del reclamo es obligatoria");
-        if (string.IsNullOrWhiteSpace(claimDto.Priority))
+        if (string.IsNullOrWhiteSpace(claim.Priority))
             throw new ArgumentException("La prioridad es obligatoria");
-        if (string.IsNullOrWhiteSpace(claimDto.Category))
+        if (string.IsNullOrWhiteSpace(claim.Category))
             throw new ArgumentException("La categoría es obligatoria");
-        if (claimDto.User_id == null)
+        if (claim.User_id == null)
             throw new ArgumentException("Debe asociarse un usuario al reclamo");
-
-        var claim = new Claim
-        {
-            Title = claimDto.Title,
-            Description = claimDto.Description,
-            State = "Nuevo",
-            Priority = claimDto.Priority,
-            Category = claimDto.Category,
-            CreatedAt = DateTime.Now,
-            Archive = claimDto.Archive,
-            User_id = claimDto.User_id,
-            ResidenceId = claimDto.ResidenceId
-        };
 
         await _claimRepository.Add(claim);
         return claim;
