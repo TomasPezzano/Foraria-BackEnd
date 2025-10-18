@@ -13,5 +13,5 @@ public interface IUserRepository
 
     Task<User?> GetByIdWithRole(int id);
     Task Update(User user);
-    Task GetAll();
+    Task<int> GetAllInNumber();
 }
