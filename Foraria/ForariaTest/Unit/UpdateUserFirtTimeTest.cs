@@ -2,51 +2,45 @@
 using Foraria.Domain.Repository;
 using ForariaDomain;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Xunit;
 using System.Threading.Tasks;
 
 namespace ForariaTest.Unit;
 
-public class UpdateUserFirtTimeTest
+public class UpdateUserFirstTimeTest
 {
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IPasswordHash> _passwordHashMock;
     private readonly Mock<IJwtTokenGenerator> _jwtTokenGeneratorMock;
     private readonly Mock<IRefreshTokenGenerator> _refreshTokenGeneratorMock;
     private readonly Mock<IRefreshTokenRepository> _refreshTokenRepositoryMock;
+    private readonly Mock<IRoleRepository> _roleRepositoryMock;
     private readonly UpdateUserFirstTime _updateUserFirstTime;
 
-    public UpdateUserFirtTimeTest()
+    public UpdateUserFirstTimeTest()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _passwordHashMock = new Mock<IPasswordHash>();
         _jwtTokenGeneratorMock = new Mock<IJwtTokenGenerator>();
         _refreshTokenGeneratorMock = new Mock<IRefreshTokenGenerator>();
         _refreshTokenRepositoryMock = new Mock<IRefreshTokenRepository>();
+        _roleRepositoryMock = new Mock<IRoleRepository>();
 
         _updateUserFirstTime = new UpdateUserFirstTime(
             _userRepositoryMock.Object,
             _passwordHashMock.Object,
             _jwtTokenGeneratorMock.Object,
             _refreshTokenGeneratorMock.Object,
-            _refreshTokenRepositoryMock.Object
+            _refreshTokenRepositoryMock.Object,
+            _roleRepositoryMock.Object
         );
     }
 
     [Fact]
-    public async Task Update_WhenUserNotFound_ShouldReturnFailure()
+    public async Task Update_WhenUserIsNull_ShouldReturnFailure()
     {
-        // Arrange
-        _userRepositoryMock
-            .Setup(x => x.GetByIdWithRole(It.IsAny<int>()))
-            .ReturnsAsync((User)null);
-
-        // Act
-        var result = await _updateUserFirstTime.Update(
-            1, "oldPass", "newPass123!", "John", "Doe", 12345678, null, "192.168.1.1");
+        // Arrange - Act
+        var result = await _updateUserFirstTime.Update(null, "oldPass", "newPass123!", "192.168.1.1");
 
         // Assert
         Assert.False(result.Success);
@@ -60,16 +54,11 @@ public class UpdateUserFirtTimeTest
         var user = new User
         {
             Id = 1,
-            RequiresPasswordChange = false  
+            RequiresPasswordChange = false
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetByIdWithRole(1))
-            .ReturnsAsync(user);
-
         // Act
-        var result = await _updateUserFirstTime.Update(
-            1, "oldPass", "newPass123!", "John", "Doe", 12345678, null, "192.168.1.1");
+        var result = await _updateUserFirstTime.Update(user, "oldPass", "newPass123!", "192.168.1.1");
 
         // Assert
         Assert.False(result.Success);
@@ -87,17 +76,12 @@ public class UpdateUserFirtTimeTest
             RequiresPasswordChange = true
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetByIdWithRole(1))
-            .ReturnsAsync(user);
-
         _passwordHashMock
             .Setup(x => x.VerifyPassword("wrongPassword", user.Password))
             .Returns(false);
 
         // Act
-        var result = await _updateUserFirstTime.Update(
-            1, "wrongPassword", "newPass123!", "John", "Doe", 12345678, null, "192.168.1.1");
+        var result = await _updateUserFirstTime.Update(user, "wrongPassword", "newPass123!", "192.168.1.1");
 
         // Assert
         Assert.False(result.Success);
@@ -105,11 +89,11 @@ public class UpdateUserFirtTimeTest
     }
 
     [Theory]
-    [InlineData("short")]           // Too short
-    [InlineData("nouppercase123!")]  // No uppercase
-    [InlineData("NOLOWERCASE123!")]  // No lowercase
-    [InlineData("NoDigits!!!")]      // No digits
-    [InlineData("NoSpecial123")]     // No special chars
+    [InlineData("short")]
+    [InlineData("nouppercase123!")]
+    [InlineData("NOLOWERCASE123!")]
+    [InlineData("NoDigits!!!")]
+    [InlineData("NoSpecial123")]
     public async Task Update_WithWeakPassword_ShouldReturnFailure(string weakPassword)
     {
         // Arrange
@@ -120,17 +104,12 @@ public class UpdateUserFirtTimeTest
             RequiresPasswordChange = true
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetByIdWithRole(1))
-            .ReturnsAsync(user);
-
         _passwordHashMock
             .Setup(x => x.VerifyPassword("oldPassword", user.Password))
             .Returns(true);
 
         // Act
-        var result = await _updateUserFirstTime.Update(
-            1, "oldPassword", weakPassword, "John", "Doe", 12345678, null, "192.168.1.1");
+        var result = await _updateUserFirstTime.Update(user, "oldPassword", weakPassword, "192.168.1.1");
 
         // Assert
         Assert.False(result.Success);
@@ -141,6 +120,7 @@ public class UpdateUserFirtTimeTest
     public async Task Update_WithValidData_ShouldReturnSuccessAndNewTokens()
     {
         // Arrange
+        var role = new Role { Id = 4, Description = "Inquilino" };
         var user = new User
         {
             Id = 1,
@@ -148,16 +128,15 @@ public class UpdateUserFirtTimeTest
             Password = "hashedOldPassword",
             Role_id = 4,
             RequiresPasswordChange = true,
-            Role = new Role { Id = 4, Description = "Inquilino" }
+            Name = "John",
+            LastName = "Doe",
+            Dni = 12345678,
+            Photo = "/uploads/photo.jpg"
         };
 
         var newAccessToken = "new.jwt.token";
         var newRefreshToken = "new.refresh.token";
         var newHashedPassword = "newHashedPassword";
-
-        _userRepositoryMock
-            .Setup(x => x.GetByIdWithRole(1))
-            .ReturnsAsync(user);
 
         _passwordHashMock
             .Setup(x => x.VerifyPassword("OldPass123!", user.Password))
@@ -167,8 +146,12 @@ public class UpdateUserFirtTimeTest
             .Setup(x => x.HashPassword("NewPass123!"))
             .Returns(newHashedPassword);
 
+        _roleRepositoryMock
+            .Setup(x => x.GetById(4))
+            .ReturnsAsync(role);
+
         _jwtTokenGeneratorMock
-            .Setup(x => x.Generate(user.Id, user.Mail, user.Role_id, user.Role.Description, false))
+            .Setup(x => x.Generate(user.Id, user.Mail, user.Role_id, role.Description, false))
             .Returns(newAccessToken);
 
         _refreshTokenGeneratorMock
@@ -184,8 +167,7 @@ public class UpdateUserFirtTimeTest
             .ReturnsAsync((RefreshToken rt) => rt);
 
         // Act
-        var result = await _updateUserFirstTime.Update(
-            1, "OldPass123!", "NewPass123!", "John", "Doe", 12345678, "/uploads/photo.jpg", "192.168.1.1");
+        var result = await _updateUserFirstTime.Update(user, "OldPass123!", "NewPass123!", "192.168.1.1");
 
         // Assert
         Assert.True(result.Success);
@@ -193,21 +175,52 @@ public class UpdateUserFirtTimeTest
         Assert.Equal(newAccessToken, result.AccessToken);
         Assert.Equal(newRefreshToken, result.RefreshToken);
 
-        // Verify user was updated
         _userRepositoryMock.Verify(x => x.Update(It.Is<User>(u =>
-            u.Name == "John" &&
-            u.LastName == "Doe" &&
             u.Password == newHashedPassword &&
-            u.Dni == 12345678 &&
-            u.Photo == "/uploads/photo.jpg" &&
-            u.RequiresPasswordChange == false  // ← Key change
+            u.RequiresPasswordChange == false
         )), Times.Once);
 
-        // Verify new refresh token was saved
         _refreshTokenRepositoryMock.Verify(x => x.Add(It.Is<RefreshToken>(rt =>
             rt.UserId == 1 &&
             rt.Token == newRefreshToken &&
             rt.CreatedByIp == "192.168.1.1"
         )), Times.Once);
+    }
+
+    [Fact]
+    public async Task Update_WhenRoleNotFound_ShouldReturnFailure()
+    {
+        // Arrange
+        var user = new User
+        {
+            Id = 1,
+            Mail = "user@example.com",
+            Password = "hashedOldPassword",
+            Role_id = 999,
+            RequiresPasswordChange = true
+        };
+
+        _passwordHashMock
+            .Setup(x => x.VerifyPassword("OldPass123!", user.Password))
+            .Returns(true);
+
+        _passwordHashMock
+            .Setup(x => x.HashPassword("NewPass123!"))
+            .Returns("newHashedPassword");
+
+        _userRepositoryMock
+            .Setup(x => x.Update(It.IsAny<User>()))
+            .Returns(Task.CompletedTask);
+
+        _roleRepositoryMock
+            .Setup(x => x.GetById(999))
+            .ReturnsAsync((Role?)null);
+
+        // Act
+        var result = await _updateUserFirstTime.Update(user, "OldPass123!", "NewPass123!", "192.168.1.1");
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal("User role not found", result.Message);
     }
 }
