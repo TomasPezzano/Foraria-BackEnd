@@ -17,8 +17,7 @@ public class UserDto
     public string Email { get; set; }
 
     [Required(ErrorMessage = "Numero es requerido")]
-    [Phone(ErrorMessage = "Formato de numero inválido")]
-    public string Phone { get; set; }
+    public long PhoneNumber { get; set; }
 
     [Required(ErrorMessage = "Rol es requerido")]
     public int RoleId { get; set; }

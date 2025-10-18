@@ -12,4 +12,6 @@ public class ResidenceRequestDto
 
     [Required(ErrorMessage = "Torre es requerida")]
     public string Tower { get; set; }
+
+    public int ConsortiumId { get; set; }
 }

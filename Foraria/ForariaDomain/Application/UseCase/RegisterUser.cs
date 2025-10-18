@@ -8,7 +8,7 @@ namespace Foraria.Application.UseCase;
 public interface IRegisterUser
 {
     Task<int> GetAllUsersInNumber();
-    Task<UserDto> Register(UserDto userDto);
+    Task<UserDto> Register(User user, int residenceId);
 }
 
 public class RegisterUser : IRegisterUser
@@ -36,9 +36,9 @@ public class RegisterUser : IRegisterUser
         _residenceRepository = residenceRepository;
     }
 
-    public async Task<UserDto> Register(UserDto userDto)
+    public async Task<UserDto> Register(User user, int residenceId)
     {
-        if (await _userRepository.ExistsEmail(userDto.Email))
+        if (await _userRepository.ExistsEmail(user.Mail))
         {
             return new UserDto
             {
@@ -47,8 +47,8 @@ public class RegisterUser : IRegisterUser
             };
         }
 
-        var roleExists = await _roleRepository.Exists(userDto.RoleId);
-        if (!roleExists)
+        Role role = await _roleRepository.GetById(user.Role_id);
+        if (role == null)
         {
             return new UserDto
             {
@@ -57,70 +57,40 @@ public class RegisterUser : IRegisterUser
             };
         }
 
-        List<Residence> residenceEntities = new List<Residence>();
-        if (userDto.Residences != null && userDto.Residences.Any())
-        {
-            foreach (var residenceDto in userDto.Residences)
-            {
-                if (!residenceDto.Id.HasValue)
-                {
-                    return new UserDto
-                    {
-                        Success = false,
-                        Message = "All residences must have a valid ID"
-                    };
-                }
-
-                var residenceExists = await _residenceRepository.Exists(residenceDto.Id.Value);
-                if (!residenceExists)
-                {
-                    return new UserDto
-                    {
-                        Success = false,
-                        Message = $"Residence with ID {residenceDto.Id} does not exist"
-                    };
-                }
-
-                var residence = await _residenceRepository.GetById(residenceDto.Id.Value);
-                if (residence != null)
-                {
-                    residenceEntities.Add(residence);
-                }
-            }
-        }
-
-        var temporaryPassword = await _generatePasswordUseCase.Generate();
-        var passwordHash = _passwordHashUseCase.HashPassword(temporaryPassword);
-
-        if (!long.TryParse(userDto.Phone.Replace(" ", "").Replace("-", ""), out long phoneNumber))
+        var residenceExists = await _residenceRepository.Exists(residenceId);
+        if (!residenceExists)
         {
             return new UserDto
             {
                 Success = false,
-                Message = "Phone format is not valid"
+                Message = $"Residence with ID {residenceId} does not exist"
             };
         }
 
-        var newUser = new User
+        var residence = await _residenceRepository.GetById(residenceId);
+        if (residence == null)
         {
-            Name = userDto.FirstName,
-            LastName = userDto.LastName,
-            Mail = userDto.Email,
-            Password = passwordHash,
-            PhoneNumber = phoneNumber,
-            Role_id = userDto.RoleId,
-            RequiresPasswordChange = true,
-            Residences = residenceEntities 
-        };
+            return new UserDto
+            {
+                Success = false,
+                Message = "Error retrieving residence information"
+            };
+        }
 
-        var savedUser = await _userRepository.Add(newUser);
+        var temporaryPassword = await _generatePasswordUseCase.Generate();
+        var passwordHash = _passwordHashUseCase.HashPassword(temporaryPassword);
+        user.Password = passwordHash;
+        user.Residences = new List<Residence> { residence };
+        user.RequiresPasswordChange = true;
+
+        var savedUser = await _userRepository.Add(user);
 
         try
         {
             await _emailUseCase.SendWelcomeEmail(
-                userDto.Email,
-                userDto.FirstName,
-                userDto.LastName,
+                user.Mail,
+                user.Name,
+                user.LastName,
                 temporaryPassword);
         }
         catch (Exception ex)
@@ -128,13 +98,16 @@ public class RegisterUser : IRegisterUser
             Console.WriteLine($"Failed to send email: {ex.Message}");
         }
 
-        var residenceDtos = residenceEntities.Select(r => new ResidenceDto
+        var residenceDtos = new List<ResidenceDto>
         {
-            Id = r.Id,
-            Number = r.Number,
-            Floor = r.Floor,
-            Tower = r.Tower
-        }).ToList();
+            new ResidenceDto
+            {
+                Id = residence.Id,
+                Number = residence.Number,
+                Floor = residence.Floor,
+                Tower = residence.Tower
+            }
+        };
 
         return new UserDto
         {
@@ -142,9 +115,9 @@ public class RegisterUser : IRegisterUser
             Message = "User registered successfully. An email has been sent with the credentials.",
             Id = savedUser.Id,
             Email = savedUser.Mail,
-            FirstName = userDto.FirstName,
-            LastName = userDto.LastName,
-            Phone = userDto.Phone,
+            FirstName = user.Name,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber,
             RoleId = savedUser.Role_id,
             TemporaryPassword = temporaryPassword,
             Residences = residenceDtos

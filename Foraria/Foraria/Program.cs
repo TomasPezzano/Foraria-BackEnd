@@ -116,6 +116,11 @@ builder.Services.AddScoped<ICreateReserve, CreateReserve>();
 builder.Services.AddScoped<IGetAllReserve, GetAllReserve>();
 builder.Services.AddScoped<IUpdateOldReserves, UpdateOldReserves>();
 builder.Services.AddHostedService<OldReserveBackgroundService>();
+builder.Services.AddScoped<IGetUserByEmail, GetUserByEmail>();
+builder.Services.AddScoped<IGetUserById, GetUserById>();
+builder.Services.AddScoped<IGetResponsibleSectorById, GetResponsibleSectorById>();
+builder.Services.AddScoped<IGetClaimById, GetClaimById>();
+
 
 
 builder.Services.AddCors(options =>
@@ -176,7 +181,40 @@ builder.Services.AddAuthorization(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Foraria API", Version = "v1" });
+
+    // 🔒 Configuración del esquema de seguridad JWT (para que aparezca el candado)
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header usando el esquema Bearer.\r\n\r\n" +
+                      "Ingresá tu token así:\r\n\r\n" +
+                      "Bearer {tu_token_jwt}",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
+});
 
 builder.Services.AddDbContext<ForariaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))
