@@ -6,7 +6,7 @@ namespace Foraria.Application.UseCase;
 
 public interface ICreateResidence
 {
-    Task<ResidenceResponseDto> Create(ResidenceRequestDto residence);
+    Task<ResidenceResponseDto> Create(Residence residence);
     Task<ResidenceResponseDto> GetResidenceById(int id);
     Task<List<ResidenceResponseDto>> GetAllResidences();
 }
@@ -20,9 +20,9 @@ public class CreateResidence : ICreateResidence
         _residenceRepository = residenceRepository;
     }
 
-    public async Task<ResidenceResponseDto> Create(ResidenceRequestDto residenceDto)
+    public async Task<ResidenceResponseDto> Create(Residence residence)
     {
-        if (string.IsNullOrWhiteSpace(residenceDto.Tower))
+        if (string.IsNullOrWhiteSpace(residence.Tower))
         {
             return new ResidenceResponseDto
             {
@@ -33,9 +33,9 @@ public class CreateResidence : ICreateResidence
 
         var existingResidences = await _residenceRepository.GetAll();
         if (existingResidences.Any(r =>
-            r.Number == residenceDto.Number &&
-            r.Floor == residenceDto.Floor &&
-            r.Tower.Equals(residenceDto.Tower, StringComparison.OrdinalIgnoreCase)))
+            r.Number == residence.Number &&
+            r.Floor == residence.Floor &&
+            r.Tower.Equals(residence.Tower, StringComparison.OrdinalIgnoreCase)))
         {
             return new ResidenceResponseDto
             {
@@ -43,13 +43,6 @@ public class CreateResidence : ICreateResidence
                 Message = "Ya existe una vivienda con ese número, piso y torre"
             };
         }
-
-        var residence = new Residence
-        {
-            Number = residenceDto.Number,
-            Floor = residenceDto.Floor,
-            Tower = residenceDto.Tower
-        };
 
         var createdResidence = await _residenceRepository.Create(residence);
 
@@ -91,6 +84,7 @@ public class CreateResidence : ICreateResidence
         var residences = await _residenceRepository.GetAll();
         return residences.Select(r => new ResidenceResponseDto
         {
+            Id = r.Id,
             Number = r.Number,
             Floor = r.Floor,
             Tower = r.Tower,

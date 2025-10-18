@@ -2,6 +2,7 @@
 using Foraria.Contracts.DTOs;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using ForariaDomain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +20,10 @@ public class UserController : ControllerBase
     private readonly IRefreshTokenUseCase _refreshTokenUseCase;
     private readonly IUpdateUserFirstTime _updateUserFirstTime;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IGetUserByEmail _getUserByEmail;
+    private readonly IGetUserById _getUserById;
 
-    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, IFileStorageService fileStorageService)
+    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, IFileStorageService fileStorageService, IGetUserByEmail getUserByEmail, IGetUserById getUserById)
     {
         _registerUserService = registerUserService;
         _loginUserService = loginUserService;
@@ -28,6 +31,8 @@ public class UserController : ControllerBase
         _refreshTokenUseCase = refreshTokenUseCase;
         _updateUserFirstTime = updateUserFirstTime;
         _fileStorageService = fileStorageService;
+        _getUserByEmail = getUserByEmail;
+        _getUserById = getUserById;
     }
 
     [HttpPost("register")]
@@ -38,17 +43,17 @@ public class UserController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var userDto = new UserDto
+
+        var user = new User
         {
-            FirstName = request.FirstName,
+            Name = request.FirstName,
             LastName = request.LastName,
-            Email = request.Email,
-            Phone = request.Phone,
-            RoleId = request.RoleId,
-            Residences = request.Residences
+            Mail = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            Role_id = request.RoleId,
         };
 
-        var result = await _registerUserService.Register(userDto);
+        var result = await _registerUserService.Register(user, request.ResidenceId);
 
         if (!result.Success)
         {
@@ -63,7 +68,7 @@ public class UserController : ControllerBase
             Email = result.Email,
             FirstName = result.FirstName,
             LastName = result.LastName,
-            Phone = result.Phone,
+            PhoneNumber = result.PhoneNumber,
             RoleId = result.RoleId,
             TemporaryPassword = result.TemporaryPassword,
             Residences = result.Residences?.Select(r => new ResidenceResponseDto
@@ -88,7 +93,10 @@ public class UserController : ControllerBase
         }
 
         var ipAddress = GetIpAddress();
-        var result = await _loginUserService.Login(request, ipAddress);
+        User usuarioLogeado = await _getUserByEmail.Execute(request.Email);
+        string passRequest = request.Password;
+
+        var result = await _loginUserService.Login(usuarioLogeado, passRequest, ipAddress);
 
         if (!result.Success)
         {
@@ -106,7 +114,7 @@ public class UserController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
+    
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (!int.TryParse(userIdClaim, out int userId))
         {
@@ -122,6 +130,8 @@ public class UserController : ControllerBase
         {
             return BadRequest(new { message = "El DNI es inválido" });
         }
+
+        User user = await _getUserById.Execute(userId);
 
         string? photoPath = null;
         if (request.Photo != null)
@@ -144,16 +154,16 @@ public class UserController : ControllerBase
         }
 
         var ipAddress = GetIpAddress();
-        var result = await _updateUserFirstTime.Update(
-            userId: userId,
-            currentPassword: request.CurrentPassword,
-            newPassword: request.NewPassword,
-            firstName: request.FirstName,
-            lastName: request.LastName,
-            dni: dniNumber,
-            photoPath: photoPath,
-            ipAddress: ipAddress
-        );
+
+        user.Name = request.FirstName;
+        user.LastName = request.LastName;
+        user.Dni = long.TryParse(request.Dni, out var dniValue) ? dniValue : (long?)null;
+        user.Photo = photoPath;
+        string currentPassword = request.CurrentPassword;
+        string newPassword = request.NewPassword;
+
+
+        var result = await _updateUserFirstTime.Update(user, currentPassword, newPassword, ipAddress);
 
         if (!result.Success)
         {
@@ -171,6 +181,7 @@ public class UserController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
     {
@@ -180,7 +191,9 @@ public class UserController : ControllerBase
         }
 
         var ipAddress = GetIpAddress();
-        var result = await _refreshTokenUseCase.Refresh(request.RefreshToken, ipAddress);
+        var refreshToken = request.RefreshToken;
+
+        var result = await _refreshTokenUseCase.Refresh(refreshToken, ipAddress);
 
         if (!result.Success)
         {
@@ -190,6 +203,7 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto request)
     {
@@ -199,7 +213,9 @@ public class UserController : ControllerBase
         }
 
         var ipAddress = GetIpAddress();
-        var result = await _logoutUserService.Logout(request.RefreshToken, ipAddress);
+        var refreshToken = request.RefreshToken;
+
+        var result = await _logoutUserService.Logout(refreshToken, ipAddress);
 
         if (!result.Success)
         {
@@ -223,7 +239,6 @@ public class UserController : ControllerBase
         }
     }
 
-    // Helper method to get client IP address
     private string GetIpAddress()
     {
         if (Request.Headers.ContainsKey("X-Forwarded-For"))
@@ -231,6 +246,27 @@ public class UserController : ControllerBase
             return Request.Headers["X-Forwarded-For"].ToString().Split(',')[0].Trim();
         }
         return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetUserById([FromQuery] int id)
+    {
+        var user = await _getUserById.Execute(id);
+        if (user == null)
+        {
+            return NotFound(new { message = "Usuario no encontrado" });
+        }
+        var response = new UserDto
+        {
+            Id = user.Id,
+            FirstName = user.Name,
+            LastName = user.LastName,
+            Email = user.Mail,
+            PhoneNumber = user.PhoneNumber,
+            RoleId = user.Role_id,           
+            Success = true
+        };
+        return Ok(response);
     }
 
 

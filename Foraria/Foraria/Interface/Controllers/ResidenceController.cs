@@ -1,5 +1,6 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
+using ForariaDomain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -16,12 +17,21 @@ public class ResidenceController : ControllerBase
     }
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateResidence([FromBody] ResidenceRequestDto residence)
+    public async Task<IActionResult> CreateResidence([FromBody] ResidenceRequestDto residenceDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
+
+
+        var residence = new Residence
+        {
+            Number = residenceDto.Number,
+            Floor = residenceDto.Floor,
+            Tower = residenceDto.Tower,
+            ConsortiumId = residenceDto.ConsortiumId
+        };
 
         var result = await _createResidenceUseCase.Create(residence);
 

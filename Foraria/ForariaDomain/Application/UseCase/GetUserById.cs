@@ -23,6 +23,9 @@ public class GetUserById : IGetUserById
 
     public async Task<User> Execute(int id)
     {
-        return await _userRepository.GetById(id);
+        var user = await _userRepository.GetById(id);
+        if (user is null)
+            throw new InvalidOperationException($"User with id {id} not found.");
+        return user;
     }
 }

@@ -1,11 +1,13 @@
 ﻿using Foraria.Domain.Repository;
+using Foraria.Interface.DTOs;
 using ForariaDomain;
+
 
 namespace Foraria.Application.UseCase;
 
 public interface IUpdateUserFirstTime
 {
-    Task<UpdateUserFirstTimeResult> Update(int userId, string currentPassword, string newPassword, string firstName, string lastName, long dni, string? photoPath, string ipAddress);
+    Task<UpdateUserFirstTimeResult> Update(User user, string currentPassword, string newPassword, string ipAddress);
 }
 
 public class UpdateUserFirstTimeResult
@@ -23,19 +25,21 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IRefreshTokenGenerator _refreshTokenGenerator;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly IRoleRepository _roleRepository;
 
-    public UpdateUserFirstTime( IUserRepository userRepository, IPasswordHash passwordHash,  IJwtTokenGenerator jwtTokenGenerator, IRefreshTokenGenerator refreshTokenGenerator, IRefreshTokenRepository refreshTokenRepository)
+    public UpdateUserFirstTime( IUserRepository userRepository, IPasswordHash passwordHash,  IJwtTokenGenerator jwtTokenGenerator, IRefreshTokenGenerator refreshTokenGenerator, IRefreshTokenRepository refreshTokenRepository, IRoleRepository roleRepository)
     {
         _userRepository = userRepository;
         _passwordHash = passwordHash;
         _jwtTokenGenerator = jwtTokenGenerator;
         _refreshTokenGenerator = refreshTokenGenerator;
         _refreshTokenRepository = refreshTokenRepository;
+        _roleRepository = roleRepository;
     }
 
-    public async Task<UpdateUserFirstTimeResult> Update(int userId, string currentPassword, string newPassword, string firstName, string lastName, long dni, string? photoPath, string ipAddress)
+    public async Task<UpdateUserFirstTimeResult> Update(User user, string currentPassword, string newPassword, string ipAddress)
     {
-        var user = await _userRepository.GetByIdWithRole(userId);
+
         if (user == null)
         {
             return new UpdateUserFirstTimeResult
@@ -76,14 +80,22 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
             };
         }
 
-        user.Name = firstName;
-        user.LastName = lastName;
+
         user.Password = _passwordHash.HashPassword(newPassword);
-        user.Dni = dni;
-        user.Photo = photoPath;
         user.RequiresPasswordChange = false;
 
         await _userRepository.Update(user);
+
+        Role? role = await _roleRepository.GetById(user.Role_id);
+        if (role == null)
+        {
+            return new UpdateUserFirstTimeResult
+            {
+                Success = false,
+                Message = "User role not found"
+            };
+        }
+        user.Role = role;
 
         var accessToken = _jwtTokenGenerator.Generate(
             user.Id,

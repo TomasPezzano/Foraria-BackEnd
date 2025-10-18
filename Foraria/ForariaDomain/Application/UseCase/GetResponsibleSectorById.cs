@@ -20,6 +20,9 @@ public class GetResponsibleSectorById : IGetResponsibleSectorById
     }
     public async Task<ResponsibleSector> Execute(int id)
     {
-        return await _responsibleSectorRepository.GetById(id);
+        var sector = await _responsibleSectorRepository.GetById(id);
+        if (sector is null)
+            throw new InvalidOperationException($"ResponsibleSector with id {id} not found.");
+        return sector;
     }
 }
