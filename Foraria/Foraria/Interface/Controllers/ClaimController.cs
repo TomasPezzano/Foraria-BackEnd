@@ -55,9 +55,11 @@ public class ClaimController : ControllerBase
                 Description = c.ClaimResponse.Description,
                 ResponseDate = c.ClaimResponse.ResponseDate,
                 User_id = c.ClaimResponse.User.Id,
-                Claim_id = c.ClaimResponse.Claim.Id,
-                ResponsibleSector_id = c.ClaimResponse.ResponsibleSector_id
-            } : null
+                Claim_id = c.ClaimResponse.Claim.Id
+            } : null,
+
+            responsibleSectorName = c.ClaimResponse?.ResponsibleSector?.Name
+
         }).ToList();
 
         return Ok(result);
