@@ -59,5 +59,43 @@ namespace Foraria.Infrastructure.Persistence
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<int> TotalThreads(int id)
+        {
+            var forum = await _context.Forums
+                .Include(f => f.Threads)
+                .FirstOrDefaultAsync(f => f.Id == id);
+
+            return forum?.Threads.Count ?? 0;
+        }
+
+        public async Task<int> TotalResponses(int id)
+        {
+            return await _context.Forums
+                .Where(f => f.Id == id)
+                .SelectMany(f => f.Threads)
+                .SelectMany(t => t.Messages)
+                .CountAsync();
+        }
+
+        public async Task<int> TotalUniqueParticipantsIncludingThreadCreators(int forumId)
+        {
+            var threadAuthors = _context.Forums
+                .Where(f => f.Id == forumId)
+                .SelectMany(f => f.Threads)
+                .Select(t => t.User_id);
+
+            var messageAuthors = _context.Forums
+                .Where(f => f.Id == forumId)
+                .SelectMany(f => f.Threads)
+                .SelectMany(t => t.Messages)
+                .Select(m => m.User_id);
+
+            var allParticipants = threadAuthors
+                .Union(messageAuthors)
+                .Distinct();
+
+            return await allParticipants.CountAsync();
+        }
     }
 }

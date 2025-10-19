@@ -12,7 +12,8 @@
         Task<Forum?> GetByCategory(ForumCategory category);
         Task<Forum?> GetByIdWithThreadsAsync(int id);
         Task Delete(int id);
-
-
+        Task<int> TotalThreads(int id);
+        Task<int> TotalResponses(int id);
+        Task<int> TotalUniqueParticipantsIncludingThreadCreators(int forumId);
     }
 }

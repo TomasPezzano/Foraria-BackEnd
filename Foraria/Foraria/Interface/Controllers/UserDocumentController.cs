@@ -3,8 +3,6 @@ using Foraria.Interface.DTOs;
 using ForariaDomain;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Foraria.Interface.Controllers;
-
 [Route("api/[controller]")]
 [ApiController]
 public class UserDocumentController : ControllerBase
@@ -12,14 +10,12 @@ public class UserDocumentController : ControllerBase
     private readonly ICreateUserDocument _createUserDocument;
     private readonly IGetUserDocuments _getUserDocuments;
 
-    
     public UserDocumentController(ICreateUserDocument createUserDocument, IGetUserDocuments getUserDocuments)
     {
         _createUserDocument = createUserDocument;
         _getUserDocuments = getUserDocuments;
     }
 
-  
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -40,8 +36,6 @@ public class UserDocumentController : ControllerBase
         return Ok(result);
     }
 
-
-
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] CreateUserDocumentDto dto)
     {
@@ -50,7 +44,17 @@ public class UserDocumentController : ControllerBase
 
         try
         {
-            var createdDocument = await _createUserDocument.Execute(dto);
+            var document = new UserDocument
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                Category = dto.Category,
+                Url = dto.Url,
+                User_id = dto.User_id,
+                Consortium_id = dto.Consortium_id
+            };
+
+            var createdDocument = await _createUserDocument.Execute(document);
 
             var result = new UserDocumentDto
             {

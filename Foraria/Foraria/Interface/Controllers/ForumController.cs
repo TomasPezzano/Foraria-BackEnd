@@ -1,5 +1,6 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
+using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers
