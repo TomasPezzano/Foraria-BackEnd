@@ -35,14 +35,32 @@ namespace Foraria.Interface.Controllers
         public async Task<IActionResult> GetMessageReactions(int messageId)
         {
             var total = await _repository.CountByMessage(messageId);
-            return Ok(new ReactionResponse { Total = total });
+            var likes = await _repository.CountLikesByMessage(messageId);
+            var dislikes = await _repository.CountDislikesByMessage(messageId);
+
+            return Ok(new ReactionResponse
+            {
+                Total = total,
+                Likes = likes,
+                Dislikes = dislikes
+            });
         }
 
         [HttpGet("thread/{threadId}")]
         public async Task<IActionResult> GetThreadReactions(int threadId)
         {
             var total = await _repository.CountByThread(threadId);
-            return Ok(new ReactionResponse { Total = total });
+            var likes = await _repository.CountLikesByThread(threadId);
+            var dislikes = await _repository.CountDislikesByThread(threadId);
+
+            return Ok(new ReactionResponse
+            {
+                Total = total,
+                Likes = likes,
+                Dislikes = dislikes
+            });
         }
+
+
     }
 }

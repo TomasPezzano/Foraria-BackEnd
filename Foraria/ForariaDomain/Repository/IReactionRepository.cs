@@ -10,5 +10,9 @@ namespace Foraria.Domain.Repository
         Task<int> CountByMessage(int messageId);
         Task<int> CountByThread(int threadId);
         Task<Reaction?> GetByUserAndTarget(int userId, int? messageId, int? threadId);
+        Task<int> CountLikesByMessage(int messageId);
+        Task<int> CountDislikesByMessage(int messageId);
+        Task<int> CountLikesByThread(int threadId);
+        Task<int> CountDislikesByThread(int threadId);
     }
 }

@@ -18,12 +18,14 @@ namespace Foraria.Application.UseCase
             var countResponses = await _repository.TotalResponses(id);
             var countUserActives = await _repository.TotalUniqueParticipantsIncludingThreadCreators(id);
             var forum = await _repository.GetById(id);
+
             if (forum == null) return null;
 
             return new ForumResponse
             {
                 Id = forum.Id,
                 Category = forum.Category,
+                CategoryName = forum.Category.ToString(),
                 CountThreads = countThreads,
                 CountResponses = countResponses,
                 CountUserActives = countUserActives

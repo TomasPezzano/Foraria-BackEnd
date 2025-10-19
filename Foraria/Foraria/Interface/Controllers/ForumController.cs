@@ -14,14 +14,16 @@ namespace Foraria.Interface.Controllers
         private readonly GetAllForums _getAllForums;
         private readonly GetForumWithThreads _getForumWithThreads;
         private readonly DeleteForum _deleteForum;
+        private readonly GetForumWithCategory _getForumWithCategory;
 
-        public ForumController(CreateForum createForum, GetForumById getForumById, GetAllForums getAllForums, GetForumWithThreads getForumWithThreads, DeleteForum deleteForum)
+        public ForumController(CreateForum createForum, GetForumById getForumById, GetAllForums getAllForums, GetForumWithThreads getForumWithThreads, DeleteForum deleteForum, GetForumWithCategory getForumWithCategory)
         {
             _createForum = createForum;
             _getForumById = getForumById;
             _getAllForums = getAllForums;
             _getForumWithThreads = getForumWithThreads;
             _deleteForum = deleteForum;
+            _getForumWithCategory = getForumWithCategory;
         }
 
         [HttpPost]
@@ -67,6 +69,16 @@ namespace Foraria.Interface.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [HttpGet("{id}/with-category")]
+        public async Task<IActionResult> GetForumWithCategory(int id)
+        {
+            var forum = await _getForumWithCategory.Execute(id);
+            if (forum == null)
+                return NotFound($"No se encontró el foro con ID {id}");
+
+            return Ok(forum);
         }
     }
 }

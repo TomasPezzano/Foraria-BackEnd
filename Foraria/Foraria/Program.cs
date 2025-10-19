@@ -120,6 +120,8 @@ builder.Services.AddScoped<IGetUserByEmail, GetUserByEmail>();
 builder.Services.AddScoped<IGetUserById, GetUserById>();
 builder.Services.AddScoped<IGetResponsibleSectorById, GetResponsibleSectorById>();
 builder.Services.AddScoped<IGetClaimById, GetClaimById>();
+builder.Services.AddScoped<GetForumWithCategory>();
+builder.Services.AddScoped<GetThreadCommentCount>();
 
 
 

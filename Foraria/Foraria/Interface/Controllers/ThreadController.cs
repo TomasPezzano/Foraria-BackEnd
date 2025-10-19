@@ -15,8 +15,9 @@ namespace Foraria.Interface.Controllers
         private readonly UpdateThread _updateThread;
         private readonly GetThreadWithMessages _getThreadWithMessages;
         private readonly CloseThread _closeThread;
+        private readonly GetThreadCommentCount _getThreadCommentCount;
 
-        public ThreadController(CreateThread createThread, GetThreadById getThreadById, GetAllThreads getAllThreads, DeleteThread deleteThread, UpdateThread updateThread, GetThreadWithMessages getThreadWithMessages, CloseThread closeThread)
+        public ThreadController(CreateThread createThread, GetThreadById getThreadById, GetAllThreads getAllThreads, DeleteThread deleteThread, UpdateThread updateThread, GetThreadWithMessages getThreadWithMessages, CloseThread closeThread, GetThreadCommentCount getThreadCommentCount)
         {
             _createThread = createThread;
             _getThreadById = getThreadById;
@@ -25,6 +26,7 @@ namespace Foraria.Interface.Controllers
             _updateThread = updateThread;
             _getThreadWithMessages = getThreadWithMessages;
             _closeThread = closeThread;
+            _getThreadCommentCount = getThreadCommentCount;
         }
 
         [HttpPost]
@@ -98,6 +100,20 @@ namespace Foraria.Interface.Controllers
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("{threadId}/comment-count")]
+        public async Task<IActionResult> GetCommentCount(int threadId)
+        {
+            try
+            {
+                var count = await _getThreadCommentCount.Execute(threadId);
+                return Ok(new { ThreadId = threadId, CommentCount = count });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
         }
 
