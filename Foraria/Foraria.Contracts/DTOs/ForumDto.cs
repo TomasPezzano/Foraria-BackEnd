@@ -20,5 +20,8 @@ namespace Foraria.Interface.DTOs
     {
         public int Id { get; set; }
         public ForumCategory Category { get; set; }
+        public int CountThreads { get; set; }
+        public int CountResponses { get; set; }
+        public int CountUserActives { get; set; }
     }
 }
