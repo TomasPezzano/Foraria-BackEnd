@@ -20,7 +20,7 @@ public class Message
 
     public string State { get; set; }
 
-    public string optionalFile { get; set; }
+    public string? optionalFile { get; set; }
 
     public int Thread_id { get; set; }
 

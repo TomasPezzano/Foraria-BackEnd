@@ -44,5 +44,31 @@ namespace Foraria.Infrastructure.Persistence
                     r.User_id == userId &&
                     r.Message_id == messageId &&
                     r.Thread_id == threadId);
+    
+
+    public async Task<int> CountLikesByMessage(int messageId)
+        {
+            return await _context.Reactions
+                .CountAsync(r => r.Message_id == messageId && r.ReactionType == 1);
+        }
+
+        public async Task<int> CountDislikesByMessage(int messageId)
+        {
+            return await _context.Reactions
+                .CountAsync(r => r.Message_id == messageId && r.ReactionType == -1);
+        }
+
+        public async Task<int> CountLikesByThread(int threadId)
+        {
+            return await _context.Reactions
+                .CountAsync(r => r.Thread_id == threadId && r.ReactionType == 1);
+        }
+
+        public async Task<int> CountDislikesByThread(int threadId)
+        {
+            return await _context.Reactions
+                .CountAsync(r => r.Thread_id == threadId && r.ReactionType == -1);
+        }
+
     }
 }

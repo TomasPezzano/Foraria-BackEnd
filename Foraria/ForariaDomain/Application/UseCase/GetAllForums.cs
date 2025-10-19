@@ -20,7 +20,8 @@ namespace Foraria.Application.UseCase
             return forums.Select(f => new ForumResponse
             {
                 Id = f.Id,
-                Category = f.Category
+                Category = f.Category,
+                CategoryName = f.Category.ToString()
             });
         }
     }

@@ -7,7 +7,7 @@ namespace Foraria.Interface.DTOs
         public string Content { get; set; }
         public int Thread_id { get; set; }
         public int User_id { get; set; }
-        public IFormFile File { get; set; }
+        public IFormFile? File { get; set; }
         public string? FilePath { get; set; }
     }
 }
