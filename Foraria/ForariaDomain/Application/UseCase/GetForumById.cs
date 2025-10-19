@@ -14,13 +14,19 @@ namespace Foraria.Application.UseCase
 
         public async Task<ForumResponse?> Execute(int id)
         {
+            var countThreads = await _repository.TotalThreads(id);
+            var countResponses = await _repository.TotalResponses(id);
+            var countUserActives = await _repository.TotalUniqueParticipantsIncludingThreadCreators(id);
             var forum = await _repository.GetById(id);
             if (forum == null) return null;
 
             return new ForumResponse
             {
                 Id = forum.Id,
-                Category = forum.Category
+                Category = forum.Category,
+                CountThreads = countThreads,
+                CountResponses = countResponses,
+                CountUserActives = countUserActives
             };
         }
     }
