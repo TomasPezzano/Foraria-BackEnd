@@ -22,13 +22,13 @@ namespace Foraria.Application.UseCase
 
         public async Task<ThreadResponse> Execute(CreateThreadRequest request)
         {
-            var forum = await _forumRepository.GetById(request.Forum_id);
+            var forum = await _forumRepository.GetById(request.ForumId);
             if (forum == null)
-                throw new InvalidOperationException($"El foro con ID {request.Forum_id} no existe.");
+                throw new InvalidOperationException($"El foro con ID {request.ForumId} no existe.");
 
-            var user = await _userRepository.GetById(request.User_id);
+            var user = await _userRepository.GetById(request.UserId);
             if (user == null)
-                throw new InvalidOperationException($"El usuario con ID {request.User_id} no existe.");
+                throw new InvalidOperationException($"El usuario con ID {request.UserId} no existe.");
 
             var existingThread = forum.Threads.FirstOrDefault(t =>
                 t.Theme.Trim().ToLower() == request.Theme.Trim().ToLower());
@@ -40,8 +40,8 @@ namespace Foraria.Application.UseCase
             {
                 Theme = request.Theme.Trim(),
                 Description = request.Description.Trim(),
-                Forum_id = request.Forum_id,
-                User_id = request.User_id,
+                ForumId = request.ForumId,
+                UserId = request.UserId,
                 CreatedAt = DateTime.UtcNow,
                 State = "Active"
             };
@@ -55,8 +55,8 @@ namespace Foraria.Application.UseCase
                 Description = thread.Description,
                 CreatedAt = thread.CreatedAt,
                 State = thread.State,
-                Forum_id = thread.Forum_id,
-                User_id = thread.User_id
+                Forum_id = thread.ForumId,
+                User_id = thread.UserId
             };
         }
     }

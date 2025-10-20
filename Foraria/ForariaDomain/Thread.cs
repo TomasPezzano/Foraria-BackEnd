@@ -23,11 +23,11 @@ public class Thread
 
     public string State { get; set; }
 
-    public int Forum_id { get; set; }   
+    public int ForumId { get; set; }   
 
     public Forum Forum { get; set; }
 
-    public int User_id { get; set; }
+    public int UserId { get; set; }
 
     public User User { get; set; }
 

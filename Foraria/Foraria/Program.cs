@@ -1,4 +1,5 @@
-﻿using Foraria.Application.UseCase;
+﻿using Foraria;
+using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
@@ -20,6 +21,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
@@ -229,6 +232,8 @@ builder.Services.AddScoped<IVoteRepository, VoteRepositoryImplementation>();
 builder.Services.AddScoped<CreateVote>();
 builder.Services.AddScoped<GetPolls>();
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
