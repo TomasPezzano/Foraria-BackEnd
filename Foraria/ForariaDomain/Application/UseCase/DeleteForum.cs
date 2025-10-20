@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using ForariaDomain.Exceptions;
+using Foraria.Domain.Repository;
 
 namespace Foraria.Application.UseCase
 {
@@ -15,12 +16,16 @@ namespace Foraria.Application.UseCase
         {
             var forum = await _repository.GetByIdWithThreadsAsync(id);
             if (forum == null)
-                throw new InvalidOperationException($"No se encontró el foro con ID {id}");
+                throw new NotFoundException($"No se encontró el foro con ID {id}.");
 
-            if (forum.Threads.Any())
-                throw new InvalidOperationException("No se puede eliminar el foro porque contiene threads activos.");
+            if (!forum.IsActive)
+                throw new BusinessException("El foro ya está deshabilitado.");
 
-            await _repository.Delete(id);
+            if (forum.Threads.Any(t => t.State == "Active"))
+                throw new BusinessException("No se puede deshabilitar el foro porque contiene threads activos.");
+
+            forum.IsActive = false;
+            await _repository.UpdateAsync(forum);
         }
     }
 }

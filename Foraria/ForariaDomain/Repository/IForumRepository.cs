@@ -11,6 +11,7 @@
         Task<IEnumerable<Forum>> GetAll();
         Task<Forum?> GetByCategory(ForumCategory category);
         Task<Forum?> GetByIdWithThreadsAsync(int id);
+        Task UpdateAsync(Forum forum);
         Task Delete(int id);
         Task<int> TotalThreads(int id);
         Task<int> TotalResponses(int id);

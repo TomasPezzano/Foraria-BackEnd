@@ -169,13 +169,13 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<Thread>()
                 .HasOne(u => u.Forum)
                 .WithMany(r => r.Threads)
-                .HasForeignKey(u => u.Forum_id)
+                .HasForeignKey(u => u.ForumId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Thread>()
                 .HasOne(u => u.User)
                 .WithMany(r => r.Threads)
-                .HasForeignKey(u => u.User_id)
+                .HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Message>()

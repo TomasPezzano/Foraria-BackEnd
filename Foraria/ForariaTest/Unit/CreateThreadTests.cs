@@ -36,15 +36,15 @@ namespace ForariaTest.Application
             {
                 Theme = "Reclamos Generales",
                 Description = "Discusión sobre reclamos del consorcio",
-                Forum_id = 1,
-                User_id = 10
+                ForumId = 1,
+                UserId = 10
             };
 
             var mockForum = new Forum { Id = 1, Category = ForumCategory.General, Threads = new List<Thread>() };
             var mockUser = new User { Id = 10, Name = "Admin" };
 
-            _mockForumRepo.Setup(r => r.GetById(request.Forum_id)).ReturnsAsync(mockForum);
-            _mockUserRepo.Setup(r => r.GetById(request.User_id)).ReturnsAsync(mockUser);
+            _mockForumRepo.Setup(r => r.GetById(request.ForumId)).ReturnsAsync(mockForum);
+            _mockUserRepo.Setup(r => r.GetById(request.UserId)).ReturnsAsync(mockUser);
             _mockThreadRepo.Setup(r => r.Add(It.IsAny<Thread>())).Returns(Task.CompletedTask);
 
             // When
@@ -54,11 +54,11 @@ namespace ForariaTest.Application
             Assert.NotNull(result);
             Assert.Equal(request.Theme, result.Theme);
             Assert.Equal(request.Description, result.Description);
-            Assert.Equal(request.Forum_id, result.Forum_id);
-            Assert.Equal(request.User_id, result.User_id);
+            Assert.Equal(request.ForumId, result.Forum_id);
+            Assert.Equal(request.UserId, result.User_id);
 
-            _mockForumRepo.Verify(r => r.GetById(request.Forum_id), Times.Once);
-            _mockUserRepo.Verify(r => r.GetById(request.User_id), Times.Once);
+            _mockForumRepo.Verify(r => r.GetById(request.ForumId), Times.Once);
+            _mockUserRepo.Verify(r => r.GetById(request.UserId), Times.Once);
             _mockThreadRepo.Verify(r => r.Add(It.IsAny<Thread>()), Times.Once);
         }
 
@@ -70,11 +70,11 @@ namespace ForariaTest.Application
             {
                 Theme = "Nuevo Tema",
                 Description = "Descripción de prueba",
-                Forum_id = 99,
-                User_id = 1
+                ForumId = 99,
+                UserId = 1
             };
 
-            _mockForumRepo.Setup(r => r.GetById(request.Forum_id)).ReturnsAsync((Forum?)null);
+            _mockForumRepo.Setup(r => r.GetById(request.ForumId)).ReturnsAsync((Forum?)null);
 
             // When / Then
             await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));
@@ -88,11 +88,11 @@ namespace ForariaTest.Application
             {
                 Theme = "Duplicado",
                 Description = "Intentando duplicar tema",
-                Forum_id = 1,
-                User_id = 1
+                ForumId = 1,
+                UserId = 1
             };
 
-            var existingThread = new Thread { Id = 2, Theme = "Duplicado", Forum_id = 1 };
+            var existingThread = new Thread { Id = 2, Theme = "Duplicado", ForumId = 1 };
             var mockForum = new Forum
             {
                 Id = 1,
@@ -101,8 +101,8 @@ namespace ForariaTest.Application
             };
             var mockUser = new User { Id = 1, Name = "TestUser" };
 
-            _mockForumRepo.Setup(r => r.GetById(request.Forum_id)).ReturnsAsync(mockForum);
-            _mockUserRepo.Setup(r => r.GetById(request.User_id)).ReturnsAsync(mockUser);
+            _mockForumRepo.Setup(r => r.GetById(request.ForumId)).ReturnsAsync(mockForum);
+            _mockUserRepo.Setup(r => r.GetById(request.UserId)).ReturnsAsync(mockUser);
 
             // When / Then
             await Assert.ThrowsAsync<InvalidOperationException>(() => _useCase.Execute(request));

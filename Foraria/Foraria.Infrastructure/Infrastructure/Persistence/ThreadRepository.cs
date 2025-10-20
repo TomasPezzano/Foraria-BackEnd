@@ -37,7 +37,7 @@ using Thread = ForariaDomain.Thread;
     public async Task<IEnumerable<Thread>> GetByForumIdAsync(int forumId)
     {
         return await _context.Threads
-            .Where(t => t.Forum_id == forumId)
+            .Where(t => t.ForumId == forumId)
             .Include(t => t.User)
             .Include(t => t.Forum)
             .ToListAsync();

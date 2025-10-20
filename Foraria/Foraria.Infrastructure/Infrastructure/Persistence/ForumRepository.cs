@@ -83,7 +83,7 @@ namespace Foraria.Infrastructure.Persistence
             var threadAuthors = _context.Forums
                 .Where(f => f.Id == forumId)
                 .SelectMany(f => f.Threads)
-                .Select(t => t.User_id);
+                .Select(t => t.UserId);
 
             var messageAuthors = _context.Forums
                 .Where(f => f.Id == forumId)
@@ -96,6 +96,11 @@ namespace Foraria.Infrastructure.Persistence
                 .Distinct();
 
             return await allParticipants.CountAsync();
+        }
+        public async Task UpdateAsync(Forum forum)
+        {
+            _context.Forums.Update(forum);
+            await _context.SaveChangesAsync();
         }
     }
 }
