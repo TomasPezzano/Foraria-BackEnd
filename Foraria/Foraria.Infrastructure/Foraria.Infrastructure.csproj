@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.AI.DocumentIntelligence" Version="1.0.0" />
     <PackageReference Include="Nethereum.Contracts" Version="5.0.0" />
     <PackageReference Include="Nethereum.Hex" Version="5.0.0" />
     <PackageReference Include="Nethereum.RPC" Version="5.0.0" />

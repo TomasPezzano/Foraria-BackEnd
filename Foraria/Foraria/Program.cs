@@ -2,10 +2,12 @@
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
+using Foraria.Filters;
 using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Infrastructure.Persistence;
+using Foraria.Infrastructure.Infrastructure.Services;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using Foraria.SignalRImplementation;
@@ -122,6 +124,9 @@ builder.Services.AddScoped<IGetResponsibleSectorById, GetResponsibleSectorById>(
 builder.Services.AddScoped<IGetClaimById, GetClaimById>();
 builder.Services.AddScoped<GetForumWithCategory>();
 builder.Services.AddScoped<GetThreadCommentCount>();
+builder.Services.AddScoped<IOcrService, AzureOcrService>();
+builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
+
 
 
 
@@ -181,13 +186,12 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Consorcio", "Administrador", "Popietario", "Inquilino"));
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Foraria API", Version = "v1" });
 
-    // 🔒 Configuración del esquema de seguridad JWT (para que aparezca el candado)
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = "JWT Authorization header usando el esquema Bearer.\r\n\r\n" +
