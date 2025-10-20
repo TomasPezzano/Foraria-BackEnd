@@ -17,7 +17,9 @@ namespace Foraria.Application.UseCase
         {
             var forums = await _repository.GetAll();
 
-            return forums.Select(f => new ForumResponse
+            var activeForums = forums.Where(f => f.IsActive);
+
+            return activeForums.Select(f => new ForumResponse
             {
                 Id = f.Id,
                 Category = f.Category,

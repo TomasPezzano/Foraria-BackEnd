@@ -97,5 +97,10 @@ namespace Foraria.Infrastructure.Persistence
 
             return await allParticipants.CountAsync();
         }
+        public async Task UpdateAsync(Forum forum)
+        {
+            _context.Forums.Update(forum);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -97,22 +97,11 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Disable(int id)
         {
-            if (id <= 0)
-                throw new ValidationException("Debe proporcionar un ID de foro válido.");
-
-            try
-            {
-                await _deleteForum.Execute(id);
-                return NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new BusinessException(ex.Message);
-            }
+            await _deleteForum.Execute(id);
+            return Ok(new { message = "Foro deshabilitado correctamente." });
         }
 
         [HttpGet("{id}/with-category")]
