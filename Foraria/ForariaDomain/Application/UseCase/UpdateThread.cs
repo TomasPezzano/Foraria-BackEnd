@@ -36,8 +36,8 @@ namespace Foraria.Application.UseCase
                 Description = thread.Description,
                 CreatedAt = thread.CreatedAt,
                 State = thread.State,
-                UserId = thread.User_id,
-                ForumId = thread.Forum_id
+                UserId = thread.UserId,
+                ForumId = thread.ForumId
             };
         }
     }

@@ -25,8 +25,8 @@ namespace Foraria.Application.UseCase
                 Description = t.Description,
                 CreatedAt = t.CreatedAt,
                 State = t.State,
-                UserId = t.User_id,
-                ForumId = t.Forum_id
+                UserId = t.UserId,
+                ForumId = t.ForumId
             }).ToList();
         }
     }

@@ -1,9 +1,10 @@
 ﻿using Foraria.Application.UseCase;
+using ForariaDomain.Exceptions;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 using Foraria.Interface.DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Interface.Controllers
 {
@@ -22,28 +23,23 @@ namespace Foraria.Interface.Controllers
             _verifyFileProof = new VerifyFileProof(blockchainService, proofRepository);
         }
 
-
         [HttpPost("notarize-file")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> NotarizeFile([FromForm] NotarizeFileRequestDto request)
         {
             if (request.File == null || request.File.Length == 0)
-                return BadRequest("Debe subir un archivo válido.");
+                throw new ValidationException("Debe subir un archivo válido.");
 
             var tempPath = Path.GetTempFileName();
-            await using (var stream = System.IO.File.Create(tempPath))
-            {
-                await request.File.CopyToAsync(stream);
-            }
 
             try
             {
+                await using (var stream = System.IO.File.Create(tempPath))
+                    await request.File.CopyToAsync(stream);
+
                 var documentId = Guid.NewGuid();
-
                 var proof = await _notarizeFile.ExecuteAsync(documentId, tempPath);
-
-                System.IO.File.Delete(tempPath);
 
                 return Ok(new
                 {
@@ -58,31 +54,27 @@ namespace Foraria.Interface.Controllers
                     proof.CreatedAtUtc
                 });
             }
-            catch (Exception ex)
+            finally
             {
-                System.IO.File.Delete(tempPath);
-                return BadRequest(new { error = ex.Message });
+                if (System.IO.File.Exists(tempPath))
+                    System.IO.File.Delete(tempPath);
             }
         }
-
-
 
         [HttpPost("verify-file")]
         public async Task<IActionResult> VerifyFile([FromForm] VerifyFileRequestDto request)
         {
             if (request.File == null || request.File.Length == 0)
-                return BadRequest("Debe subir un archivo válido.");
+                throw new ValidationException("Debe subir un archivo válido.");
 
             var tempPath = Path.GetTempFileName();
-            await using (var stream = System.IO.File.Create(tempPath))
-            {
-                await request.File.CopyToAsync(stream);
-            }
 
             try
             {
+                await using (var stream = System.IO.File.Create(tempPath))
+                    await request.File.CopyToAsync(stream);
+
                 var isValid = await _verifyFileProof.ExecuteAsync(request.DocumentId, tempPath);
-                System.IO.File.Delete(tempPath);
 
                 return Ok(new
                 {
@@ -93,10 +85,10 @@ namespace Foraria.Interface.Controllers
                         : "El archivo fue modificado o no fue notarizado."
                 });
             }
-            catch (Exception ex)
+            finally
             {
-                System.IO.File.Delete(tempPath);
-                return BadRequest(new { error = ex.Message });
+                if (System.IO.File.Exists(tempPath))
+                    System.IO.File.Delete(tempPath);
             }
         }
     }
