@@ -38,13 +38,21 @@ public class ProcessInvoiceOcr : IProcessInvoiceOcr
 
             if (result.Success)
             {
+                // ⭐ Logging mejorado con los nuevos campos
                 _logger.LogInformation(
                     "Factura procesada exitosamente en {ProcessingTime}ms. " +
-                    "Proveedor: {SupplierName}, CUIT: {Cuit}, Monto: {Amount}, Confianza: {Confidence}",
+                    "Proveedor: {SupplierName}, CUIT: {Cuit}, " +
+                    "Nº Factura: {InvoiceNumber}, Fecha: {InvoiceDate}, " +
+                    "Vencimiento: {DueDate}, Subtotal: {SubTotal}, Total: {TotalAmount}, " +
+                    "Confianza: {Confidence}",
                     processingTime,
                     result.SupplierName ?? "N/A",
                     result.Cuit ?? "N/A",
-                    result.TotalAmount,
+                    result.InvoiceNumber ?? "N/A",
+                    result.InvoiceDate?.ToString("dd/MM/yyyy") ?? "N/A",
+                    result.DueDate?.ToString("dd/MM/yyyy") ?? "N/A",
+                    result.SubTotal?.ToString("C") ?? "N/A",
+                    result.TotalAmount?.ToString("C") ?? "N/A",
                     result.ConfidenceScore
                 );
             }
@@ -63,14 +71,12 @@ public class ProcessInvoiceOcr : IProcessInvoiceOcr
         catch (Exception ex)
         {
             var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
-
             _logger.LogError(
                 ex,
                 "Excepción al procesar factura {FileName} después de {ProcessingTime}ms",
                 file.FileName,
                 processingTime
             );
-
             throw;
         }
     }

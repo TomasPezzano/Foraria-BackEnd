@@ -56,7 +56,6 @@ public class AzureOcrService : IOcrService
                 };
             }
 
-
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
@@ -85,16 +84,29 @@ public class AzureOcrService : IOcrService
             return new InvoiceOcrResult
             {
                 Success = true,
+
+                // CAMPOS PRINCIPALES
                 SupplierName = GetFieldValue(invoice.Fields, "VendorName"),
                 Cuit = ExtractCuit(invoice.Fields, result.Content),
                 InvoiceDate = GetFieldValueAsDateTime(invoice.Fields, "InvoiceDate"),
+                DueDate = GetFieldValueAsDateTime(invoice.Fields, "DueDate"),
+                InvoiceNumber = GetFieldValue(invoice.Fields, "InvoiceId"),
+                SubTotal = GetFieldValueAsDecimal(invoice.Fields, "SubTotal"),
                 TotalAmount = GetFieldValueAsDecimal(invoice.Fields, "InvoiceTotal")
                              ?? GetFieldValueAsDecimal(invoice.Fields, "AmountDue"),
+
+                // CAMPOS SECUNDARIOS
+                TotalTax = GetFieldValueAsDecimal(invoice.Fields, "TotalTax"),
+                SupplierAddress = GetFieldValue(invoice.Fields, "VendorAddress"),
+                PurchaseOrder = GetFieldValue(invoice.Fields, "PurchaseOrder"),
                 Description = GetFieldValue(invoice.Fields, "PurchaseOrder")
                              ?? GetFieldValue(invoice.Fields, "InvoiceId")
                              ?? "Factura procesada",
+
+                // DATOS DE PROCESAMIENTO
                 Items = ExtractItems(invoice.Fields),
-                ConfidenceScore = invoice.Confidence
+                ConfidenceScore = invoice.Confidence,
+                ProcessedAt = DateTime.UtcNow  
             };
         }
         catch (RequestFailedException ex) when (ex.Status == 401)
