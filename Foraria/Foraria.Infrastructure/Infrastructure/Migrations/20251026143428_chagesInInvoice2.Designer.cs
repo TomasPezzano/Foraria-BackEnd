@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251026143428_chagesInInvoice2")]
+    partial class chagesInInvoice2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,9 +321,6 @@ namespace Foraria.Migrations
 
                     b.Property<int>("Category")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -960,7 +960,7 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ForumId")
+                    b.Property<int>("Forum_id")
                         .HasColumnType("int");
 
                     b.Property<string>("State")
@@ -971,14 +971,14 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("User_id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ForumId");
+                    b.HasIndex("Forum_id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("User_id");
 
                     b.ToTable("thread", (string)null);
                 });
@@ -1405,13 +1405,13 @@ namespace Foraria.Migrations
                 {
                     b.HasOne("ForariaDomain.Forum", "Forum")
                         .WithMany("Threads")
-                        .HasForeignKey("ForumId")
+                        .HasForeignKey("Forum_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ForariaDomain.User", "User")
                         .WithMany("Threads")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("User_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

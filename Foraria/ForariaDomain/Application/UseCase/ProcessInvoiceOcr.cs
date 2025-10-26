@@ -13,11 +13,13 @@ public class ProcessInvoiceOcr : IProcessInvoiceOcr
 {
     private readonly IOcrService _ocrService;
     private readonly ILogger<ProcessInvoiceOcr> _logger;
+    private readonly ILocalFileStorageService _fileStorageService;
 
-    public ProcessInvoiceOcr(IOcrService ocrService, ILogger<ProcessInvoiceOcr> logger)
+    public ProcessInvoiceOcr(IOcrService ocrService, ILogger<ProcessInvoiceOcr> logger, ILocalFileStorageService fileStorageService)
     {
         _ocrService = ocrService;
         _logger = logger;
+        _fileStorageService = fileStorageService;
     }
 
     public async Task<InvoiceOcrResult> ExecuteAsync(IFormFile file)
@@ -34,36 +36,39 @@ public class ProcessInvoiceOcr : IProcessInvoiceOcr
         {
             var result = await _ocrService.ProcessInvoiceAsync(file);
 
-            var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
-
-            if (result.Success)
-            {
-                _logger.LogInformation(
-                    "Factura procesada exitosamente en {ProcessingTime}ms. " +
-                    "Proveedor: {SupplierName}, CUIT: {Cuit}, Monto: {Amount}, Confianza: {Confidence}",
-                    processingTime,
-                    result.SupplierName ?? "N/A",
-                    result.Cuit ?? "N/A",
-                    result.TotalAmount,
-                    result.ConfidenceScore
-                );
-            }
-            else
+            if (!result.Success)
             {
                 _logger.LogWarning(
-                    "Error al procesar factura {FileName} después de {ProcessingTime}ms: {Error}",
+                    "Error en OCR para {FileName}: {Error}",
                     file.FileName,
-                    processingTime,
                     result.ErrorMessage
                 );
+                return result;
             }
+
+            using var stream = file.OpenReadStream();
+            result.FilePath = await _fileStorageService.SaveInvoiceFileAsync(stream, file.FileName);
+
+            var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
+
+            _logger.LogInformation(
+                "Factura procesada exitosamente en {ProcessingTime}ms. " +
+                "Archivo guardado en: {FilePath}, " +
+                "Proveedor: {SupplierName}, CUIT: {Cuit}, " +
+                "Nº Factura: {InvoiceNumber}, Total: {TotalAmount}",
+                processingTime,
+                result.FilePath,
+                result.SupplierName ?? "N/A",
+                result.Cuit ?? "N/A",
+                result.InvoiceNumber ?? "N/A",
+                result.TotalAmount?.ToString("C") ?? "N/A"
+            );
 
             return result;
         }
         catch (Exception ex)
         {
             var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
-
             _logger.LogError(
                 ex,
                 "Excepción al procesar factura {FileName} después de {ProcessingTime}ms",
@@ -71,7 +76,11 @@ public class ProcessInvoiceOcr : IProcessInvoiceOcr
                 processingTime
             );
 
-            throw;
+            return new InvoiceOcrResult
+            {
+                Success = false,
+                ErrorMessage = $"Error interno al procesar: {ex.Message}"
+            };
         }
     }
 }

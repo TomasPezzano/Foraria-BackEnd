@@ -52,7 +52,7 @@ builder.Services.AddScoped<ISupplierContractRepository, SupplierContractReposito
 builder.Services.AddScoped<ICreateSupplier, CreateSupplier>();
 builder.Services.AddScoped<IDeleteSupplier, DeleteSupplier>();
 builder.Services.AddScoped<ICreateSupplierContract, CreateSupplierContract>();
-builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<ILocalFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<IContractExpirationService, ContractExpirationService>();
 builder.Services.AddScoped<IGetAllSupplier, GetAllSupplier>();
 builder.Services.AddHostedService<PollExpirationService>();
@@ -132,6 +132,9 @@ builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
 builder.Services.AddScoped<IFileProcessor, FileProcessor>();
 builder.Services.AddScoped<IGetPlaceById, GetPlaceById>();
 builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
+builder.Services.AddScoped<ICreateInvoice, CreateInvoice>();
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+builder.Services.AddScoped<IGetAllInvoices, GetAllInvoices>();
 
 
 
