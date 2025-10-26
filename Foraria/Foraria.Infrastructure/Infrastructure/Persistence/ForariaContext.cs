@@ -335,11 +335,11 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<RefreshToken>()
                 .HasIndex(rt => rt.UserId);
 
-            //modelBuilder.Entity<Supplier>()
-            //    .HasOne(c => c.Consortium)
-            //    .WithMany(s => s.Suppliers)
-            //    .HasForeignKey(c => c.ConsortiumId)
-            //    .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Supplier>()
+                .HasOne(c => c.Consortium)
+                .WithMany(s => s.Suppliers)
+                .HasForeignKey(c => c.ConsortiumId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<SupplierContract>()
                 .HasOne(sc => sc.Supplier)

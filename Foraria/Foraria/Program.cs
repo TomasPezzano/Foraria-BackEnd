@@ -139,6 +139,8 @@ builder.Services.AddScoped<GetActiveReserveCount>();
 builder.Services.AddScoped<ICreateInvoice, CreateInvoice>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IGetAllInvoices, GetAllInvoices>();
+builder.Services.AddScoped<IGetConsortiumById, GetConsortiumById>();
+builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
 
 
 
