@@ -26,6 +26,7 @@ public class CreateReserve : ICreateReserve
     {
 
         reserve.DeletedAt = reserve.CreatedAt.AddHours(1);
+        reserve.Date = DateTime.UtcNow;
         await _reserveRepository.Add(reserve);
         return reserve;
     }
