@@ -28,7 +28,7 @@ namespace Foraria.Application.UseCase
                     Description = t.Description,
                     CreatedAt = t.CreatedAt,
                     State = t.State,
-                    UserId = t.User_id
+                    UserId = t.UserId
                 }).ToList()
             };
         }

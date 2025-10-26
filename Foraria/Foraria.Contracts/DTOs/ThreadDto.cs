@@ -24,11 +24,11 @@ namespace Foraria.Interface.DTOs
 
         [Required(ErrorMessage = "El foro asociado es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El ID del foro debe ser un número válido.")]
-        public int Forum_id { get; set; }
+        public int ForumId { get; set; }
 
         [Required(ErrorMessage = "El usuario es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El ID del usuario debe ser un número válido.")]
-        public int User_id { get; set; }
+        public int UserId { get; set; }
     }
 
     public class UpdateThreadRequest

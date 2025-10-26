@@ -70,5 +70,10 @@ namespace Foraria.Infrastructure.Persistence
                 .CountAsync(r => r.Thread_id == threadId && r.ReactionType == -1);
         }
 
+        public Task Update(Reaction existing)
+        {
+            _context.Reactions.Update(existing);
+            return _context.SaveChangesAsync();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Foraria.Application.UseCase;
+﻿using Foraria;
+using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
@@ -22,6 +23,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
@@ -126,6 +129,9 @@ builder.Services.AddScoped<GetForumWithCategory>();
 builder.Services.AddScoped<GetThreadCommentCount>();
 builder.Services.AddScoped<IOcrService, AzureOcrService>();
 builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
+builder.Services.AddScoped<IFileProcessor, FileProcessor>();
+builder.Services.AddScoped<IGetPlaceById, GetPlaceById>();
+builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
 builder.Services.AddScoped<ICreateInvoice, CreateInvoice>();
 builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IGetAllInvoices, GetAllInvoices>();
@@ -236,6 +242,8 @@ builder.Services.AddScoped<IVoteRepository, VoteRepositoryImplementation>();
 builder.Services.AddScoped<CreateVote>();
 builder.Services.AddScoped<GetPolls>();
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
