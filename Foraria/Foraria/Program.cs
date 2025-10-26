@@ -132,6 +132,7 @@ builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
 builder.Services.AddScoped<IFileProcessor, FileProcessor>();
 builder.Services.AddScoped<IGetPlaceById, GetPlaceById>();
 builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
+builder.Services.AddScoped<GetActiveReserveCount>();
 
 
 
@@ -196,7 +197,10 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.EnableAnnotations();
     c.SwaggerDoc("v1", new() { Title = "Foraria API", Version = "v1" });
+
+
 
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
