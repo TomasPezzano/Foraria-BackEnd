@@ -4,6 +4,7 @@ using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 using Foraria.Interface.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Interface.Controllers
@@ -24,6 +25,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost("notarize-file")]
+        [SwaggerOperation(
+            Summary = "Notariza un archivo en la blockchain.",
+            Description = "Recibe un archivo, genera su hash SHA-256 y lo registra en la blockchain (actualmente en Polygon) junto con un identificador de documento único. Devuelve los datos de la prueba creada, incluyendo el hash, el hash de transacción y la red utilizada."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> NotarizeFile([FromForm] NotarizeFileRequestDto request)
@@ -62,6 +67,12 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost("verify-file")]
+        [SwaggerOperation(
+            Summary = "Verifica un archivo contra su prueba registrada en blockchain.",
+            Description = "Recibe un archivo y un ID de documento, calcula su hash y verifica si coincide con la prueba registrada previamente en la blockchain. Devuelve si la verificación es válida o si el archivo fue alterado."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> VerifyFile([FromForm] VerifyFileRequestDto request)
         {
             if (request.File == null || request.File.Length == 0)

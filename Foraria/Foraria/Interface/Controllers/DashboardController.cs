@@ -2,6 +2,7 @@
 using Foraria.Domain.Repository;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Interface.Controllers
@@ -40,6 +41,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/total")]
+        [SwaggerOperation(
+            Summary = "Obtiene el total mensual de gastos.",
+            Description = "Devuelve el monto total de expensas del mes actual para un consorcio específico."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetMonthlyExpenseTotal([FromQuery] int consortiumId)
@@ -61,6 +66,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/category")]
+        [SwaggerOperation(
+            Summary = "Obtiene el desglose de gastos por categoría.",
+            Description = "Devuelve un listado de categorías con los montos de expensas asociados a cada una, para el mes actual o la fecha indicada."
+        )]
         public async Task<IActionResult> GetExpenseByCategory(
             [FromQuery] int consortiumId,
             [FromQuery] DateTime? date = null)
@@ -82,6 +91,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/pending")]
+        [SwaggerOperation(
+            Summary = "Obtiene las expensas pendientes.",
+            Description = "Lista todas las expensas aún no pagadas correspondientes al consorcio indicado."
+        )]
         public async Task<IActionResult> GetPendingExpenses([FromQuery] int consortiumId)
         {
             if (consortiumId <= 0)
@@ -101,6 +114,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/summary")]
+        [SwaggerOperation(
+            Summary = "Obtiene el resumen de gastos del usuario.",
+            Description = "Devuelve el estado de pagos del usuario, incluyendo expensas pagadas, vencidas y próximas a vencer."
+        )]
         public async Task<IActionResult> GetUserExpenseSummary([FromQuery] int userId)
         {
             if (userId <= 0)
@@ -120,6 +137,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/monthly-history")]
+        [SwaggerOperation(
+            Summary = "Obtiene el historial mensual de gastos del usuario.",
+            Description = "Devuelve la evolución de los gastos del usuario a lo largo del año actual o el año especificado."
+        )]
         public async Task<IActionResult> GetUserMonthlyExpenseHistory(
             [FromQuery] int userId,
             [FromQuery] int? year = null)
@@ -139,6 +160,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("polls/active")]
+        [SwaggerOperation(
+            Summary = "Obtiene la cantidad de votaciones activas.",
+            Description = "Devuelve la cantidad de votaciones abiertas actualmente en el consorcio."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -164,6 +189,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("reservations/active")]
+        [SwaggerOperation(
+            Summary = "Obtiene las reservas activas.",
+            Description = "Devuelve un listado de las próximas reservas activas para el consorcio indicado, ordenadas por fecha."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -184,6 +213,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("reservations/count")]
+        [SwaggerOperation(
+            Summary = "Obtiene la cantidad de reservas activas.",
+            Description = "Devuelve el número total de reservas activas o próximas dentro del consorcio especificado."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

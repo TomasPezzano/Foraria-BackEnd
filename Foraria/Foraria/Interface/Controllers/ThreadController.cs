@@ -1,8 +1,8 @@
 ﻿using Foraria.Application.UseCase;
-using ForariaDomain.Exceptions;
 using Foraria.Interface.DTOs;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Interface.Controllers
@@ -41,6 +41,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost]
+        [SwaggerOperation(
+            Summary = "Crea un nuevo hilo de discusión.",
+            Description = "Permite crear un nuevo hilo dentro de un foro existente, asociado a un usuario y una categoría. Devuelve los datos del hilo creado."
+        )]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateThreadRequest request)
@@ -66,6 +70,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id}")]
+        [SwaggerOperation(
+            Summary = "Obtiene un hilo por su ID.",
+            Description = "Devuelve los detalles del hilo solicitado, incluyendo información básica como su tema, estado y usuario creador."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
@@ -82,6 +90,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation(
+            Summary = "Obtiene todos los hilos de un foro.",
+            Description = "Devuelve una lista de hilos."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] int? forumId)
         {
@@ -97,6 +109,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpDelete("{id}")]
+        [SwaggerOperation(
+            Summary = "Elimina un hilo existente.",
+            Description = "Elimina un hilo."
+        )]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
@@ -116,7 +132,12 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPut("{id}")]
+        [SwaggerOperation(
+            Summary = "Actualiza la información de un hilo.",
+            Description = "Permite modificar el título, descripción u otros campos del hilo indicado."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateThreadRequest request)
         {
             if (id <= 0)
@@ -140,6 +161,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id}/messages")]
+        [SwaggerOperation(
+            Summary = "Obtiene un hilo con todos sus mensajes.",
+            Description = "Devuelve el hilo solicitado junto con todos los mensajes y respuestas asociados."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetThreadWithMessages(int id)
@@ -156,6 +181,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPatch("{id}/close")]
+        [SwaggerOperation(
+            Summary = "Cierra un hilo de discusión.",
+            Description = "Marca el hilo como cerrado, impidiendo que se agreguen nuevos mensajes o reacciones. Solo el creador o un administrador pueden cerrarlo."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Close(int id)
@@ -175,6 +204,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{threadId}/comment-count")]
+        [SwaggerOperation(
+            Summary = "Obtiene la cantidad total de comentarios de un hilo.",
+            Description = "Devuelve el número total de mensajes o comentarios asociados a un hilo específico."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCommentCount(int threadId)

@@ -2,6 +2,7 @@
 using Foraria.Interface.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Foraria.Interface.Controllers
 {
@@ -38,7 +39,14 @@ namespace Foraria.Interface.Controllers
             _getMessagesByUser = getMessagesByUser;
         }
 
+        // 📝 CREAR MENSAJE (con o sin archivo adjunto)
         [HttpPost]
+        [SwaggerOperation(
+            Summary = "Crea un nuevo mensaje dentro de un hilo del foro.",
+            Description = "Permite crear un mensaje asociado a un hilo existente. Si se incluye un archivo, será almacenado en la carpeta de foro correspondiente."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromForm] CreateMessageWithFileRequest request)
         {
             if (request.File != null)
@@ -60,6 +68,12 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id}")]
+        [SwaggerOperation(
+            Summary = "Obtiene un mensaje por su ID.",
+            Description = "Devuelve la información completa de un mensaje específico, incluyendo su contenido y cualquier archivo adjunto."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             var response = await _getMessageById.Execute(id);
@@ -67,7 +81,13 @@ namespace Foraria.Interface.Controllers
             return Ok(response);
         }
 
+        // 💬 OBTENER MENSAJES POR HILO
         [HttpGet("thread/{threadId}")]
+        [SwaggerOperation(
+            Summary = "Obtiene los mensajes asociados a un hilo.",
+            Description = "Devuelve todos los mensajes publicados dentro del hilo especificado, ordenados cronológicamente."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByThread(int threadId)
         {
             var responses = await _getMessagesByThread.Execute(threadId);
@@ -75,6 +95,12 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpDelete("{id}")]
+        [SwaggerOperation(
+            Summary = "Elimina un mensaje existente.",
+            Description = "Elimina un mensaje del foro de forma permanente. Solo los administradores o el autor pueden realizar esta acción."
+        )]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _deleteMessage.Execute(id);
@@ -83,6 +109,12 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPut("{id}")]
+        [SwaggerOperation(
+            Summary = "Actualiza el contenido de un mensaje.",
+            Description = "Permite modificar el texto de un mensaje y, opcionalmente, añadir un archivo adjunto."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, [FromForm] UpdateMessageRequest request)
         {
             if (request.File != null)
@@ -104,6 +136,12 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPatch("{id}/hide")]
+        [SwaggerOperation(
+            Summary = "Oculta un mensaje sin eliminarlo.",
+            Description = "Cambia el estado de visibilidad del mensaje, ocultándolo del foro sin eliminarlo de la base de datos."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Hide(int id)
         {
             try
@@ -118,6 +156,11 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("user/{userId}")]
+        [SwaggerOperation(
+            Summary = "Obtiene todos los mensajes publicados por un usuario.",
+            Description = "Devuelve la lista completa de mensajes creados por el usuario especificado en todos los hilos en los que haya participado."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByUser(int userId)
         {
             var messages = await _getMessagesByUser.ExecuteAsync(userId);
