@@ -19,11 +19,11 @@ public class UserController : ControllerBase
     private readonly ILogoutUser _logoutUserService;
     private readonly IRefreshTokenUseCase _refreshTokenUseCase;
     private readonly IUpdateUserFirstTime _updateUserFirstTime;
-    private readonly IFileStorageService _fileStorageService;
+    private readonly ILocalFileStorageService _fileStorageService;
     private readonly IGetUserByEmail _getUserByEmail;
     private readonly IGetUserById _getUserById;
 
-    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, IFileStorageService fileStorageService, IGetUserByEmail getUserByEmail, IGetUserById getUserById)
+    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, ILocalFileStorageService fileStorageService, IGetUserByEmail getUserByEmail, IGetUserById getUserById)
     {
         _registerUserService = registerUserService;
         _loginUserService = loginUserService;

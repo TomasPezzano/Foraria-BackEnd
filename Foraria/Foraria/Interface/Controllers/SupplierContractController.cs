@@ -12,17 +12,17 @@ public class SupplierContractController : ControllerBase
 {
     private readonly ICreateSupplierContract _createSupplierContract;
     private readonly GetSupplierById _getSupplierById;
-    private readonly IFileStorageService _fileStorageService;
+    private readonly ILocalFileStorageService _localFileStorageService;
     private readonly GetSupplierContractById _getSupplierContractById;
     private readonly GetSupplierContractsById _getContractsBySupplierId;
     private static readonly string[] AllowedFileExtensions = { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
     private const long MaxFileSizeInBytes = 10 * 1024 * 1024;
 
-    public SupplierContractController(ICreateSupplierContract createSupplierContract, GetSupplierById getSupplierById, IFileStorageService fileStorageService, GetSupplierContractById getSupplierContractById, GetSupplierContractsById getSupplierContractsBySupplierId)
+    public SupplierContractController(ICreateSupplierContract createSupplierContract, GetSupplierById getSupplierById, ILocalFileStorageService localFileStorageService, GetSupplierContractById getSupplierContractById, GetSupplierContractsById getSupplierContractsBySupplierId)
     {
         _createSupplierContract = createSupplierContract;
         _getSupplierById = getSupplierById;
-        _fileStorageService = fileStorageService;
+        _localFileStorageService = localFileStorageService;
         _getSupplierContractById = getSupplierContractById;
         _getContractsBySupplierId = getSupplierContractsBySupplierId;
     }
@@ -38,12 +38,12 @@ public class SupplierContractController : ControllerBase
             string? filePath = null;
             if (file != null)
             {
-                if (!await _fileStorageService.ValidateFileAsync(file, AllowedFileExtensions, MaxFileSizeInBytes))
+                if (!await _localFileStorageService.ValidateFileAsync(file, AllowedFileExtensions, MaxFileSizeInBytes))
                 {
                     return BadRequest(new { message = "Archivo inválido. Formatos permitidos: PDF, DOC, DOCX, JPG, PNG. Tamaño máximo: 10MB." });
                 }
 
-                filePath = await _fileStorageService.SaveFileAsync(file, "contracts");
+                filePath = await _localFileStorageService.SaveFileAsync(file, "contracts");
             }
 
             var contract = new SupplierContract
@@ -73,7 +73,7 @@ public class SupplierContractController : ControllerBase
                 EndDate = createdContract.EndDate,
                 Active = createdContract.Active,
                 FilePath = createdContract.FilePath != null
-                    ? await _fileStorageService.GetFileUrlAsync(createdContract.FilePath)
+                    ? await _localFileStorageService.GetFileUrlAsync(createdContract.FilePath)
                     : null,
                 SupplierId = createdContract.SupplierId,
                 SupplierName = supplier?.CommercialName ?? "Desconocido",
@@ -122,7 +122,7 @@ public class SupplierContractController : ControllerBase
                 EndDate = contract.EndDate,
                 Active = contract.Active,
                 FilePath = contract.FilePath != null
-                    ? await _fileStorageService.GetFileUrlAsync(contract.FilePath)
+                    ? await _localFileStorageService.GetFileUrlAsync(contract.FilePath)
                     : null,
                 SupplierId = contract.SupplierId,
                 SupplierName = supplier?.CommercialName ?? "Desconocido",
@@ -165,7 +165,7 @@ public class SupplierContractController : ControllerBase
                     EndDate = contract.EndDate,
                     Active = contract.Active,
                     FilePath = contract.FilePath != null
-                        ? await _fileStorageService.GetFileUrlAsync(contract.FilePath)
+                        ? await _localFileStorageService.GetFileUrlAsync(contract.FilePath)
                         : null,
                     SupplierId = contract.SupplierId,
                     SupplierName = supplier.CommercialName,
