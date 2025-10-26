@@ -1,7 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using ForariaDomain.Exceptions;
-using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Interface.Controllers
@@ -31,6 +31,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("users/count")]
+        [SwaggerOperation(
+            Summary = "Obtiene el total de usuarios registrados.",
+            Description = "Devuelve la cantidad total de usuarios del sistema o, si se indica un consorcio, el número de usuarios asociados a dicho consorcio."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetTotalUsers([FromQuery] int? consortiumId = null)
@@ -43,6 +47,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("claims/pending-count")]
+        [SwaggerOperation(
+            Summary = "Obtiene la cantidad de reclamos pendientes.",
+            Description = "Devuelve el número total de reclamos sin resolver en el sistema o en un consorcio específico."
+        )]
         public async Task<IActionResult> GetPendingClaimsCount([FromQuery] int? consortiumId = null)
         {
             if (consortiumId is < 0)
@@ -53,6 +61,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("claims/latest")]
+        [SwaggerOperation(
+            Summary = "Obtiene el reclamo pendiente más reciente.",
+            Description = "Devuelve la información del último reclamo pendiente registrado en el sistema o en el consorcio indicado."
+        )]
         public async Task<IActionResult> GetLatestPendingClaim([FromQuery] int? consortiumId = null)
         {
             var claim = await _getLatestPendingClaim.ExecuteAsync(consortiumId);
@@ -64,6 +76,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/collected-percentage")]
+        [SwaggerOperation(
+            Summary = "Obtiene el porcentaje de expensas recaudadas.",
+            Description = "Calcula el porcentaje total de expensas cobradas frente al total emitido, para el consorcio indicado y la fecha (opcional)."
+        )]
         public async Task<IActionResult> GetCollectedExpensesPercentage(
             [FromQuery] int consortiumId,
             [FromQuery] DateTime? date = null)
@@ -76,6 +92,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("reservations/upcoming")]
+        [SwaggerOperation(
+            Summary = "Obtiene las próximas reservas programadas.",
+            Description = "Devuelve un listado con las próximas reservas activas dentro del consorcio, ordenadas por fecha."
+        )]
         public async Task<IActionResult> GetUpcomingReservations(
             [FromQuery] int consortiumId,
             [FromQuery] int limit = 5)

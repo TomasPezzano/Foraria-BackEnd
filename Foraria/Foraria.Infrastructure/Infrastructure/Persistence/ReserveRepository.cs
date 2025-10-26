@@ -47,5 +47,19 @@ namespace Foraria.Infrastructure.Repository
             _context.Reserves.UpdateRange(reserves);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Reserve>> GetActiveReservationsAsync(int consortiumId, DateTime now)
+        {
+            return await _context.Reserves
+                .Include(r => r.Place)
+                .Include(r => r.User)
+                .Include(r => r.Residence)
+                .Where(r =>
+                    r.Residence.ConsortiumId == consortiumId &&
+                    r.State == "active" &&             // activa/Active(?)
+                    r.DeletedAt == null &&
+                    r.Date >= now)
+                .ToListAsync();
+        }
     }
 }

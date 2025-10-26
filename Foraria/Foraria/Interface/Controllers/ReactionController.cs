@@ -3,6 +3,7 @@ using ForariaDomain.Exceptions;
 using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Interface.Controllers
@@ -21,6 +22,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost("toggle")]
+        [SwaggerOperation(
+            Summary = "Agrega o quita una reacción (like/dislike).",
+            Description = "Permite alternar una reacción en un mensaje o hilo específico. Si la reacción ya existe, se elimina; si no, se crea."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -60,6 +65,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("message/{messageId}")]
+        [SwaggerOperation(
+            Summary = "Obtiene las reacciones de un mensaje.",
+            Description = "Devuelve la cantidad total de reacciones (likes y dislikes) aplicadas a un mensaje específico del foro."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetMessageReactions(int messageId)
@@ -84,6 +93,10 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("thread/{threadId}")]
+        [SwaggerOperation(
+            Summary = "Obtiene las reacciones de un hilo.",
+            Description = "Devuelve el total de reacciones (likes y dislikes) asociadas a un hilo completo del foro."
+        )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetThreadReactions(int threadId)

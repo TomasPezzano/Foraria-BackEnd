@@ -8,5 +8,8 @@ namespace Foraria.Domain.Repository
         Task Add(Reserve reserve);
         Task<List<Reserve>> GetAll();
         Task UpdateRange(List<Reserve> reserves);
+        Task<IEnumerable<Reserve>> GetActiveReservationsAsync(int consortiumId, DateTime now);
+
+
     }
 }
