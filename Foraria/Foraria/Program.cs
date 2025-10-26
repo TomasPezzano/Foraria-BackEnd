@@ -197,6 +197,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Propietario"));
     options.AddPolicy("Tenant", policy =>
         policy.RequireRole("Inquilino"));
+    options.AddPolicy("OwnerAndTenant", policy =>
+        policy.RequireRole("Propietario", "Inquilino"));
     options.AddPolicy("All", policy =>
         policy.RequireRole("Consorcio", "Administrador", "Popietario", "Inquilino"));
 });

@@ -1,6 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -20,11 +21,9 @@ public class UserDocumentController : ControllerBase
         _getUserDocuments = getUserDocuments;
     }
 
-    /// <summary>
-    /// Obtiene todos los documentos de usuario registrados.
-    /// </summary>
-    /// <returns>Lista de documentos con sus datos asociados.</returns>
+
     [HttpGet]
+    [Authorize(Policy = "All")]
     [ProducesResponseType(typeof(List<UserDocumentDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
@@ -46,12 +45,9 @@ public class UserDocumentController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Crea un nuevo documento de usuario.
-    /// </summary>
-    /// <param name="dto">Datos del documento a crear.</param>
-    /// <returns>Documento creado con sus datos completos.</returns>
+
     [HttpPost]
+    [Authorize(Policy = "All")]
     [ProducesResponseType(typeof(UserDocumentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

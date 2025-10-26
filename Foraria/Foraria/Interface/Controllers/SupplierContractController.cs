@@ -2,6 +2,7 @@
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -28,6 +29,7 @@ public class SupplierContractController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> Create([FromForm] SupplierContractRequestDto request, IFormFile? file)
     {
         try
@@ -98,6 +100,7 @@ public class SupplierContractController : ControllerBase
 
 
     [HttpGet("{id}")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> GetById(int id)
     {
         try
@@ -138,6 +141,7 @@ public class SupplierContractController : ControllerBase
     }
 
     [HttpGet("supplier/{supplierId}")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> GetBySupplierId(int supplierId)
     {
         try

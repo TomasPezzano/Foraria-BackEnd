@@ -2,6 +2,7 @@
 using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -19,6 +20,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> CreateInvoice([FromBody] InvoiceRequestDto invoiceDto)
     {
         if (!ModelState.IsValid)

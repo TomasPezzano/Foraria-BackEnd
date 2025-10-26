@@ -1,6 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -41,6 +42,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Crea un nuevo hilo de discusión.",
             Description = "Permite crear un nuevo hilo dentro de un foro existente, asociado a un usuario y una categoría. Devuelve los datos del hilo creado."
@@ -70,6 +72,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene un hilo por su ID.",
             Description = "Devuelve los detalles del hilo solicitado, incluyendo información básica como su tema, estado y usuario creador."
@@ -90,6 +93,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene todos los hilos de un foro.",
             Description = "Devuelve una lista de hilos."
@@ -109,6 +113,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Elimina un hilo existente.",
             Description = "Elimina un hilo."
@@ -132,6 +137,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Actualiza la información de un hilo.",
             Description = "Permite modificar el título, descripción u otros campos del hilo indicado."
@@ -161,6 +167,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id}/messages")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene un hilo con todos sus mensajes.",
             Description = "Devuelve el hilo solicitado junto con todos los mensajes y respuestas asociados."
@@ -181,6 +188,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPatch("{id}/close")]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Cierra un hilo de discusión.",
             Description = "Marca el hilo como cerrado, impidiendo que se agreguen nuevos mensajes o reacciones. Solo el creador o un administrador pueden cerrarlo."
@@ -204,6 +212,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{threadId}/comment-count")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene la cantidad total de comentarios de un hilo.",
             Description = "Devuelve el número total de mensajes o comentarios asociados a un hilo específico."

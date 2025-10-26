@@ -1,6 +1,7 @@
 ﻿using Foraria.Contracts.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,11 +30,9 @@ public class ReserveController : ControllerBase
         _getPlaceById = getPlaceById;
     }
 
-    /// <summary>
-    /// Obtiene todas las reservas registradas.
-    /// </summary>
-    /// <returns>Lista de reservas.</returns>
+
     [HttpGet]
+    [Authorize(Policy = "All")]
     [ProducesResponseType(typeof(List<ReserveDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
@@ -42,12 +41,9 @@ public class ReserveController : ControllerBase
         return Ok(reserves);
     }
 
-    /// <summary>
-    /// Crea una nueva reserva.
-    /// </summary>
-    /// <param name="reserveDto">Datos de la reserva.</param>
-    /// <returns>Reserva creada.</returns>
+
     [HttpPost]
+    [Authorize(Policy = "All")]
     [ProducesResponseType(typeof(ReserveDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -102,10 +98,7 @@ public class ReserveController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Actualiza el estado de reservas antiguas.
-    /// </summary>
-    /// <returns>Mensaje de confirmación.</returns>
+
     [HttpPost("update-old")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
