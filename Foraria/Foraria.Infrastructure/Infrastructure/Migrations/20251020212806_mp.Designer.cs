@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251020212806_mp")]
+    partial class mp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -379,16 +382,11 @@ namespace Foraria.Migrations
                     b.Property<int>("ExpenseId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("InstallmentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("Installments")
-                        .HasColumnType("int");
-
                     b.Property<string>("MercadoPagoPaymentId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PaymentMethodId")
+                    b.Property<int>("PaymentMethodId")
                         .HasColumnType("int");
 
                     b.Property<string>("PreferenceId")
@@ -403,9 +401,11 @@ namespace Foraria.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StatusDetail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Voucher")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -1149,7 +1149,8 @@ namespace Foraria.Migrations
                     b.HasOne("ForariaDomain.PaymentMethod", "PaymentMethod")
                         .WithMany("Payments")
                         .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("ForariaDomain.Residence", "Residence")
                         .WithMany("Payments")

@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MercadoPago.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -232,6 +233,8 @@ builder.Services.AddScoped<CreatePoll>();
 builder.Services.AddScoped<IVoteRepository, VoteRepositoryImplementation>();
 builder.Services.AddScoped<CreateVote>();
 builder.Services.AddScoped<GetPolls>();
+
+MercadoPagoConfig.AccessToken = builder.Configuration["MercadoPago:AccessToken"];
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
