@@ -1,6 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -17,6 +18,8 @@ public class ResidenceController : ControllerBase
     }
 
     [HttpPost("create")]
+    [Authorize(Policy = "OnlyConsortium")]
+
     public async Task<IActionResult> CreateResidence([FromBody] ResidenceRequestDto residenceDto)
     {
         if (!ModelState.IsValid)
@@ -44,6 +47,7 @@ public class ResidenceController : ControllerBase
     }
 
     [HttpGet("getById/{id}")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> GetResidenceById(int id)
     {
         var result = await _createResidenceUseCase.GetResidenceById(id);
@@ -57,6 +61,7 @@ public class ResidenceController : ControllerBase
     }
 
     [HttpGet("getAll")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> GetAllResidences()
     {
         var residences = await _createResidenceUseCase.GetAllResidences();

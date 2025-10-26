@@ -1,7 +1,8 @@
 ﻿using Foraria.Application.UseCase;
-using ForariaDomain.Exceptions;
 using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
+using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -22,6 +23,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost("toggle")]
+        [Authorize(Policy = "OwnerAndTenant")]
         [SwaggerOperation(
             Summary = "Agrega o quita una reacción (like/dislike).",
             Description = "Permite alternar una reacción en un mensaje o hilo específico. Si la reacción ya existe, se elimina; si no, se crea."
@@ -65,6 +67,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("message/{messageId}")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene las reacciones de un mensaje.",
             Description = "Devuelve la cantidad total de reacciones (likes y dislikes) aplicadas a un mensaje específico del foro."
@@ -93,6 +96,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("thread/{threadId}")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene las reacciones de un hilo.",
             Description = "Devuelve el total de reacciones (likes y dislikes) asociadas a un hilo completo del foro."

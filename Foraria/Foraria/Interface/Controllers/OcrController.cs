@@ -22,7 +22,7 @@ public class OcrController : ControllerBase
     [HttpPost("process-invoice")]
     [RequestSizeLimit(10 * 1024 * 1024)]
     [Consumes("multipart/form-data")]
-    //[Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> ProcessInvoice([FromForm] ProcessInvoiceRequestDto request)
     {
         // Validaciones

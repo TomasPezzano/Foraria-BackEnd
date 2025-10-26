@@ -1,6 +1,7 @@
 ﻿using Foraria.Contracts.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -24,6 +25,7 @@ public class SupplierController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public IActionResult Create([FromBody] SupplierRequestDto request)
     {
         try
@@ -31,7 +33,6 @@ public class SupplierController : ControllerBase
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Validar que el consorcio exista
             var consortiumExists = _getConsortiumById.Execute(request.ConsortiumId);
             if (consortiumExists == null)
                 return BadRequest(new { message = "El consorcio especificado no existe." });
@@ -81,6 +82,7 @@ public class SupplierController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public IActionResult Delete(int id)
     {
         try
@@ -103,6 +105,7 @@ public class SupplierController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Policy = "All")]
     public IActionResult GetSupplierById(int id)
     {
         var supplier = _getSupplierById.Execute(id);
@@ -133,6 +136,7 @@ public class SupplierController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "All")]
     public IActionResult GetAllSuppliers()
     {
         var suppliers = _getAllSupplier.Execute();

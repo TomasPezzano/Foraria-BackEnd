@@ -1,6 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -35,6 +36,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Crea un nuevo foro.",
             Description = "Permite crear un foro dentro de una categoría específica. Devuelve los datos del foro creado si la operación es exitosa."
@@ -58,6 +60,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene un foro por su ID.",
             Description = "Devuelve los detalles del foro solicitado, incluyendo su categoría, siempre que el ID sea válido."
@@ -78,6 +81,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene todos los foros disponibles.",
             Description = "Devuelve una lista de todos los foros registrados en el sistema, incluyendo su categoría."
@@ -94,6 +98,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id}/threads")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene un foro junto con sus hilos de discusión.",
             Description = "Devuelve el foro solicitado con la lista completa de hilos y sus mensajes asociados."
@@ -114,6 +119,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize (Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Deshabilita un foro existente.",
             Description = "Marca un foro como deshabilitado sin eliminarlo de la base de datos. Los hilos asociados permanecen inactivos."
@@ -126,6 +132,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id}/with-category")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene un foro con su categoría.",
             Description = "Devuelve los datos del foro junto con la información detallada de su categoría asignada."

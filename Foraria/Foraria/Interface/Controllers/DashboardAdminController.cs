@@ -1,5 +1,6 @@
 ﻿using Foraria.Application.UseCase;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -31,6 +32,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("users/count")]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Obtiene el total de usuarios registrados.",
             Description = "Devuelve la cantidad total de usuarios del sistema o, si se indica un consorcio, el número de usuarios asociados a dicho consorcio."
@@ -47,6 +49,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("claims/pending-count")]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Obtiene la cantidad de reclamos pendientes.",
             Description = "Devuelve el número total de reclamos sin resolver en el sistema o en un consorcio específico."
@@ -61,6 +64,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("claims/latest")]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Obtiene el reclamo pendiente más reciente.",
             Description = "Devuelve la información del último reclamo pendiente registrado en el sistema o en el consorcio indicado."
@@ -76,6 +80,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/collected-percentage")]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Obtiene el porcentaje de expensas recaudadas.",
             Description = "Calcula el porcentaje total de expensas cobradas frente al total emitido, para el consorcio indicado y la fecha (opcional)."
@@ -92,6 +97,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("reservations/upcoming")]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Obtiene las próximas reservas programadas.",
             Description = "Devuelve un listado con las próximas reservas activas dentro del consorcio, ordenadas por fecha."

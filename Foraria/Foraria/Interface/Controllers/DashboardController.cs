@@ -1,6 +1,7 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -41,6 +42,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/total")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene el total mensual de gastos.",
             Description = "Devuelve el monto total de expensas del mes actual para un consorcio específico."
@@ -66,6 +68,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/category")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene el desglose de gastos por categoría.",
             Description = "Devuelve un listado de categorías con los montos de expensas asociados a cada una, para el mes actual o la fecha indicada."
@@ -91,6 +94,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/pending")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene las expensas pendientes.",
             Description = "Lista todas las expensas aún no pagadas correspondientes al consorcio indicado."
@@ -114,6 +118,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/summary")]
+        [Authorize(Policy = "OwnerAndTenant")]
         [SwaggerOperation(
             Summary = "Obtiene el resumen de gastos del usuario.",
             Description = "Devuelve el estado de pagos del usuario, incluyendo expensas pagadas, vencidas y próximas a vencer."
@@ -137,6 +142,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/monthly-history")]
+        [Authorize(Policy = "OwnerAndTenant")]
         [SwaggerOperation(
             Summary = "Obtiene el historial mensual de gastos del usuario.",
             Description = "Devuelve la evolución de los gastos del usuario a lo largo del año actual o el año especificado."
@@ -160,6 +166,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("polls/active")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene la cantidad de votaciones activas.",
             Description = "Devuelve la cantidad de votaciones abiertas actualmente en el consorcio."
@@ -189,6 +196,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("reservations/active")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene las reservas activas.",
             Description = "Devuelve un listado de las próximas reservas activas para el consorcio indicado, ordenadas por fecha."
@@ -213,6 +221,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("reservations/count")]
+        [Authorize (Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene la cantidad de reservas activas.",
             Description = "Devuelve el número total de reservas activas o próximas dentro del consorcio especificado."

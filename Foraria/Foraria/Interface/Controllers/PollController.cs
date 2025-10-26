@@ -4,6 +4,7 @@ using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers
@@ -31,6 +32,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         public async Task<IActionResult> Create([FromBody] PollDto request)
         {
             try
@@ -65,6 +67,7 @@ namespace Foraria.Interface.Controllers
 
 
         [HttpGet]
+        [Authorize(Policy = "All")]
         public async Task<IActionResult> GetAll()
         {
             List<Poll> polls = await _polls.ExecuteAsync();
@@ -87,6 +90,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("with-results/{id}")]
+        [Authorize(Policy = "All")]
         public async Task<IActionResult> GetPollWithResults(int id)
         {
             var poll = await _getPollWithResults.ExecuteAsync(id);
@@ -127,6 +131,7 @@ namespace Foraria.Interface.Controllers
 
 
         [HttpGet("with-results")]
+        [Authorize(Policy = "All")]
         public async Task<IActionResult> GetAllPollsWithResults()
         {
             var polls = await _getAllPollsWithResults.ExecuteAsync();
@@ -163,6 +168,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Policy = "All")]
         public async Task<IActionResult> GetById(int id)
         {
             var poll = await _getPollById.ExecuteAsync(id);
@@ -188,6 +194,8 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpPost("{id:int}/notarize")]
+        [Authorize(Policy = "OwnerAndTenant")]
+
         public async Task<IActionResult> Notarize(int id)
         {
             var poll = await _getPollById.ExecuteAsync(id);
@@ -208,6 +216,8 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("polls/active-count")]
+        [Authorize(Policy = "All")]
+
         public async Task<IActionResult> GetActivePollCount(
     [FromQuery] int consortiumId,
     [FromQuery] DateTime? dateTime = null)
