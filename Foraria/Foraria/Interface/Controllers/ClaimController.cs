@@ -1,126 +1,119 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Produces("application/json")]
+[Consumes("application/json")]
 public class ClaimController : ControllerBase
 {
+    private readonly ICreateClaim _createClaim;
+    private readonly IGetClaims _getClaims;
+    private readonly IRejectClaim _rejectClaim;
+    private readonly IFileProcessor _fileProcessor;
 
-    public readonly ICreateClaim _createClaim;
-    public readonly IGetClaims _getClaims;
-    public readonly IRejectClaim _rejectClaim;
-    public ClaimController(ICreateClaim CreateClaim, IGetClaims GetClaims, IRejectClaim rejectClaim)
+    public ClaimController(ICreateClaim CreateClaim, IGetClaims GetClaims, IRejectClaim rejectClaim, IFileProcessor fileProcessor)
     {
         _createClaim = CreateClaim;
         _getClaims = GetClaims;
         _rejectClaim = rejectClaim;
+        _fileProcessor = fileProcessor;
     }
 
+    /// <summary>
+    /// Obtiene todos los reclamos registrados.
+    /// </summary>
+    /// <returns>Lista de reclamos con información del usuario y respuesta.</returns>
     [HttpGet]
+    [ProducesResponseType(typeof(List<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
     {
-        List<Claim> claims = await _getClaims.Execute();
-        var result = claims.Select(c => new
+        try
         {
-            claim = new ClaimDto
+            List<Claim> claims = await _getClaims.Execute();
+
+            var result = claims.Select(c => new
             {
-                Id = c.Id,
-                Title = c.Title,
-                Description = c.Description,
-                State = c.State,
-                Priority = c.Priority,
-                Category = c.Category,
-                Archive = c.Archive,
-                User_id = c.User_id,
-                CreatedAt = c.CreatedAt
-            },
-            
-            user = c.User != null ? new UserDto
-            {
-                Id = c.User.Id,
-                FirstName = c.User.Name,
-                LastName = c.User.LastName,
-                Residences = (List<ResidenceDto>)c.User.Residences
-            } : null,
+                claim = new ClaimDto
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    Description = c.Description,
+                    State = c.State,
+                    Priority = c.Priority,
+                    Category = c.Category,
+                    Archive = c.Archive,
+                    User_id = c.User_id,
+                    CreatedAt = c.CreatedAt
+                },
 
-            claimResponse = c.ClaimResponse != null ? new ClaimResponseDto
-            {
-                Description = c.ClaimResponse.Description,
-                ResponseDate = c.ClaimResponse.ResponseDate,
-                User_id = c.ClaimResponse.User.Id,
-                Claim_id = c.ClaimResponse.Claim.Id
-            } : null,
+                user = c.User != null ? new UserDto
+                {
+                    Id = c.User.Id,
+                    FirstName = c.User.Name,
+                    LastName = c.User.LastName,
+                    Residences = (List<ResidenceDto>)c.User.Residences
+                } : null,
 
-            responsibleSectorName = c.ClaimResponse?.ResponsibleSector?.Name
+                claimResponse = c.ClaimResponse != null ? new ClaimResponseDto
+                {
+                    Description = c.ClaimResponse.Description,
+                    ResponseDate = c.ClaimResponse.ResponseDate,
+                    User_id = c.ClaimResponse.User.Id,
+                    Claim_id = c.ClaimResponse.Claim.Id
+                } : null,
 
-        }).ToList();
+                responsibleSectorName = c.ClaimResponse?.ResponsibleSector?.Name
+            }).ToList();
 
-        return Ok(result);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al obtener los reclamos", details = ex.Message });
+        }
     }
 
-    [HttpPost]
-     public async Task<IActionResult> Add([FromBody] ClaimDto claimDto)
-    {
 
+        /// <summary>
+        /// Crea un nuevo reclamo.
+        /// </summary>
+        /// <param name="claimDto">Datos del reclamo.</param>
+        /// <returns>Reclamo creado.</returns>
+        [HttpPost]
+    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Add([FromBody] ClaimDto claimDto)
+    {
         try
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             string? filePath = null;
-
-            // Si viene un archivo en Base64, lo guardamos físicamente
             if (!string.IsNullOrEmpty(claimDto.Archive))
             {
-                // Ejemplo: data:image/png;base64,iVBORw0KGgoAAAANS...
-                var base64Parts = claimDto.Archive.Split(',');
-
-                if (base64Parts.Length == 2)
-                {
-                    var base64Data = base64Parts[1];
-                    var bytes = Convert.FromBase64String(base64Data);
-
-                    // Detectar tipo de archivo por el prefijo
-                    var extension = ".png"; // valor por defecto
-                    if (base64Parts[0].Contains("jpeg")) extension = ".jpg";
-                    else if (base64Parts[0].Contains("pdf")) extension = ".pdf";
-                    else if (base64Parts[0].Contains("mp4")) extension = ".mp4";
-
-                    // Crear carpeta
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "claims");
-                    if (!Directory.Exists(uploadsFolder))
-                        Directory.CreateDirectory(uploadsFolder);
-
-                    // Nombre único
-                    var uniqueFileName = $"{Guid.NewGuid()}{extension}";
-                    var fullPath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    // Guardar el archivo
-                    await System.IO.File.WriteAllBytesAsync(fullPath, bytes);
-
-                    // Guardar ruta relativa en BD
-                    filePath = $"/uploads/claims/{uniqueFileName}";
-                }
+                filePath = await _fileProcessor.SaveBase64FileAsync(claimDto.Archive, "claims");
             }
 
-            // Crear entidad Claim
-            var claim = new Claim
-            {
+            var claim = new Claim {
                 Title = claimDto.Title,
                 Description = claimDto.Description,
                 Priority = claimDto.Priority,
                 Category = claimDto.Category,
-                Archive = filePath,                // opcional
-                User_id = claimDto.User_id,        // opcional
+                Archive = filePath,
+                User_id = claimDto.User_id,
                 ResidenceId = claimDto.ResidenceId,
-                CreatedAt = DateTime.UtcNow,       // obligatorio
-                State = "Nuevo"                // obligatorio
+                CreatedAt = DateTime.UtcNow,
+                State = "Nuevo"
             };
-
             var createdClaim = await _createClaim.Execute(claim);
 
             var response = new
@@ -145,7 +138,15 @@ public class ClaimController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Rechaza un reclamo por su ID.
+    /// </summary>
+    /// <param name="id">ID del reclamo.</param>
+    /// <returns>Mensaje de confirmación.</returns>
     [HttpPut("reject/{id}")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RejectClaimById(int id)
     {
         try
@@ -162,6 +163,4 @@ public class ClaimController : ControllerBase
             return StatusCode(500, new { error = "Ocurrió un error interno", details = ex.Message });
         }
     }
-
-
 }

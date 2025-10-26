@@ -129,6 +129,9 @@ builder.Services.AddScoped<GetForumWithCategory>();
 builder.Services.AddScoped<GetThreadCommentCount>();
 builder.Services.AddScoped<IOcrService, AzureOcrService>();
 builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
+builder.Services.AddScoped<IFileProcessor, FileProcessor>();
+builder.Services.AddScoped<IGetPlaceById, GetPlaceById>();
+builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
 
 
 
