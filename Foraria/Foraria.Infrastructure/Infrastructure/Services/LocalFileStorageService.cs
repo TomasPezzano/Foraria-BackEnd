@@ -1,47 +1,80 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ForariaDomain.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
-namespace ForariaDomain.Services;
+namespace Foraria.Infrastructure.Infrastructure.Services;
 
-public interface IFileStorageService
-{
-    Task <string> SaveFileAsync(IFormFile file, string directory);
-    Task DeleteFileAsync(string filePath);
-
-    Task <string> GetFileUrlAsync(string filePath);
-
-    Task <bool> ValidateFileAsync(IFormFile file, string[] allowedExtensions, long maxSizeInBytes);
-
-    Task<FileStorageResult> SavePhotoAsync(
-    IFormFile file,
-    string folder,
-    string[] allowedExtensions,
-    long maxFileSize);
-
-}
-
-public class FileStorageResult
-{
-    public bool Success { get; set; }
-    public string? FilePath { get; set; }
-    public string? ErrorMessage { get; set; }
-}
-
-public class FileStorageService : IFileStorageService
+public class LocalFileStorageService : ILocalFileStorageService
 {
     private readonly string _baseUploadPath;
+    private readonly ILogger<LocalFileStorageService> _logger;
 
-    public FileStorageService()
+    public LocalFileStorageService(ILogger<LocalFileStorageService> logger)
     {
+        _logger = logger;
         _baseUploadPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
 
         if (!Directory.Exists(_baseUploadPath))
         {
             Directory.CreateDirectory(_baseUploadPath);
+            _logger.LogInformation("Directorio de uploads creado: {Path}", _baseUploadPath);
+        }
+    }
+
+    public async Task<string> SaveInvoiceFileAsync(Stream fileStream, string fileName)
+    {
+        try
+        {
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var safeFileName = Path.GetFileNameWithoutExtension(fileName)
+                .Replace(" ", "_")
+                .Replace("-", "_");
+            var extension = Path.GetExtension(fileName);
+            var uniqueFileName = $"{timestamp}_{safeFileName}{extension}";
+
+            var fullPath = Path.Combine(_baseUploadPath, uniqueFileName);
+
+            using (var fileStreamOutput = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+            {
+                await fileStream.CopyToAsync(fileStreamOutput);
+            }
+
+            _logger.LogInformation("Archivo guardado: {FullPath}", fullPath);
+
+            return $"uploads/{uniqueFileName}";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al guardar archivo {FileName}", fileName);
+            throw new InvalidOperationException($"Error al guardar el archivo: {ex.Message}", ex);
+        }
+    }
+
+    public async Task<Stream> GetFileAsync(string filePath)
+    {
+        try
+        {
+            var fullPath = Path.Combine(_baseUploadPath, Path.GetFileName(filePath));
+
+            if (!File.Exists(fullPath))
+            {
+                _logger.LogWarning("Archivo no encontrado: {FilePath}", fullPath);
+                throw new FileNotFoundException($"Archivo no encontrado: {filePath}");
+            }
+
+            var memoryStream = new MemoryStream();
+            using (var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read))
+            {
+                await fileStream.CopyToAsync(memoryStream);
+            }
+            memoryStream.Position = 0;
+
+            return memoryStream;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al leer archivo {FilePath}", filePath);
+            throw;
         }
     }
 
@@ -90,6 +123,7 @@ public class FileStorageService : IFileStorageService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error al guardar foto");
             return new FileStorageResult
             {
                 Success = false,
@@ -109,6 +143,7 @@ public class FileStorageService : IFileStorageService
         if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
+            _logger.LogInformation("Carpeta creada: {FolderPath}", folderPath);
         }
 
         var fileExtension = Path.GetExtension(file.FileName);
@@ -120,15 +155,17 @@ public class FileStorageService : IFileStorageService
             await file.CopyToAsync(stream);
         }
 
-        return $"/uploads/{folder}/{uniqueFileName}";
+        _logger.LogInformation("Archivo guardado: {FullPath}", fullPath);
+
+        return $"uploads/{folder}/{uniqueFileName}";
     }
 
-    public async Task DeleteFileAsync(string filePath)
+    public async Task<bool> DeleteFileAsync(string filePath)
     {
         if (string.IsNullOrEmpty(filePath))
-            return;
+            return false;
 
-        await Task.Run(() =>
+        return await Task.Run(() =>
         {
             try
             {
@@ -140,19 +177,23 @@ public class FileStorageService : IFileStorageService
                 if (File.Exists(fullPath))
                 {
                     File.Delete(fullPath);
+                    _logger.LogInformation("Archivo eliminado: {FullPath}", fullPath);
+                    return true;
                 }
+
+                _logger.LogWarning("Archivo no encontrado para eliminar: {FullPath}", fullPath);
+                return false;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al eliminar archivo: {ex.Message}");
+                _logger.LogError(ex, "Error al eliminar archivo {FilePath}", filePath);
+                return false;
             }
         });
     }
 
     public Task<string> GetFileUrlAsync(string filePath)
     {
-        // En local, la URL es la misma ruta relativa
-        // En cloud sería la URL completa del blob storage
         return Task.FromResult(filePath);
     }
 
@@ -161,10 +202,8 @@ public class FileStorageService : IFileStorageService
         if (file == null || file.Length == 0)
             return Task.FromResult(false);
 
-
         if (file.Length > maxSizeInBytes)
             return Task.FromResult(false);
-
 
         var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
         var isValid = allowedExtensions.Contains(fileExtension);

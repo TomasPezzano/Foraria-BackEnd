@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251026132507_chagesInInvoice")]
+    partial class chagesInInvoice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,9 +322,6 @@ namespace Foraria.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.ToTable("forum", (string)null);
@@ -348,9 +348,6 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<float?>("ConfidenceScore")
-                        .HasColumnType("real");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -380,20 +377,9 @@ namespace Foraria.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime>("ProcessedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PurchaseOrder")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<decimal>("SubTotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("SupplierAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("SupplierName")
                         .IsRequired()
@@ -407,40 +393,6 @@ namespace Foraria.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("invoice", (string)null);
-                });
-
-            modelBuilder.Entity("ForariaDomain.InvoiceItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("InvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InvoiceId");
-
-                    b.ToTable("invoiceItem", (string)null);
                 });
 
             modelBuilder.Entity("ForariaDomain.Message", b =>
@@ -960,7 +912,7 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ForumId")
+                    b.Property<int>("Forum_id")
                         .HasColumnType("int");
 
                     b.Property<string>("State")
@@ -971,14 +923,14 @@ namespace Foraria.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("User_id")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ForumId");
+                    b.HasIndex("Forum_id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("User_id");
 
                     b.ToTable("thread", (string)null);
                 });
@@ -1215,17 +1167,6 @@ namespace Foraria.Migrations
                     b.Navigation("Expense");
                 });
 
-            modelBuilder.Entity("ForariaDomain.InvoiceItem", b =>
-                {
-                    b.HasOne("ForariaDomain.Invoice", "Invoice")
-                        .WithMany("Items")
-                        .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Invoice");
-                });
-
             modelBuilder.Entity("ForariaDomain.Message", b =>
                 {
                     b.HasOne("ForariaDomain.Thread", "Thread")
@@ -1405,13 +1346,13 @@ namespace Foraria.Migrations
                 {
                     b.HasOne("ForariaDomain.Forum", "Forum")
                         .WithMany("Threads")
-                        .HasForeignKey("ForumId")
+                        .HasForeignKey("Forum_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ForariaDomain.User", "User")
                         .WithMany("Threads")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("User_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1539,11 +1480,6 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.Forum", b =>
                 {
                     b.Navigation("Threads");
-                });
-
-            modelBuilder.Entity("ForariaDomain.Invoice", b =>
-                {
-                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("ForariaDomain.Message", b =>

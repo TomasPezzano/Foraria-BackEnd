@@ -67,6 +67,10 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<BlockchainProof> BlockchainProofs { get; set; }
 
+        public DbSet<Invoice> Invoices { get; set; }
+
+        public DbSet<InvoiceItem> InvoiceItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("user");
@@ -96,6 +100,8 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<RefreshToken>().ToTable("refreshToken");
             modelBuilder.Entity<Supplier>().ToTable("supplier");
             modelBuilder.Entity<SupplierContract>().ToTable("supplierContract");
+            modelBuilder.Entity<Invoice>().ToTable("invoice");
+            modelBuilder.Entity<InvoiceItem>().ToTable("invoiceItem");
 
 
             modelBuilder.Entity<User>()
@@ -344,6 +350,12 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<Supplier>()
                 .Property(s => s.Rating)
                 .HasPrecision(3, 2);
+
+            modelBuilder.Entity<InvoiceItem>()
+                .HasOne(ii => ii.Invoice)
+                .WithMany(i => i.Items)
+                .HasForeignKey(ii => ii.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
             foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))

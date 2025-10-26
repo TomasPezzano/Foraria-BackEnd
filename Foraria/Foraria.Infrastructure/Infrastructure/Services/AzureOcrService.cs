@@ -3,17 +3,20 @@ using Azure.AI.DocumentIntelligence;
 using ForariaDomain.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Foraria.Infrastructure.Infrastructure.Services;
 
 public class AzureOcrService : IOcrService
 {
-
     private readonly DocumentIntelligenceClient _client;
+    private readonly ILogger<AzureOcrService> _logger;
     private const string PrebuiltInvoiceModel = "prebuilt-invoice";
 
-    public AzureOcrService(IConfiguration configuration)
+    public AzureOcrService(IConfiguration configuration, ILogger<AzureOcrService> logger)
     {
+        _logger = logger;
+        
         var endpoint = configuration["AzureDocumentIntelligence:Endpoint"];
         var apiKey = configuration["AzureDocumentIntelligence:ApiKey"];
 
@@ -56,12 +59,13 @@ public class AzureOcrService : IOcrService
                 };
             }
 
-
             using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
 
             var fileData = BinaryData.FromStream(memoryStream);
+
+            _logger.LogInformation("Iniciando análisis OCR para archivo: {FileName}", file.FileName);
 
             Operation<AnalyzeResult> operation = await _client.AnalyzeDocumentAsync(
                 WaitUntil.Completed,
@@ -82,23 +86,60 @@ public class AzureOcrService : IOcrService
 
             var invoice = result.Documents[0];
 
-            return new InvoiceOcrResult
+            var totalAmount = GetFieldValueAsDecimal(invoice.Fields, "InvoiceTotal")
+                             ?? GetFieldValueAsDecimal(invoice.Fields, "AmountDue");
+            var subTotal = GetFieldValueAsDecimal(invoice.Fields, "SubTotal");
+            var totalTax = GetFieldValueAsDecimal(invoice.Fields, "TotalTax");
+
+            if (totalAmount.HasValue && subTotal.HasValue)
+            {
+                var calculatedTax = totalAmount.Value - subTotal.Value;
+                
+                if (!totalTax.HasValue || Math.Abs(totalTax.Value - calculatedTax) > 1)
+                {
+                    _logger.LogWarning(
+                        "TotalTax recalculado: {Calculated} (OCR retornó: {Original})",
+                        calculatedTax,
+                        totalTax ?? 0
+                    );
+                    totalTax = calculatedTax;
+                }
+            }
+
+            var ocrResult = new InvoiceOcrResult
             {
                 Success = true,
+
                 SupplierName = GetFieldValue(invoice.Fields, "VendorName"),
                 Cuit = ExtractCuit(invoice.Fields, result.Content),
                 InvoiceDate = GetFieldValueAsDateTime(invoice.Fields, "InvoiceDate"),
-                TotalAmount = GetFieldValueAsDecimal(invoice.Fields, "InvoiceTotal")
-                             ?? GetFieldValueAsDecimal(invoice.Fields, "AmountDue"),
+                DueDate = GetFieldValueAsDateTime(invoice.Fields, "DueDate"),
+                InvoiceNumber = GetFieldValue(invoice.Fields, "InvoiceId"),
+                SubTotal = subTotal,
+                TotalAmount = totalAmount,
+                TotalTax = totalTax,
+
+                SupplierAddress = GetFieldValue(invoice.Fields, "VendorAddress"),
+                PurchaseOrder = GetFieldValue(invoice.Fields, "PurchaseOrder"),
                 Description = GetFieldValue(invoice.Fields, "PurchaseOrder")
                              ?? GetFieldValue(invoice.Fields, "InvoiceId")
                              ?? "Factura procesada",
+
                 Items = ExtractItems(invoice.Fields),
-                ConfidenceScore = invoice.Confidence
+                ConfidenceScore = invoice.Confidence,
+                ProcessedAt = DateTime.UtcNow
             };
+
+            if (!string.IsNullOrEmpty(ocrResult.Cuit) && !IsValidCuit(ocrResult.Cuit))
+            {
+                _logger.LogWarning("CUIT extraído es inválido: {Cuit}", ocrResult.Cuit);
+            }
+
+            return ocrResult;
         }
         catch (RequestFailedException ex) when (ex.Status == 401)
         {
+            _logger.LogError(ex, "Error de autenticación con Azure");
             return new InvoiceOcrResult
             {
                 Success = false,
@@ -107,6 +148,7 @@ public class AzureOcrService : IOcrService
         }
         catch (RequestFailedException ex) when (ex.Status == 429)
         {
+            _logger.LogError(ex, "Límite de solicitudes excedido");
             return new InvoiceOcrResult
             {
                 Success = false,
@@ -115,6 +157,7 @@ public class AzureOcrService : IOcrService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error al procesar documento");
             return new InvoiceOcrResult
             {
                 Success = false,
@@ -125,9 +168,16 @@ public class AzureOcrService : IOcrService
 
     private string? GetFieldValue(IReadOnlyDictionary<string, DocumentField> fields, string fieldName)
     {
-        if (fields.TryGetValue(fieldName, out var field))
+        if (fields.TryGetValue(fieldName, out var field) && !string.IsNullOrEmpty(field.Content))
         {
-            return field.Content;
+            return field.Content
+                .Replace("\n", " ")         
+                .Replace("\r", "")           
+                .Replace("®", "")            
+                .Replace("©", "")
+                .Replace("™", "")
+                .Trim()
+                .Replace("  ", " ");        
         }
         return null;
     }
@@ -171,7 +221,9 @@ public class AzureOcrService : IOcrService
         var taxId = GetFieldValue(fields, "VendorTaxId");
         if (!string.IsNullOrEmpty(taxId))
         {
-            return CleanCuit(taxId);
+            var cleaned = CleanCuit(taxId);
+            if (!string.IsNullOrEmpty(cleaned))
+                return cleaned;
         }
 
         if (!string.IsNullOrEmpty(fullContent))
@@ -188,9 +240,34 @@ public class AzureOcrService : IOcrService
         return null;
     }
 
-    private string CleanCuit(string cuit)
+    private string? CleanCuit(string cuit)
     {
-        return System.Text.RegularExpressions.Regex.Replace(cuit, @"[^\d]", "");
+        if (string.IsNullOrEmpty(cuit))
+            return null;
+
+        var cleaned = System.Text.RegularExpressions.Regex.Replace(cuit, @"[^\d]", "");
+        
+        return cleaned.Length == 11 ? cleaned : null;
+    }
+
+    private bool IsValidCuit(string cuit)
+    {
+        if (string.IsNullOrEmpty(cuit) || cuit.Length != 11 || !cuit.All(char.IsDigit))
+            return false;
+
+        int[] multiplicadores = { 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
+        int suma = 0;
+
+        for (int i = 0; i < 10; i++)
+        {
+            suma += int.Parse(cuit[i].ToString()) * multiplicadores[i];
+        }
+
+        int verificador = 11 - (suma % 11);
+        if (verificador == 11) verificador = 0;
+        if (verificador == 10) verificador = 9;
+
+        return verificador == int.Parse(cuit[10].ToString());
     }
 
     private List<InvoiceItem> ExtractItems(IReadOnlyDictionary<string, DocumentField> fields)
@@ -207,14 +284,59 @@ public class AzureOcrService : IOcrService
                 {
                     var itemDict = item.ValueDictionary;
 
+                    var description = GetItemField(itemDict, "Description")
+                                    ?? GetItemField(itemDict, "ProductCode")
+                                    ?? "Item";
+
+                    var amount = GetItemFieldAsDecimal(itemDict, "Amount");
+                    var quantity = GetItemFieldAsInt(itemDict, "Quantity");
+                    var unitPrice = GetItemFieldAsDecimal(itemDict, "UnitPrice");
+
+
+                    if ((!quantity.HasValue || quantity == 0) && 
+                        amount.HasValue && 
+                        unitPrice.HasValue &&
+                        amount.Value < 100 &&        
+                        unitPrice.Value > 1000)   
+                    {
+                        _logger.LogWarning(
+                            "Item con valores invertidos detectados: {Description}. " +
+                            "Amount={Amount}, UnitPrice={UnitPrice}. Corrigiendo...",
+                            description, amount, unitPrice
+                        );
+
+                        var tempAmount = amount.Value;
+                        quantity = (int)tempAmount;
+                        amount = unitPrice;
+                        unitPrice = amount.Value / quantity.Value;
+                    }
+
+                    if (quantity.HasValue && quantity > 0)
+                    {
+                        if (amount.HasValue && !unitPrice.HasValue)
+                        {
+                            unitPrice = amount.Value / quantity.Value;
+                            _logger.LogInformation(
+                                "UnitPrice calculado para '{Description}': {UnitPrice}",
+                                description, unitPrice
+                            );
+                        }
+                        else if (unitPrice.HasValue && !amount.HasValue)
+                        {
+                            amount = unitPrice.Value * quantity.Value;
+                            _logger.LogInformation(
+                                "Amount calculado para '{Description}': {Amount}",
+                                description, amount
+                            );
+                        }
+                    }
+
                     items.Add(new InvoiceItem
                     {
-                        Description = GetItemField(itemDict, "Description")
-                                    ?? GetItemField(itemDict, "ProductCode")
-                                    ?? "Item",
-                        Amount = GetItemFieldAsDecimal(itemDict, "Amount"),
-                        Quantity = GetItemFieldAsInt(itemDict, "Quantity"),
-                        UnitPrice = GetItemFieldAsDecimal(itemDict, "UnitPrice")
+                        Description = description,
+                        Amount = amount,
+                        Quantity = quantity ?? 1,  
+                        UnitPrice = unitPrice
                     });
                 }
             }
@@ -225,7 +347,14 @@ public class AzureOcrService : IOcrService
 
     private string? GetItemField(IReadOnlyDictionary<string, DocumentField> dict, string key)
     {
-        return dict.TryGetValue(key, out var field) ? field.Content : null;
+        if (dict.TryGetValue(key, out var field) && !string.IsNullOrEmpty(field.Content))
+        {
+            return field.Content
+                .Replace("\n", " ")
+                .Replace("\r", "")
+                .Trim();
+        }
+        return null;
     }
 
     private decimal? GetItemFieldAsDecimal(IReadOnlyDictionary<string, DocumentField> dict, string key)
@@ -240,19 +369,27 @@ public class AzureOcrService : IOcrService
             {
                 return (decimal)field.ValueDouble.Value;
             }
+            else if (field.FieldType == DocumentFieldType.Int64 && field.ValueInt64.HasValue)
+            {
+                return (decimal)field.ValueInt64.Value;
+            }
         }
         return null;
     }
 
     private int? GetItemFieldAsInt(IReadOnlyDictionary<string, DocumentField> dict, string key)
     {
-        if (dict.TryGetValue(key, out var field)
-            && field.FieldType == DocumentFieldType.Int64
-            && field.ValueInt64.HasValue)
+        if (dict.TryGetValue(key, out var field))
         {
-            return (int)field.ValueInt64.Value;
+            if (field.FieldType == DocumentFieldType.Int64 && field.ValueInt64.HasValue)
+            {
+                return (int)field.ValueInt64.Value;
+            }
+            else if (field.FieldType == DocumentFieldType.Double && field.ValueDouble.HasValue)
+            {
+                return (int)field.ValueDouble.Value;
+            }
         }
         return null;
     }
-
 }
