@@ -81,13 +81,14 @@ public class ReserveController : ControllerBase
                 Id = created.Id,
                 Description = created.Description,
                 State = created.State,
-                CreatedAt = created.CreatedAt,
+                CreatedAt = created.Date,
                 DeletedAt = created.DeletedAt,
                 Place_id = created.Place_id,
                 PlaceName = created.Place?.Name,
                 Residence_id = created.Residence_id,
                 User_id = created.User_id,
-                UserName = created.User?.Name
+                UserName = created.User?.Name,
+                DateReserve = created.CreatedAt
             };
 
             return CreatedAtAction(nameof(GetAll), new { id = response.Id }, response);

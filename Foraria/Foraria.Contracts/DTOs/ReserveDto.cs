@@ -43,4 +43,6 @@ public class ReserveResponseDto
 
     public int User_id { get; set; }
     public string? UserName { get; set; }
+
+    public DateTime DateReserve { get; set; }
 }
