@@ -40,5 +40,7 @@ public class SupplierRequestDto
     [MaxLength(1000)]
     public string? Observations { get; set; }
 
-   
+    [Required(ErrorMessage = "El ConsortiumId es obligatorio.")]
+    public int ConsortiumId { get; set; }
+
 }

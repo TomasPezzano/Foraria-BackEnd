@@ -47,6 +47,7 @@ public class Supplier
     public ICollection<SupplierContract?> Contracts { get; set; }
 
 
-    //public int ConsortiumId { get; set; }
-    //public Consortium Consortium { get; set; } = null!;
+    public int ConsortiumId { get; set; }
+    [ForeignKey(nameof(ConsortiumId))]
+    public Consortium Consortium { get; set; } = null!;
 }
