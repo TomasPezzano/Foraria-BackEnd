@@ -4,11 +4,14 @@ using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Foraria.Interface.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Produces("application/json")]
+[Consumes("application/json")]
 public class ClaimResponseController : ControllerBase
 {
     private readonly ICreateClaimResponse _createClaimResponse;
@@ -28,7 +31,15 @@ public class ClaimResponseController : ControllerBase
         _getResponsibleSectorById = getResponsibleSectorById;
     }
 
+    /// <summary>
+    /// Crea una respuesta a un reclamo existente.
+    /// </summary>
+    /// <param name="claimResponseDto">Datos de la respuesta al reclamo.</param>
+    /// <returns>Respuesta creada o error de validación.</returns>
     [HttpPost]
+    [ProducesResponseType(typeof(ClaimResponseResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Add([FromBody] ClaimResponseDto claimResponseDto)
     {
         if (!ModelState.IsValid)
@@ -38,15 +49,15 @@ public class ClaimResponseController : ControllerBase
         {
             var user = await _getUserById.Execute(claimResponseDto.User_id);
             if (user == null)
-                return BadRequest(new { error = "Usuario no encontrado" });
+                return NotFound(new { error = "Usuario no encontrado" });
 
             var claim = await _getClaimById.Execute(claimResponseDto.Claim_id);
             if (claim == null)
-                return BadRequest(new { error = "Reclamo no encontrado" });
+                return NotFound(new { error = "Reclamo no encontrado" });
 
             var sector = await _getResponsibleSectorById.Execute(claimResponseDto.ResponsibleSector_id);
             if (sector == null)
-                return BadRequest(new { error = "Sector responsable no encontrado" });
+                return NotFound(new { error = "Sector responsable no encontrado" });
 
             var claimResponse = new ClaimResponse
             {
@@ -60,7 +71,20 @@ public class ClaimResponseController : ControllerBase
 
             var responseResult = await _createClaimResponse.Execute(claimResponse);
 
-            return Ok(responseResult);
+            var responseDto = new ClaimResponseResultDto
+            {
+                Id = claimResponse.Id,
+                Description = claimResponse.Description,
+                ResponseDate = claimResponse.ResponseDate,
+                User_id = claimResponse.User?.Id ?? claimResponseDto.User_id,
+                UserName = claimResponse.User?.Name,
+                Claim_id = claimResponse.Claim?.Id ?? claimResponseDto.Claim_id,
+                ClaimTitle = claimResponse.Claim?.Title,
+                ResponsibleSector_id = claimResponse.ResponsibleSector_id,
+                ResponsibleSectorName = claimResponse.ResponsibleSector?.Name
+            };
+
+            return CreatedAtAction(nameof(Add), new { id = responseDto.Id }, responseDto);
         }
         catch (ArgumentException ex)
         {
@@ -72,3 +96,4 @@ public class ClaimResponseController : ControllerBase
         }
     }
 }
+

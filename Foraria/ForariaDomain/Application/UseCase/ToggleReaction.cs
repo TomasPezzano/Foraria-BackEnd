@@ -26,8 +26,7 @@ namespace Foraria.Application.UseCase
                 else
                 {
                     existing.ReactionType = reactionType;
-                    await _repository.Remove(existing);
-                    await _repository.Add(existing);
+                    await _repository.Update(existing);
                     return true;
                 }
             }

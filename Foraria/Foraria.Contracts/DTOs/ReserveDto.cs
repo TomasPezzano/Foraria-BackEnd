@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Foraria.Contracts.DTOs;
 
-public class ReserveRequestDto
+public class ReserveDto
 {
 
     [Required(ErrorMessage = "La descripción es obligatoria.")]
@@ -25,4 +25,22 @@ public class ReserveRequestDto
 
     [Required(ErrorMessage = "Debe especificar el usuario que crea la reserva.")]
     public int User_id { get; set; }
+}
+
+public class ReserveResponseDto
+{
+    public int Id { get; set; }
+    public string Description { get; set; }
+    public string State { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
+
+    public int Place_id { get; set; }
+    public string? PlaceName { get; set; }
+
+    public int Residence_id { get; set; }
+    public string? Residence { get; set; }
+
+    public int User_id { get; set; }
+    public string? UserName { get; set; }
 }

@@ -37,6 +37,7 @@ public class CreateClaimResponse : ICreateClaimResponse
 
         var resultDto = new ClaimResponseDto
         {
+            Id = claimResponse.Id,
             Description = claimResponse.Description,
             ResponseDate = claimResponse.ResponseDate,
             User_id = claimResponse.User.Id,
