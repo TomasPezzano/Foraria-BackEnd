@@ -1,4 +1,5 @@
-﻿using Foraria.Application.UseCase;
+﻿using Foraria;
+using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
@@ -21,8 +22,13 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MercadoPago.Config;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Annotations;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
@@ -50,7 +56,7 @@ builder.Services.AddScoped<ISupplierContractRepository, SupplierContractReposito
 builder.Services.AddScoped<ICreateSupplier, CreateSupplier>();
 builder.Services.AddScoped<IDeleteSupplier, DeleteSupplier>();
 builder.Services.AddScoped<ICreateSupplierContract, CreateSupplierContract>();
-builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<ILocalFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<IContractExpirationService, ContractExpirationService>();
 builder.Services.AddScoped<IGetAllSupplier, GetAllSupplier>();
 builder.Services.AddHostedService<PollExpirationService>();
@@ -127,6 +133,22 @@ builder.Services.AddScoped<GetForumWithCategory>();
 builder.Services.AddScoped<GetThreadCommentCount>();
 builder.Services.AddScoped<IOcrService, AzureOcrService>();
 builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
+builder.Services.AddScoped<IFileProcessor, FileProcessor>();
+builder.Services.AddScoped<IGetPlaceById, GetPlaceById>();
+builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
+builder.Services.AddScoped<GetActiveReserveCount>();
+builder.Services.AddScoped<ICreateInvoice, CreateInvoice>();
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+builder.Services.AddScoped<IGetAllInvoices, GetAllInvoices>();
+builder.Services.AddScoped<IGetConsortiumById, GetConsortiumById>();
+builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentGateway, MercadoPagoService>();
+builder.Services.AddScoped<CreatePreferenceMP>();
+builder.Services.AddScoped<ProcessWebHookMP>();
+builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+
 
 
 
@@ -191,32 +213,39 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "Foraria API", Version = "v1" });
+    c.EnableAnnotations();
 
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Foraria API",
+        Version = "v1",
+        Description = "API Foraria."
+    });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header usando el esquema Bearer.\r\n\r\n" +
                       "Ingresá tu token así:\r\n\r\n" +
                       "Bearer {tu_token_jwt}",
         Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
 
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            new OpenApiSecurityScheme
             {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                Reference = new OpenApiReference
                 {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 },
                 Scheme = "oauth2",
                 Name = "Bearer",
-                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                In = ParameterLocation.Header
             },
             new List<string>()
         }
@@ -236,6 +265,8 @@ builder.Services.AddScoped<GetPolls>();
 
 MercadoPagoConfig.AccessToken = builder.Configuration["MercadoPago:AccessToken"];
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {

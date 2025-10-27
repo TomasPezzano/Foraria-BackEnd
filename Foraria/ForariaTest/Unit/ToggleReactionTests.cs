@@ -49,7 +49,7 @@ public class ToggleReactionTests
     }
 
     [Fact]
-    public async Task GivenExistingLike_WhenTogglingDislike_ThenReplacesReactionAndReturnsTrue()
+    public async Task GivenExistingLike_WhenTogglingDislike_ThenUpdatesReactionAndReturnsTrue()
     {
         // Given
         var existing = new Reaction { User_id = 1, Message_id = 10, ReactionType = 1 };
@@ -62,7 +62,9 @@ public class ToggleReactionTests
 
         // Then
         Assert.True(result);
-        _mockRepo.Verify(r => r.Remove(existing), Times.Once);
-        _mockRepo.Verify(r => r.Add(It.IsAny<Reaction>()), Times.Once);
+        _mockRepo.Verify(r => r.Update(It.Is<Reaction>(r =>
+            r.User_id == 1 &&
+            r.Message_id == 10 &&
+            r.ReactionType == -1)), Times.Once);
     }
 }

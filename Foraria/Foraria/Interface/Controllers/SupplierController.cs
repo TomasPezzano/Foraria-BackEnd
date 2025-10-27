@@ -13,12 +13,14 @@ public class SupplierController : ControllerBase
     private readonly IDeleteSupplier _deleteSupplier;
     private readonly GetSupplierById _getSupplierById;
     private readonly IGetAllSupplier _getAllSupplier;
-    public SupplierController(ICreateSupplier createSupplier, IDeleteSupplier deleteSupplier, GetSupplierById getSupplierById, IGetAllSupplier getAllSupplier)
+    private readonly IGetConsortiumById _getConsortiumById;
+    public SupplierController(ICreateSupplier createSupplier, IDeleteSupplier deleteSupplier, GetSupplierById getSupplierById, IGetAllSupplier getAllSupplier, IGetConsortiumById getConsortiumById)
     {
         _createSupplier = createSupplier;
         _deleteSupplier = deleteSupplier;
         _getSupplierById = getSupplierById;
-        _getAllSupplier = getAllSupplier;
+        _getAllSupplier = getAllSupplier; 
+        _getConsortiumById = getConsortiumById;
     }
 
     [HttpPost]
@@ -28,6 +30,11 @@ public class SupplierController : ControllerBase
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            // Validar que el consorcio exista
+            var consortiumExists = _getConsortiumById.Execute(request.ConsortiumId);
+            if (consortiumExists == null)
+                return BadRequest(new { message = "El consorcio especificado no existe." });
 
             var supplier = new Supplier
             {
@@ -39,7 +46,8 @@ public class SupplierController : ControllerBase
                 Phone = request.Phone,
                 Address = request.Address,
                 ContactPerson = request.ContactPerson,
-                Observations = request.Observations
+                Observations = request.Observations,
+                ConsortiumId = request.ConsortiumId
             };
 
             var createdSupplier = _createSupplier.Execute(supplier);
@@ -60,13 +68,12 @@ public class SupplierController : ControllerBase
             };
 
             return Ok(response);
-
         }
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return StatusCode(500, new { message = "Ocurrió un error al crear el proveedor." });
         }
