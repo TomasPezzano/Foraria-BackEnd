@@ -100,19 +100,18 @@ namespace Foraria.Interface.Controllers
         [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Elimina un mensaje existente.",
-            Description = "Elimina un mensaje del foro de forma permanente. Solo los administradores o el autor pueden realizar esta acción."
+            Description = "Elimina un mensaje del foro pero no de la base de datos. Los administradores pueden borrar cualquier mensaje. Los usuarios solo pueden borrar su propio mensaje"
         )]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, [FromQuery] int userId)
         {
-            var deleted = await _deleteMessage.Execute(id);
-            if (!deleted) return NotFound();
+            await _deleteMessage.ExecuteAsync(id, userId);
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        [Authorize (Policy = "All")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Actualiza el contenido de un mensaje.",
             Description = "Permite modificar el texto de un mensaje y, opcionalmente, añadir un archivo adjunto."
@@ -136,7 +135,14 @@ namespace Foraria.Interface.Controllers
             }
 
             var updated = await _updateMessage.ExecuteAsync(id, request);
-            return Ok(updated);
+
+            return Ok(new
+            {
+                updated.Id,
+                updated.Content,
+                updated.optionalFile,
+                updated.UpdatedAt
+            });
         }
 
         [HttpPatch("{id}/hide")]
