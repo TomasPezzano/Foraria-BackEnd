@@ -83,7 +83,7 @@ namespace ForariaDomain.Application.UseCase
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine($"⚠️ Error al parsear metadata JSON: {ex.Message}");
+                    Console.WriteLine($"⚠️ Error al parsear metadata JSON: {e.Message}");
                     metadataDict = null;
                 }
             }
