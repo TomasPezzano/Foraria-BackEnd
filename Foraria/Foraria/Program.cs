@@ -20,9 +20,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -186,7 +187,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(secretKey)
             ),
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
@@ -203,7 +206,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("OwnerAndTenant", policy =>
         policy.RequireRole("Propietario", "Inquilino"));
     options.AddPolicy("All", policy =>
-        policy.RequireRole("Consorcio", "Administrador", "Popietario", "Inquilino"));
+        policy.RequireRole("Consorcio", "Administrador", "Propietario", "Inquilino"));
 });
 
 

@@ -41,6 +41,7 @@ namespace Foraria.Interface.DTOs
 
         [RegularExpression("Active|Closed|Archived", ErrorMessage = "El estado debe ser Active, Closed o Archived.")]
         public string? State { get; set; }
+        public int UserId { get; set; }
     }
 
     public class ThreadResponse
