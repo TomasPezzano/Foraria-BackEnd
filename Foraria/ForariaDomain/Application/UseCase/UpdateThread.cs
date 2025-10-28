@@ -1,22 +1,40 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
+using ForariaDomain;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Repository;
+using Thread = ForariaDomain.Thread;
 
 namespace Foraria.Application.UseCase
 {
     public class UpdateThread
     {
-        private readonly IThreadRepository _repository;
+        private readonly IThreadRepository _threadRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UpdateThread(IThreadRepository repository)
+        public UpdateThread(IThreadRepository threadRepository, IUserRepository userRepository)
         {
-            _repository = repository;
+            _threadRepository = threadRepository;
+            _userRepository = userRepository;
         }
 
-        public async Task<ThreadDto> ExecuteAsync(int id, UpdateThreadRequest request)
+        public async Task<Thread> ExecuteAsync(int threadId, UpdateThreadRequest request)
         {
-            var thread = await _repository.GetById(id);
-            if (thread == null)
-                throw new InvalidOperationException($"No se encontró el thread con ID {id}");
+            var user = await _userRepository.GetById(request.UserId)
+                ?? throw new NotFoundException($"No se encontró el usuario con id {request.UserId}");
+
+            var thread = await _threadRepository.GetById(threadId)
+                ?? throw new NotFoundException($"No se encontró el hilo con id {threadId}");
+
+            var isOwner = thread.UserId == user.Id;
+            var roleName = user.Role.Description.ToLower();
+            var isAdminOrConsortium = roleName == "Administrador" || roleName == "Consorcio";
+
+            if (!isOwner && !isAdminOrConsortium)
+                throw new ForbiddenAccessException("No tienes permisos para editar este hilo.");
+
+            if (!isAdminOrConsortium && thread.State is "Closed" or "Archived")
+                throw new ForbiddenAccessException("No puedes modificar un hilo cerrado o archivado.");
 
             if (!string.IsNullOrWhiteSpace(request.Theme))
                 thread.Theme = request.Theme;
@@ -25,20 +43,25 @@ namespace Foraria.Application.UseCase
                 thread.Description = request.Description;
 
             if (!string.IsNullOrWhiteSpace(request.State))
-                thread.State = request.State;
-
-            await _repository.UpdateAsync(thread);
-
-            return new ThreadDto
             {
-                Id = thread.Id,
-                Theme = thread.Theme,
-                Description = thread.Description,
-                CreatedAt = thread.CreatedAt,
-                State = thread.State,
-                UserId = thread.UserId,
-                ForumId = thread.ForumId
-            };
+                if (!isAdminOrConsortium)
+                    throw new ForbiddenAccessException("No tienes permisos para cambiar el estado del hilo.");
+
+                var current = thread.State;
+                var target = request.State;
+
+                if (current == "Archived" && target != "Archived")
+                    throw new ForbiddenAccessException("No se puede modificar el estado de un hilo archivado.");
+
+                if (current == "Closed" && target == "Active")
+                    throw new ForbiddenAccessException("No se puede reabrir un hilo cerrado.");
+
+                thread.State = target;
+            }
+
+            thread.UpdatedAt = DateTime.UtcNow;
+            await _threadRepository.UpdateAsync(thread);
+            return thread;
         }
     }
 }
