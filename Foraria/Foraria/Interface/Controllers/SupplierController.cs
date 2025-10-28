@@ -25,15 +25,15 @@ public class SupplierController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "ConsortiumAndAdmin")]
-    public IActionResult Create([FromBody] SupplierRequestDto request)
+    //[Authorize(Policy = "ConsortiumAndAdmin")]
+    public async Task<IActionResult> CreateAsync([FromBody] SupplierRequestDto request)
     {
         try
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var consortiumExists = _getConsortiumById.Execute(request.ConsortiumId);
+            var consortiumExists = await _getConsortiumById.Execute(request.ConsortiumId);
             if (consortiumExists == null)
                 return BadRequest(new { message = "El consorcio especificado no existe." });
 
@@ -51,7 +51,7 @@ public class SupplierController : ControllerBase
                 ConsortiumId = request.ConsortiumId
             };
 
-            var createdSupplier = _createSupplier.Execute(supplier);
+            var createdSupplier = await _createSupplier.Execute(supplier);
 
             var response = new SupplierResponseDto
             {
@@ -74,9 +74,9 @@ public class SupplierController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Ocurrió un error al crear el proveedor." });
+            return StatusCode(500, new { message = "Ocurrió un error al crear el proveedor.", error = ex.Message, stack = ex.StackTrace });
         }
 
     }
