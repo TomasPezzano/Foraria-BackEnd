@@ -20,12 +20,13 @@ using Thread = ForariaDomain.Thread;
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Thread?> GetById(int id)
-        {
-            return await _context.Threads
-                .Include(t => t.Messages)
-                .FirstOrDefaultAsync(t => t.Id == id);
-        }
+    public async Task<Thread?> GetById(int id)
+    {
+        return await _context.Threads
+            .Include(t => t.User)
+            .ThenInclude(u => u.Role)
+            .FirstOrDefaultAsync(t => t.Id == id);
+    }
     public async Task<IEnumerable<Thread>> GetAllAsync()
     {
         return await _context.Threads
