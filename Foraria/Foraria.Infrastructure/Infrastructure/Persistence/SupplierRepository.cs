@@ -20,10 +20,10 @@ public class SupplierRepository : ISupplierRepository
     }
 
 
-    public Supplier Create(Supplier supplier)
+    public async Task<Supplier> Create(Supplier supplier)
     {
         _context.Suppliers.Add(supplier);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return supplier;
     }
 
