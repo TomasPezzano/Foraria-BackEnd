@@ -145,6 +145,8 @@ builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
 builder.Services.AddScoped<IGetTotalTenantUsers, GetTotalTenantUsers>();
 builder.Services.AddScoped<IGetTotalOwnerUsers, GetTotalOwnerUsers>();
 builder.Services.AddScoped<IGetUsersByConsortium, GetUsersByConsortium>();
+builder.Services.AddScoped<IGetResidenceById, GetResidenceById>();
+builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByConsortium>();
 
 
 
