@@ -142,6 +142,9 @@ builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IGetAllInvoices, GetAllInvoices>();
 builder.Services.AddScoped<IGetConsortiumById, GetConsortiumById>();
 builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
+builder.Services.AddScoped<IGetTotalTenantUsers, GetTotalTenantUsers>();
+builder.Services.AddScoped<IGetTotalOwnerUsers, GetTotalOwnerUsers>();
+builder.Services.AddScoped<IGetUsersByConsortium, GetUsersByConsortium>();
 
 
 
