@@ -2,6 +2,7 @@
 using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using ForariaDomain.Repository;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,13 @@ public class GetUsersByConsortium : IGetUsersByConsortium
             throw new KeyNotFoundException($"El consorcio con ID {consortiumId} no existe.");
         }
 
-        return await _userRepository.GetUsersByConsortiumIdAsync(consortiumId);
+        var users = await _userRepository.GetUsersByConsortiumIdAsync(consortiumId);
+
+        if (users.IsNullOrEmpty())
+        {
+            throw new KeyNotFoundException($"El consorcio con ID {consortiumId} no tiene usuarios asignados");
+        }
+
+        return users;
     }
 }
