@@ -22,8 +22,11 @@ public class UserController : ControllerBase
     private readonly ILocalFileStorageService _fileStorageService;
     private readonly IGetUserByEmail _getUserByEmail;
     private readonly IGetUserById _getUserById;
+    private readonly IGetTotalTenantUsers _getTotalTenantUsers;
+    private readonly IGetTotalOwnerUsers _getTotalOwnerUsers;
+    private readonly IGetUsersByConsortium _getUsersByConsortium;
 
-    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, ILocalFileStorageService fileStorageService, IGetUserByEmail getUserByEmail, IGetUserById getUserById)
+    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, ILocalFileStorageService fileStorageService, IGetUserByEmail getUserByEmail, IGetUserById getUserById, IGetTotalTenantUsers getTotalTenantUsers, IGetTotalOwnerUsers getTotalOwnerUsers, IGetUsersByConsortium getUsersByConsortium)
     {
         _registerUserService = registerUserService;
         _loginUserService = loginUserService;
@@ -33,9 +36,12 @@ public class UserController : ControllerBase
         _fileStorageService = fileStorageService;
         _getUserByEmail = getUserByEmail;
         _getUserById = getUserById;
+        _getTotalTenantUsers = getTotalTenantUsers;
+        _getTotalOwnerUsers = getTotalOwnerUsers;
+        _getUsersByConsortium = getUsersByConsortium;
     }
 
-    [Authorize(Policy = "ConsortiumAndAdmin")]
+    //[Authorize(Policy = "ConsortiumAndAdmin")]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserRequestDto request)
     {
@@ -261,6 +267,85 @@ public class UserController : ControllerBase
             Success = true
         };
         return Ok(response);
+    }
+
+    [HttpGet ("totalTenants")]
+    //[Authorize(Policy = "All")]
+    public async Task<IActionResult> GetTotalTenantsByConsortiumIdAsync([FromQuery] int consortiumId)
+    {
+        try
+        {
+            var totalTenants = await _getTotalTenantUsers.ExecuteAsync(consortiumId);
+            return Ok(new { totalTenants });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error interno del servidor", detail = ex.Message });
+        }
+    }
+
+    [HttpGet("totalOwners")]
+    //[Authorize(Policy = "All")]
+    public async Task<IActionResult> GetTotalOwnersByConsortiumIdAsync([FromQuery] int consortiumId)
+    {
+        try
+        {
+            var totalOwners = await _getTotalOwnerUsers.ExecuteAsync(consortiumId);
+            return Ok(new { totalOwners });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error interno del servidor", detail = ex.Message });
+        }
+    }
+
+    [HttpGet("consortium/{consortiumId}")]
+    //[Authorize(Policy = "All")]
+    public async Task<IActionResult> GetUsersByConsortium(int consortiumId)
+    {
+        try
+        {
+            var users = await _getUsersByConsortium.ExecuteAsync(consortiumId);
+
+            var usersDto = users.Select(u => new UserDetailDto
+            {
+                Id = u.Id,
+                FirstName = u.Name,
+                LastName = u.LastName,
+                Mail = u.Mail,
+                PhoneNumber = u.PhoneNumber,
+                Role = u.Role.Description,
+                Residences = u.Residences.Select(r => new ResidenceDto
+                {
+                    Id = r.Id,
+                    Floor = r.Floor,
+                    Number = r.Number,
+                    ConsortiumId = r.ConsortiumId
+                }).ToList()
+            }).ToList();
+
+            return Ok(usersDto);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error al obtener usuarios del consorcio", detail = ex.Message });
+        }
     }
 
     private string GetIpAddress()

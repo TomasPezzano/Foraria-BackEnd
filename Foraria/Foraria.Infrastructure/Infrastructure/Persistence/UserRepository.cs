@@ -75,4 +75,30 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users.CountAsync();
     }
+
+    public async Task<int> GetTotalUsersByTenantIdAsync(int idConsortium)
+    {
+        return await _context.Users
+            .Where(u => u.Role.Description == "Inquilino" && u.Residences.Any(r => r.ConsortiumId == idConsortium))
+            .CountAsync();
+    }
+
+    public async Task<int> GetTotalOwnerUsersAsync(int idConsortium)
+    {
+        return await _context.Users
+            .Where(u => u.Role.Description == "Propietario" && u.Residences.Any(r => r.ConsortiumId == idConsortium))
+            .CountAsync();
+    }
+
+    public async Task<List<User>> GetUsersByConsortiumIdAsync(int consortiumId)
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .Include(u => u.Residences)
+            .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId))
+            .OrderBy(u => u.LastName)
+            .ThenBy(u => u.Name)
+            .ToListAsync();
+    }
+
 }
