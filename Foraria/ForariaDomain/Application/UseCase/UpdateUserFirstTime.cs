@@ -102,6 +102,7 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
             user.Mail,
             user.Role_id,
             user.Role.Description,
+            user.RequiresPasswordChange,
             false
         );
 

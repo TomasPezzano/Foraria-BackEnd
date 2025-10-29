@@ -147,6 +147,8 @@ builder.Services.AddScoped<IGetTotalOwnerUsers, GetTotalOwnerUsers>();
 builder.Services.AddScoped<IGetUsersByConsortium, GetUsersByConsortium>();
 builder.Services.AddScoped<IGetResidenceById, GetResidenceById>();
 builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByConsortium>();
+builder.Services.AddScoped<ITransferPermission, TransferPermission>();
+builder.Services.AddScoped<IRevokePermission, RevokePermission>();
 
 
 
@@ -209,6 +211,39 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Propietario", "Inquilino"));
     options.AddPolicy("All", policy =>
         policy.RequireRole("Consorcio", "Administrador", "Propietario", "Inquilino"));
+
+
+    options.AddPolicy("CanVote", policy =>
+    policy.RequireAssertion(context =>
+    {
+        var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
+        var hasPermissionClaim = context.User.FindFirst("hasPermission")?.Value;
+        var hasPermission = hasPermissionClaim == "True";
+
+        if (role == "Consorcio" || role == "Administrador" || role == "Propietario")
+            return true;
+
+        if (role == "Inquilino" && hasPermission)
+            return true;
+
+        return false;
+    }));
+
+    options.AddPolicy("CanAttendMeetings", policy =>
+        policy.RequireAssertion(context =>
+        {
+            var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
+            var hasPermissionClaim = context.User.FindFirst("hasPermission")?.Value;
+            var hasPermission = hasPermissionClaim == "True";
+
+            if (role == "Consorcio" || role == "Administrador" || role == "Propietario")
+                return true;
+
+            if (role == "Inquilino" && hasPermission)
+                return true;
+
+            return false;
+        }));
 });
 
 
