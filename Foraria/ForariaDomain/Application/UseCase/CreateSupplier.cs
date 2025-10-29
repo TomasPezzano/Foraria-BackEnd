@@ -9,7 +9,7 @@ namespace ForariaDomain.Application.UseCase;
 
 public interface ICreateSupplier
 {
-    Supplier Execute(Supplier supplier);
+    Task<Supplier> Execute(Supplier supplier);
 }
 public class CreateSupplier : ICreateSupplier
 {
@@ -19,10 +19,10 @@ public class CreateSupplier : ICreateSupplier
         _supplierRepository = supplierRepository;
     }
 
-    public Supplier Execute(Supplier supplier)
+    public async Task<Supplier> Execute(Supplier supplier)
     {
         ValidateCuit(supplier.Cuit);
-        return _supplierRepository.Create(supplier);
+        return await _supplierRepository.Create(supplier);
     }
 
     private void ValidateCuit(string cuit)

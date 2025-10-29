@@ -8,7 +8,7 @@ namespace ForariaDomain.Repository;
 
 public interface ISupplierRepository
 {
-    Supplier Create(Supplier supplier);
+    Task<Supplier> Create(Supplier supplier);
     void Delete(int supplierId);
     List <Supplier> GetAll();
     Supplier? GetById(int supplierId);
