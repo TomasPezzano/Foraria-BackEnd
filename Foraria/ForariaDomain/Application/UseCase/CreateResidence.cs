@@ -1,94 +1,90 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Repository;
 
 namespace Foraria.Application.UseCase;
 
 public interface ICreateResidence
 {
-    Task<ResidenceResponseDto> Create(Residence residence);
-    Task<ResidenceResponseDto> GetResidenceById(int id);
-    Task<List<ResidenceResponseDto>> GetAllResidences();
+    Task<CreateResidenceResult> Create(int consortiumId, int number, int floor, string tower);
+}
+
+public class CreateResidenceResult
+{
+    public bool Success { get; set; }
+    public string Message { get; set; }
+    public Residence? Residence { get; set; }
 }
 
 public class CreateResidence : ICreateResidence
 {
     private readonly IResidenceRepository _residenceRepository;
+    private readonly IConsortiumRepository _consortiumRepository;
 
-    public CreateResidence(IResidenceRepository residenceRepository)
+    public CreateResidence(IResidenceRepository residenceRepository, IConsortiumRepository consortiumRepository)
     {
         _residenceRepository = residenceRepository;
+        _consortiumRepository = consortiumRepository;
     }
 
-    public async Task<ResidenceResponseDto> Create(Residence residence)
+    public async Task<CreateResidenceResult> Create(int consortiumId, int number, int floor, string tower)
     {
-        if (string.IsNullOrWhiteSpace(residence.Tower))
+        if (string.IsNullOrWhiteSpace(tower))
         {
-            return new ResidenceResponseDto
+            return new CreateResidenceResult
             {
                 Success = false,
                 Message = "La torre no puede estar vacía"
             };
         }
 
-        var existingResidences = await _residenceRepository.GetAll();
-        if (existingResidences.Any(r =>
-            r.Number == residence.Number &&
-            r.Floor == residence.Floor &&
-            r.Tower.Equals(residence.Tower, StringComparison.OrdinalIgnoreCase)))
+        if (number == 0)
         {
-            return new ResidenceResponseDto
+            return new CreateResidenceResult
+            {
+                Success = false,
+                Message = "El número no puede estar vacío"
+            };
+        }
+
+        var consortiumExists = await _consortiumRepository.FindById(consortiumId);
+        if (consortiumExists == null)
+        {
+            return new CreateResidenceResult
+            {
+                Success = false,
+                Message = $"El consorcio con ID {consortiumId} no existe"
+            };
+        }
+
+        var existingResidences = await _residenceRepository.GetResidenceByConsortiumIdAsync(consortiumId);
+        if (existingResidences.Any(r =>
+            r.Number == number &&
+            r.Floor == floor &&
+            r.Tower.Equals(tower, StringComparison.OrdinalIgnoreCase)))
+        {
+            return new CreateResidenceResult
             {
                 Success = false,
                 Message = "Ya existe una vivienda con ese número, piso y torre"
             };
         }
 
-        var createdResidence = await _residenceRepository.Create(residence);
-
-        return new ResidenceResponseDto
+        var residence = new Residence
         {
-            Number = createdResidence.Number,
-            Floor = createdResidence.Floor,
-            Tower = createdResidence.Tower,
-            Success = true,
-            Message = "Vivienda creada exitosamente"
+            Number = number,
+            Floor = floor,
+            Tower = tower,
+            ConsortiumId = consortiumId
         };
-    }
 
-    public async Task<ResidenceResponseDto> GetResidenceById(int id)
-    {
-        var residence = await _residenceRepository.GetById(id);
+        var createdResidence = await _residenceRepository.Create(residence, consortiumId);
 
-        if (residence == null)
+        return new CreateResidenceResult
         {
-            return new ResidenceResponseDto
-            {
-                Success = false,
-                Message = "Vivienda no encontrada"
-            };
-        }
-
-        return new ResidenceResponseDto
-        {
-            Number = residence.Number,
-            Floor = residence.Floor,
-            Tower = residence.Tower,
             Success = true,
-            Message = "Vivienda obtenida exitosamente"
+            Message = "Vivienda creada exitosamente",
+            Residence = createdResidence
         };
-    }
-
-    public async Task<List<ResidenceResponseDto>> GetAllResidences()
-    {
-        var residences = await _residenceRepository.GetAll();
-        return residences.Select(r => new ResidenceResponseDto
-        {
-            Id = r.Id,
-            Number = r.Number,
-            Floor = r.Floor,
-            Tower = r.Tower,
-            Success = true
-        }).ToList();
     }
 }

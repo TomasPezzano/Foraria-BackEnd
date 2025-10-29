@@ -29,6 +29,8 @@ namespace ForariaDomain
 
         public Role Role { get; set; }
 
+        public bool HasPermission { get; set; } = true;
+
         public ICollection<Claim> Claims { get; set; }
 
         public ICollection<ClaimResponse> ClaimsResponse { get; set; }
