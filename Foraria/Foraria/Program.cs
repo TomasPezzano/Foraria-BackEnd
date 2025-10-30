@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using MercadoPago.Config;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
@@ -142,6 +144,12 @@ builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IGetAllInvoices, GetAllInvoices>();
 builder.Services.AddScoped<IGetConsortiumById, GetConsortiumById>();
 builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentGateway, MercadoPagoService>();
+builder.Services.AddScoped<CreatePreferenceMP>();
+builder.Services.AddScoped<ProcessWebHookMP>();
+builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
 builder.Services.AddScoped<IGetTotalTenantUsers, GetTotalTenantUsers>();
 builder.Services.AddScoped<IGetTotalOwnerUsers, GetTotalOwnerUsers>();
 builder.Services.AddScoped<IGetUsersByConsortium, GetUsersByConsortium>();
@@ -149,6 +157,7 @@ builder.Services.AddScoped<IGetResidenceById, GetResidenceById>();
 builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByConsortium>();
 builder.Services.AddScoped<ITransferPermission, TransferPermission>();
 builder.Services.AddScoped<IRevokePermission, RevokePermission>();
+
 
 
 
@@ -299,6 +308,8 @@ builder.Services.AddScoped<CreatePoll>();
 builder.Services.AddScoped<IVoteRepository, VoteRepositoryImplementation>();
 builder.Services.AddScoped<CreateVote>();
 builder.Services.AddScoped<GetPolls>();
+
+MercadoPagoConfig.AccessToken = builder.Configuration["MercadoPago:AccessToken"];
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();

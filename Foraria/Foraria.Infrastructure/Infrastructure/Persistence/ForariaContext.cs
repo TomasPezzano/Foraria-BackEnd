@@ -351,6 +351,10 @@ namespace Foraria.Infrastructure.Persistence
                 .Property(s => s.Rating)
                 .HasPrecision(3, 2);
 
+            modelBuilder.Entity<Payment>()
+            .Property(p => p.Amount)
+            .HasPrecision(18, 2);
+
             modelBuilder.Entity<InvoiceItem>()
                 .HasOne(ii => ii.Invoice)
                 .WithMany(i => i.Items)

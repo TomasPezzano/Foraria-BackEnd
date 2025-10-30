@@ -9,8 +9,8 @@ namespace Foraria.Domain.Repository
         Task<IEnumerable<Expense>> GetUserExpensesByState(int userId, string state);
         Task<IEnumerable<Expense>> GetUserExpenses(int userId);
         Task<(int totalCount, int paidCount, double totalPaidAmount, double totalUnpaidAmount)> GetMonthlyCollectionStatsAsync(int consortiumId, DateTime monthStart, DateTime monthEnd);
-
-
+        Task<Expense?> GetByIdAsync(int id);
+        Task SaveChangesAsync();
 
     }
 }
