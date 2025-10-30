@@ -101,4 +101,12 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
+    public async Task<bool> ExistsUserWithRoleInResidence(int residenceId, string roleDescription)
+    {
+        return await _context.Users
+            .AnyAsync(u =>
+                u.Role.Description.Equals(roleDescription) &&
+                u.Residences.Any(r => r.Id == residenceId));
+    }
+
 }
