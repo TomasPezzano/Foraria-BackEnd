@@ -24,6 +24,8 @@ using System.Text;
 using MercadoPago.Config;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -148,6 +150,13 @@ builder.Services.AddScoped<IPaymentGateway, MercadoPagoService>();
 builder.Services.AddScoped<CreatePreferenceMP>();
 builder.Services.AddScoped<ProcessWebHookMP>();
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+builder.Services.AddScoped<IGetTotalTenantUsers, GetTotalTenantUsers>();
+builder.Services.AddScoped<IGetTotalOwnerUsers, GetTotalOwnerUsers>();
+builder.Services.AddScoped<IGetUsersByConsortium, GetUsersByConsortium>();
+builder.Services.AddScoped<IGetResidenceById, GetResidenceById>();
+builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByConsortium>();
+builder.Services.AddScoped<ITransferPermission, TransferPermission>();
+builder.Services.AddScoped<IRevokePermission, RevokePermission>();
 
 
 
@@ -191,7 +200,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(secretKey)
             ),
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
@@ -205,8 +216,43 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Propietario"));
     options.AddPolicy("Tenant", policy =>
         policy.RequireRole("Inquilino"));
+    options.AddPolicy("OwnerAndTenant", policy =>
+        policy.RequireRole("Propietario", "Inquilino"));
     options.AddPolicy("All", policy =>
-        policy.RequireRole("Consorcio", "Administrador", "Popietario", "Inquilino"));
+        policy.RequireRole("Consorcio", "Administrador", "Propietario", "Inquilino"));
+
+
+    options.AddPolicy("CanVote", policy =>
+    policy.RequireAssertion(context =>
+    {
+        var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
+        var hasPermissionClaim = context.User.FindFirst("hasPermission")?.Value;
+        var hasPermission = hasPermissionClaim == "True";
+
+        if (role == "Consorcio" || role == "Administrador" || role == "Propietario")
+            return true;
+
+        if (role == "Inquilino" && hasPermission)
+            return true;
+
+        return false;
+    }));
+
+    options.AddPolicy("CanAttendMeetings", policy =>
+        policy.RequireAssertion(context =>
+        {
+            var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
+            var hasPermissionClaim = context.User.FindFirst("hasPermission")?.Value;
+            var hasPermission = hasPermissionClaim == "True";
+
+            if (role == "Consorcio" || role == "Administrador" || role == "Propietario")
+                return true;
+
+            if (role == "Inquilino" && hasPermission)
+                return true;
+
+            return false;
+        }));
 });
 
 

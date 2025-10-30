@@ -31,4 +31,10 @@ public class Message
     public User User { get; set; }
     public ICollection<Reaction> Reactions { get; set; } = new List<Reaction>();
 
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public int? DeletedByUserId { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+
+
 }

@@ -10,8 +10,10 @@ public interface IUserRepository
     Task<User?> GetById(int id);
     Task<User?> GetByEmailWithRole(string email);
     Task<int> GetTotalUsersAsync(int? consortiumId = null);
-
+    Task<int> GetTotalUsersByTenantIdAsync(int idConsortium);
+    Task<int> GetTotalOwnerUsersAsync(int idConsortium);
     Task<User?> GetByIdWithRole(int id);
     Task Update(User user);
     Task<int> GetAllInNumber();
+    Task<List<User>> GetUsersByConsortiumIdAsync(int consortiumId);
 }

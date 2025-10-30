@@ -2,6 +2,7 @@
 using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -25,13 +26,11 @@ public class ClaimController : ControllerBase
         _fileProcessor = fileProcessor;
     }
 
-    /// <summary>
-    /// Obtiene todos los reclamos registrados.
-    /// </summary>
-    /// <returns>Lista de reclamos con información del usuario y respuesta.</returns>
+
     [HttpGet]
     [ProducesResponseType(typeof(List<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "All")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -81,15 +80,12 @@ public class ClaimController : ControllerBase
     }
 
 
-        /// <summary>
-        /// Crea un nuevo reclamo.
-        /// </summary>
-        /// <param name="claimDto">Datos del reclamo.</param>
-        /// <returns>Reclamo creado.</returns>
-        [HttpPost]
+    [HttpPost]
     [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "OwnerAndTenant")]
+
     public async Task<IActionResult> Add([FromBody] ClaimDto claimDto)
     {
         try
@@ -103,7 +99,8 @@ public class ClaimController : ControllerBase
                 filePath = await _fileProcessor.SaveBase64FileAsync(claimDto.Archive, "claims");
             }
 
-            var claim = new Claim {
+            var claim = new Claim
+            {
                 Title = claimDto.Title,
                 Description = claimDto.Description,
                 Priority = claimDto.Priority,
@@ -138,15 +135,13 @@ public class ClaimController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Rechaza un reclamo por su ID.
-    /// </summary>
-    /// <param name="id">ID del reclamo.</param>
-    /// <returns>Mensaje de confirmación.</returns>
+
     [HttpPut("reject/{id}")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
+
     public async Task<IActionResult> RejectClaimById(int id)
     {
         try

@@ -21,11 +21,19 @@ namespace Foraria.Infrastructure.Persistence
             return message;
         }
 
-        public async Task<Message?> GetById(int id)
+        public async Task<Message?> GetByIdWithThread(int id)
         {
             return await _context.Messages
                 .Include(m => m.User)
                 .Include(m => m.Thread)
+                .FirstOrDefaultAsync(m => m.Id == id);
+        }
+
+        public async Task<Message?> GetById(int id)
+        {
+            return await _context.Messages
+                .Include(m => m.User)
+                .ThenInclude(u => u.Role)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 

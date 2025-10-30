@@ -1,6 +1,7 @@
 ﻿using Foraria.Contracts.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Interface.Controllers;
@@ -24,15 +25,15 @@ public class SupplierController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] SupplierRequestDto request)
+    //[Authorize(Policy = "ConsortiumAndAdmin")]
+    public async Task<IActionResult> CreateAsync([FromBody] SupplierRequestDto request)
     {
         try
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Validar que el consorcio exista
-            var consortiumExists = _getConsortiumById.Execute(request.ConsortiumId);
+            var consortiumExists = await _getConsortiumById.Execute(request.ConsortiumId);
             if (consortiumExists == null)
                 return BadRequest(new { message = "El consorcio especificado no existe." });
 
@@ -50,7 +51,7 @@ public class SupplierController : ControllerBase
                 ConsortiumId = request.ConsortiumId
             };
 
-            var createdSupplier = _createSupplier.Execute(supplier);
+            var createdSupplier = await _createSupplier.Execute(supplier);
 
             var response = new SupplierResponseDto
             {
@@ -73,14 +74,15 @@ public class SupplierController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Ocurrió un error al crear el proveedor." });
+            return StatusCode(500, new { message = "Ocurrió un error al crear el proveedor.", error = ex.Message, stack = ex.StackTrace });
         }
 
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     public IActionResult Delete(int id)
     {
         try
@@ -103,6 +105,7 @@ public class SupplierController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Policy = "All")]
     public IActionResult GetSupplierById(int id)
     {
         var supplier = _getSupplierById.Execute(id);
@@ -133,6 +136,7 @@ public class SupplierController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "All")]
     public IActionResult GetAllSuppliers()
     {
         var suppliers = _getAllSupplier.Execute();

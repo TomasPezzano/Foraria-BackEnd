@@ -76,11 +76,12 @@ public class LoginUser : ILoginUser
             usuarioLogueado.Mail,
             usuarioLogueado.Role_id,
             usuarioLogueado.Role.Description,
-            usuarioLogueado.RequiresPasswordChange
+            usuarioLogueado.RequiresPasswordChange,
+            usuarioLogueado.HasPermission
         );
 
         var refreshToken = _refreshTokenGenerator.Generate();
-        var refreshTokenEntity = new ForariaDomain.RefreshToken
+        var refreshTokenEntity = new RefreshToken
         {
             UserId = usuarioLogueado.Id,
             Token = refreshToken,

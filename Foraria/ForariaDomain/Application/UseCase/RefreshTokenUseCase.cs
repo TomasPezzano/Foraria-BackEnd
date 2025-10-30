@@ -50,7 +50,8 @@ public class RefreshTokenUseCase : IRefreshTokenUseCase
             storedToken.User.Mail,
             storedToken.User.Role_id,
             storedToken.User.Role.Description,
-            storedToken.User.RequiresPasswordChange
+            storedToken.User.RequiresPasswordChange,
+            storedToken.User.HasPermission
         );
 
         var newRefreshToken = _refreshTokenGenerator.Generate();

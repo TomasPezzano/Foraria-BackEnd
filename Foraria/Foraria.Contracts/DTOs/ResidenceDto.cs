@@ -19,4 +19,6 @@ public class ResidenceDto
 
     public string? Message { get; set; } = string.Empty;
 
+    public int? ConsortiumId { get; set; }
+
 }

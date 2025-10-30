@@ -3,6 +3,7 @@ using Foraria.Domain.Repository;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Asn1.Ocsp;
 
@@ -31,15 +32,13 @@ public class ClaimResponseController : ControllerBase
         _getResponsibleSectorById = getResponsibleSectorById;
     }
 
-    /// <summary>
-    /// Crea una respuesta a un reclamo existente.
-    /// </summary>
-    /// <param name="claimResponseDto">Datos de la respuesta al reclamo.</param>
-    /// <returns>Respuesta creada o error de validación.</returns>
+
     [HttpPost]
     [ProducesResponseType(typeof(ClaimResponseResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
+
     public async Task<IActionResult> Add([FromBody] ClaimResponseDto claimResponseDto)
     {
         if (!ModelState.IsValid)
