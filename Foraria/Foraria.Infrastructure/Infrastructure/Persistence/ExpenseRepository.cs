@@ -50,6 +50,11 @@ namespace Foraria.Infrastructure.Repository
                 .ToListAsync();
         }
 
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<(int totalCount, int paidCount, double totalPaidAmount, double totalUnpaidAmount)>
            GetMonthlyCollectionStatsAsync(int consortiumId, DateTime monthStart, DateTime monthEnd)
         {
@@ -68,6 +73,11 @@ namespace Foraria.Infrastructure.Repository
             var totalUnpaidAmount = unpaidExpenses.Sum(e => e.TotalAmount);
 
             return (totalCount, paidCount, totalPaidAmount, totalUnpaidAmount);
+        }
+
+        public async Task<Expense?> GetByIdAsync(int id)
+        {
+            return await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id);
         }
     }
  }
