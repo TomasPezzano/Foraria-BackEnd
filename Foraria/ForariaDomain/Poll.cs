@@ -49,4 +49,3 @@ public class Poll
     public User? ApprovedByUser { get; set; }
     public DateTime? ApprovedAt { get; set; }
 }
-

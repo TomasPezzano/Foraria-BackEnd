@@ -20,6 +20,8 @@ public class UserDocumentController : ControllerBase
     private readonly GetUserDocumentsByCategory _getUserDocumentsByCategory;
     private readonly GetLastUploadDate _getLastUploadDate;
     private readonly GetUserDocumentStats _getUserDocumentStats;
+    private ICreateUserDocument object1;
+    private IGetUserDocuments object2;
 
     public UserDocumentController(
         ICreateUserDocument createUserDocument,
@@ -35,6 +37,12 @@ public class UserDocumentController : ControllerBase
         _getUserDocumentsByCategory = getUserDocumentsByCategory;
         _getLastUploadDate = getLastUploadDate;
         _getUserDocumentStats = getUserDocumentStats;
+    }
+
+    public UserDocumentController(ICreateUserDocument object1, IGetUserDocuments object2)
+    {
+        this.object1 = object1;
+        this.object2 = object2;
     }
 
     [HttpGet]

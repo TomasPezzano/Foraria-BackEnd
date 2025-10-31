@@ -26,18 +26,15 @@ namespace Foraria.Application.UseCase
             var user = await _userRepository.GetById(request.UserId)
                 ?? throw new NotFoundException($"El usuario con ID {request.UserId} no existe.");
 
-            // Verificación de permisos
             bool isOwner = poll.User_id == request.UserId;
             bool isConsortium = user.Role.Description == "Consorcio";
 
             if (!isOwner && !isConsortium)
                 throw new UnauthorizedAccessException("No tiene permisos para modificar esta votación.");
 
-            // Restricciones de estado
             if (poll.State == "Active" || poll.State == "Closed" || poll.State == "Rejected")
                 throw new InvalidOperationException("No se pueden modificar votaciones activas, cerradas o rechazadas.");
 
-            // Actualizamos solo los campos permitidos
             if (!string.IsNullOrWhiteSpace(request.Title))
                 poll.Title = request.Title;
 
@@ -53,7 +50,7 @@ namespace Foraria.Application.UseCase
             if (!string.IsNullOrWhiteSpace(request.State))
                 poll.State = request.State;
 
-            _pollRepository.Update(poll);
+            await _pollRepository.UpdatePoll(poll);
             await _unitOfWork.SaveChangesAsync();
 
             return poll;

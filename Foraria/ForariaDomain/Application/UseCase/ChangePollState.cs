@@ -38,7 +38,7 @@ namespace Foraria.Application.UseCase
             poll.ApprovedByUserId = user.Id;
             poll.ApprovedAt = DateTime.UtcNow;
 
-            _pollRepository.Update(poll);
+            _pollRepository.UpdatePoll(poll);
             await _unitOfWork.SaveChangesAsync();
 
             return poll;
