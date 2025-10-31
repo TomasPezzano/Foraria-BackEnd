@@ -1,120 +1,201 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Interface.Controllers;
-using Foraria.Interface.DTOs;
+﻿using FluentAssertions;
+using Foraria.Application.UseCase;
+using Foraria.Domain.Repository;
 using ForariaDomain;
-using Microsoft.AspNetCore.Mvc;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Repository;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
 
-public class UserDocumentTests
+namespace ForariaTest.Tests.UserDocument
 {
-    private readonly Mock<ICreateUserDocument> _createUserDocumentMock;
-    private readonly Mock<IGetUserDocuments> _getUserDocumentsMock;
-    private readonly UserDocumentController _controller;
-
-    public UserDocumentTests()
+    public class UserDocumentTests
     {
-        _createUserDocumentMock = new Mock<ICreateUserDocument>();
-        _getUserDocumentsMock = new Mock<IGetUserDocuments>();
-        _controller = new UserDocumentController(_createUserDocumentMock.Object, _getUserDocumentsMock.Object);
-    }
+        private readonly Mock<IUserDocumentRepository> _userDocRepoMock;
+        private readonly Mock<IUserRepository> _userRepoMock;
+        private readonly Mock<IConsortiumRepository> _consortiumRepoMock;
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly CreateUserDocument _createUserDocument;
+        private readonly GetUserDocuments _getUserDocuments;
 
-    [Fact]
-    public async Task GetAll_ReturnsOk_WithListOfDocuments()
-    {
-        // Arrange
-        var documents = new List<UserDocument>
+        public UserDocumentTests()
         {
-            new UserDocument { Id = 1, Title = "Doc 1", Category = "Legal", Url = "http://example.com", User_id = 1, Consortium_id = 1, CreatedAt = DateTime.UtcNow },
-            new UserDocument { Id = 2, Title = "Doc 2", Category = "Finance", Url = "http://example.com", User_id = 2, Consortium_id = 2, CreatedAt = DateTime.UtcNow }
-        };
+            _userDocRepoMock = new Mock<IUserDocumentRepository>();
+            _userRepoMock = new Mock<IUserRepository>();
+            _consortiumRepoMock = new Mock<IConsortiumRepository>();
+            _unitOfWorkMock = new Mock<IUnitOfWork>();
 
-        _getUserDocumentsMock.Setup(x => x.Execute()).ReturnsAsync(documents);
+            _createUserDocument = new CreateUserDocument(
+                _userDocRepoMock.Object,
+                _userRepoMock.Object,
+                _consortiumRepoMock.Object,
+                _unitOfWorkMock.Object
+            );
 
-        // Act
-        var result = await _controller.GetAll();
+            _getUserDocuments = new GetUserDocuments(_userDocRepoMock.Object);
+        }
 
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedDocs = Assert.IsType<List<UserDocumentDto>>(okResult.Value);
-        Assert.Equal(2, returnedDocs.Count);
-    }
-
-    [Fact]
-    public async Task Add_ValidDto_ReturnsCreatedAtAction()
-    {
-        // Arrange
-        var dto = new CreateUserDocumentDto
+        [Fact]
+        public async Task Execute_ShouldCreateDocument_WhenUserAndConsortiumExist()
         {
-            Title = "New Doc",
-            Category = "Legal",
-            Url = "http://example.com",
-            User_id = 1,
-            Consortium_id = 1
-        };
+            // Arrange
+            var document = new global::ForariaDomain.UserDocument
+            {
+                Title = "Contrato de alquiler",
+                Category = "Contrato",
+                Url = "https://ejemplo.com/contrato.pdf",
+                User_id = 1,
+                Consortium_id = 10
+            };
 
-        var document = new UserDocument
+            var user = new global::ForariaDomain.User
+            {
+                Id = 1,
+                Role = new Role { Description = "Residente" }
+            };
+            var consortium = new global::ForariaDomain.Consortium { Id = 10, Name = "Consorcio Central" };
+
+            _userRepoMock.Setup(r => r.GetById(1)).ReturnsAsync(user);
+            _consortiumRepoMock.Setup(r => r.FindById(10)).ReturnsAsync(consortium);
+            _userDocRepoMock.Setup(r => r.Add(It.IsAny<global::ForariaDomain.UserDocument>()))
+                            .Returns(Task.CompletedTask);
+            _unitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+
+            // Act
+            var result = await _createUserDocument.Execute(document);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.IsValid.Should().BeTrue();
+            result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            result.Title.Should().Be("Contrato de alquiler");
+            _userDocRepoMock.Verify(r => r.Add(It.IsAny<global::ForariaDomain.UserDocument>()), Times.Once);
+            _unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task Execute_ShouldThrowNotFound_WhenUserDoesNotExist()
         {
-            Id = 99,
-            Title = dto.Title,
-            Category = dto.Category,
-            Url = dto.Url,
-            User_id = dto.User_id,
-            Consortium_id = dto.Consortium_id,
-            CreatedAt = DateTime.UtcNow
-        };
+            // Arrange
+            var document = new global::ForariaDomain.UserDocument
+            {
+                Title = "Documento sin usuario",
+                Category = "Contrato",
+                Url = "https://ejemplo.com/contrato.pdf",
+                User_id = 999,
+                Consortium_id = 1
+            };
 
-        _createUserDocumentMock.Setup(x => x.Execute(It.IsAny<UserDocument>())).ReturnsAsync(document);
+            _userRepoMock.Setup(r => r.GetById(999))
+                         .ReturnsAsync((global::ForariaDomain.User?)null);
 
-        // Act
-        var result = await _controller.Add(dto);
+            // Act
+            Func<Task> act = async () => await _createUserDocument.Execute(document);
 
-        // Assert
-        var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-        var returnedDto = Assert.IsType<UserDocumentDto>(createdResult.Value);
-        Assert.Equal(99, returnedDto.Id);
-        Assert.Equal(dto.Title, returnedDto.Title);
-        Assert.Equal(dto.Category, returnedDto.Category);
-    }
+            // Assert
+            await act.Should().ThrowAsync<NotFoundException>()
+                .WithMessage("El usuario con ID 999 no existe.");
+        }
 
-    [Fact]
-    public async Task Add_InvalidModel_ReturnsBadRequest()
-    {
-        // Arrange
-        var dto = new CreateUserDocumentDto(); // vacío
-        _controller.ModelState.AddModelError("Title", "El título es obligatorio.");
-
-        // Act
-        var result = await _controller.Add(dto);
-
-        // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
-    }
-
-    [Fact]
-    public async Task Add_ThrowsArgumentException_ReturnsBadRequestWithMessage()
-    {
-        // Arrange
-        var dto = new CreateUserDocumentDto
+        [Fact]
+        public async Task Execute_ShouldThrowNotFound_WhenConsortiumDoesNotExist()
         {
-            Title = "", // inválido
-            Category = "Legal",
-            Url = "http://example.com",
-            User_id = 1,
-            Consortium_id = 1
-        };
+            // Arrange
+            var document = new global::ForariaDomain.UserDocument
+            {
+                Title = "Documento inválido",
+                Category = "Contrato",
+                Url = "https://ejemplo.com/contrato.pdf",
+                User_id = 1,
+                Consortium_id = 500
+            };
 
-        _createUserDocumentMock.Setup(x => x.Execute(It.IsAny<UserDocument>()))
-            .ThrowsAsync(new ArgumentException("El título del documento es obligatorio."));
+            var user = new global::ForariaDomain.User
+            {
+                Id = 1,
+                Role = new Role { Description = "Residente" }
+            };
 
-        // Act
-        var result = await _controller.Add(dto);
+            _userRepoMock.Setup(r => r.GetById(1)).ReturnsAsync(user);
+            _consortiumRepoMock.Setup(r => r.FindById(500))
+                               .ReturnsAsync((global::ForariaDomain.Consortium?)null);
 
-        // Assert
-        var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-        var value = badRequest.Value;
-        var messageProp = value.GetType().GetProperty("message");
-        var message = messageProp?.GetValue(value)?.ToString();
+            // Act
+            Func<Task> act = async () => await _createUserDocument.Execute(document);
 
-        Assert.Equal("El título del documento es obligatorio.", message);
+            // Assert
+            await act.Should().ThrowAsync<NotFoundException>()
+                .WithMessage("El consorcio con ID 500 no existe.");
+        }
+
+        [Fact]
+        public async Task Execute_ShouldThrowArgumentException_WhenUrlIsInvalid()
+        {
+            // Arrange
+            var document = new global::ForariaDomain.UserDocument
+            {
+                Title = "Documento con URL inválida",
+                Category = "Contrato",
+                Url = "archivo_local.pdf",
+                User_id = 1,
+                Consortium_id = 1
+            };
+
+            var user = new global::ForariaDomain.User
+            {
+                Id = 1,
+                Role = new Role { Description = "Residente" }
+            };
+            var consortium = new global::ForariaDomain.Consortium { Id = 1 };
+
+            _userRepoMock.Setup(r => r.GetById(1)).ReturnsAsync(user);
+            _consortiumRepoMock.Setup(r => r.FindById(1)).ReturnsAsync(consortium);
+
+            // Act
+            Func<Task> act = async () => await _createUserDocument.Execute(document);
+
+            // Assert
+            await act.Should().ThrowAsync<ArgumentException>()
+                .WithMessage("La URL del documento no es válida.");
+        }
+
+        [Fact]
+        public async Task Execute_ShouldReturnListOfDocuments()
+        {
+            // Arrange
+            var docs = new List<global::ForariaDomain.UserDocument>
+            {
+                new global::ForariaDomain.UserDocument { Id = 1, Title = "Doc1", Category = "Contrato", Url = "https://ex.com/doc1.pdf" },
+                new global::ForariaDomain.UserDocument { Id = 2, Title = "Doc2", Category = "Actas", Url = "https://ex.com/doc2.pdf" }
+            };
+
+            _userDocRepoMock.Setup(r => r.GetAll()).ReturnsAsync(docs);
+
+            // Act
+            var result = await _getUserDocuments.Execute();
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().HaveCount(2);
+            result[0].Title.Should().Be("Doc1");
+            _userDocRepoMock.Verify(r => r.GetAll(), Times.Once);
+        }
+
+        [Fact]
+        public async Task Execute_ShouldReturnEmptyList_WhenNoDocumentsExist()
+        {
+            // Arrange
+            _userDocRepoMock.Setup(r => r.GetAll()).ReturnsAsync(new List<global::ForariaDomain.UserDocument>());
+
+            // Act
+            var result = await _getUserDocuments.Execute();
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
+        }
     }
 }

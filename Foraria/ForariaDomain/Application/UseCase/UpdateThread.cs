@@ -28,7 +28,7 @@ namespace Foraria.Application.UseCase
 
             var isOwner = thread.UserId == user.Id;
             var roleName = user.Role.Description.ToLower();
-            var isAdminOrConsortium = roleName == "Administrador" || roleName == "Consorcio";
+            var isAdminOrConsortium = roleName == "administrador" || roleName == "consorcio";
 
             if (!isOwner && !isAdminOrConsortium)
                 throw new ForbiddenAccessException("No tienes permisos para editar este hilo.");

@@ -24,7 +24,7 @@ namespace Foraria.Application.UseCase
             if (user == null)
                 throw new NotFoundException($"El usuario con ID {poll.User_id} no existe.");
 
-            if (user.Role.Description == "Administrador")
+            if (user.Role?.Description == "Administrador")
                 poll.State = "Pendiente";
             else
                 poll.State = "Activa";
