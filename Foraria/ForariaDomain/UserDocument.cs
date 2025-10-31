@@ -28,4 +28,5 @@ public class UserDocument
 
     public int Consortium_id { get; set; }
     public Consortium Consortium { get; set; }
+    public bool IsValid { get; set; } = false;
 }

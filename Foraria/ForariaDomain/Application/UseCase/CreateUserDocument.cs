@@ -1,42 +1,67 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Repository;
+using System.Text.RegularExpressions;
 
-namespace Foraria.Application.UseCase;
-
-public interface ICreateUserDocument
+namespace Foraria.Application.UseCase
 {
-    Task<UserDocument> Execute(UserDocument document);
-}
-
-public class CreateUserDocument : ICreateUserDocument
-{
-    private readonly IUserDocumentRepository _userDocumentRepository;
-
-    public CreateUserDocument(IUserDocumentRepository userDocumentRepository)
+    public interface ICreateUserDocument
     {
-        _userDocumentRepository = userDocumentRepository;
+        Task<UserDocument> Execute(UserDocument document);
     }
 
-    public async Task<UserDocument> Execute(UserDocument document)
+    public class CreateUserDocument : ICreateUserDocument
     {
-        if (string.IsNullOrWhiteSpace(document.Title))
-            throw new ArgumentException("El título del documento es obligatorio.");
+        private readonly IUserDocumentRepository _userDocumentRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IConsortiumRepository _consortiumRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        if (string.IsNullOrWhiteSpace(document.Category))
-            throw new ArgumentException("La categoría del documento es obligatoria.");
+        public CreateUserDocument(
+            IUserDocumentRepository userDocumentRepository,
+            IUserRepository userRepository,
+            IConsortiumRepository consortiumRepository,
+            IUnitOfWork unitOfWork)
+        {
+            _userDocumentRepository = userDocumentRepository;
+            _userRepository = userRepository;
+            _consortiumRepository = consortiumRepository;
+            _unitOfWork = unitOfWork;
+        }
 
-        if (document.User_id <= 0)
-            throw new ArgumentException("Debe asociarse un usuario válido al documento.");
+        public async Task<UserDocument> Execute(UserDocument document)
+        {
+            var user = await _userRepository.GetById(document.User_id)
+                ?? throw new NotFoundException($"El usuario con ID {document.User_id} no existe.");
 
-        if (document.Consortium_id <= 0)
-            throw new ArgumentException("Debe asociarse un consorcio válido al documento.");
+            var consortium = await _consortiumRepository.FindById(document.Consortium_id)
+                ?? throw new NotFoundException($"El consorcio con ID {document.Consortium_id} no existe.");
 
-        document.CreatedAt = DateTime.UtcNow;
+            ValidateDocument(document);
 
-        await _userDocumentRepository.Add(document);
+            document.CreatedAt = DateTime.UtcNow;
+            document.IsValid = true;
 
-        return document;
+            await _userDocumentRepository.Add(document);
+            await _unitOfWork.SaveChangesAsync();
+
+            return document;
+        }
+
+        private void ValidateDocument(UserDocument document)
+        {
+            var urlRegex = new Regex(@"^https?:\/\/[\w\-\.]+(\.[\w\-]+)+[/#?]?.*$");
+            if (!urlRegex.IsMatch(document.Url))
+                throw new ArgumentException("La URL del documento no es válida.");
+
+            var allowedCategories = new[] { "Contrato", "Reglamentos", "Actas", "Presupuestos", "Planos", "Seguros", "Manuales", "Emergencias", "Mantenimiento"}; //(?)
+            if (!allowedCategories.Contains(document.Category, StringComparer.OrdinalIgnoreCase))
+                throw new ArgumentException("La categoría del documento no es válida.");
+
+            var validExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".docx", ".txt", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".odt" };
+            if (!validExtensions.Any(ext => document.Url.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+                throw new ArgumentException("El formato del documento no es válido (solo .pdf, .jpg, .png, docx, txt, xls, xlsx, csv, ppt, pptx y odt).");
+        }
     }
 }
-
