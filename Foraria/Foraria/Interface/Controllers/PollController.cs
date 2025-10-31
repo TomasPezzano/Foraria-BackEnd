@@ -4,8 +4,10 @@ using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using MercadoPago.Resource.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Foraria.Interface.Controllers
 {
@@ -15,12 +17,14 @@ namespace Foraria.Interface.Controllers
     {
         private readonly CreatePoll _createPoll;
         private readonly GetPolls _polls;
-        private readonly NotarizePoll _notarizePoll; 
+        private readonly NotarizePoll _notarizePoll;
         private readonly GetPollById _getPollById;
         private readonly GetPollWithResults _getPollWithResults;
         private readonly GetAllPollsWithResults _getAllPollsWithResults;
         private readonly GetActivePollCount _getActivePollCount;
-        public PollController(CreatePoll poll, GetPolls polls, GetPollById getPollById, NotarizePoll notarizePoll,GetPollWithResults getPollWithResults, GetAllPollsWithResults getAllPollsWithResults, GetActivePollCount getActivePollCount)
+        private readonly ChangePollState _changePollState;
+        private readonly UpdatePoll _updatePoll;
+        public PollController(CreatePoll poll, GetPolls polls, GetPollById getPollById, NotarizePoll notarizePoll, GetPollWithResults getPollWithResults, GetAllPollsWithResults getAllPollsWithResults, GetActivePollCount getActivePollCount, ChangePollState changePollState, UpdatePoll updatePoll)
         {
             _createPoll = poll;
             _polls = polls;
@@ -29,6 +33,8 @@ namespace Foraria.Interface.Controllers
             _getPollWithResults = getPollWithResults;
             _getAllPollsWithResults = getAllPollsWithResults;
             _getActivePollCount = getActivePollCount;
+            _changePollState = changePollState;
+            _updatePoll = updatePoll;
         }
 
         [HttpPost]
@@ -182,12 +188,12 @@ namespace Foraria.Interface.Controllers
                 Description = poll.Description,
                 CategoryPollId = poll.CategoryPoll_id,
                 CreatedAt = poll.CreatedAt,
-                DeletedAt = poll.DeletedAt, 
+                DeletedAt = poll.DeletedAt,
                 State = poll.State,
                 UserId = poll.User_id,
                 Options = poll.PollOptions != null
              ? poll.PollOptions.Select(option => option.Text).ToList()
-             : new List<string>() 
+             : new List<string>()
             };
 
             return Ok(pollReceived);
@@ -219,8 +225,8 @@ namespace Foraria.Interface.Controllers
         [Authorize(Policy = "All")]
 
         public async Task<IActionResult> GetActivePollCount(
-    [FromQuery] int consortiumId,
-    [FromQuery] DateTime? dateTime = null)
+        [FromQuery] int consortiumId,
+        [FromQuery] DateTime? dateTime = null)
         {
             var count = await _getActivePollCount.ExecuteAsync(consortiumId, dateTime);
             return Ok(new
@@ -229,8 +235,35 @@ namespace Foraria.Interface.Controllers
                 checkedAt = (dateTime ?? DateTime.UtcNow).ToString("yyyy-MM-dd HH:mm:ss")
             });
         }
+
+        [HttpPost("{pollId}/state")]
+        [Authorize(Roles = "Consorcio")]
+        [SwaggerOperation(
+            Summary = "Cambia el estado de una votación",
+            Description = "Permite aprobar o rechazar una votación pendiente. Solo el rol Consorcio puede ejecutar esta acción.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Estado de la votación actualizado correctamente", typeof(Poll))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Solicitud inválida o estado no permitido")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "El usuario no tiene permisos para cambiar el estado de la votación")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "La votación o el usuario no fueron encontrados")]
+        public async Task<IActionResult> ChangePollState(int pollId, [FromBody] ChangePollStateRequest request)
+        {
+            var result = await _changePollState.ExecuteAsync(pollId, request.UserId, request.NewState);
+            return Ok(result);
+        }
+
+        [HttpPut("{pollId}")]
+        [Authorize(Roles = "Administrador,Consorcio")]
+        [SwaggerOperation(
+            Summary = "Actualiza los datos de una votación existente",
+            Description = "Permite modificar el título, descripción, fechas o estado de una votación. Solo los roles Administrador o Consorcio pueden editar.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Votación actualizada correctamente", typeof(Poll))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos inválidos o error de validación")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "El usuario no tiene permisos para modificar la votación")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "La votación no fue encontrada")]
+        public async Task<IActionResult> UpdatePoll(int pollId, [FromBody] UpdatePollRequest request)
+        {
+            var result = await _updatePoll.ExecuteAsync(pollId, request);
+            return Ok(result);
+        }
     }
-
-
-
 }

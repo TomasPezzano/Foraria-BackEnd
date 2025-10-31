@@ -22,15 +22,20 @@ namespace Foraria.Application.UseCase
         {
             var user = await _userRepository.GetById(poll.User_id);
             if (user == null)
-            {
                 throw new NotFoundException($"El usuario con ID {poll.User_id} no existe.");
-            }
+
+            if (user.Role?.Description == "Administrador")
+                poll.State = "Pendiente";
+            else
+                poll.State = "Activa";
+
+            poll.CreatedAt = DateTime.UtcNow;
 
             await _pollRepository.CreatePoll(poll);
-
             await _unitOfWork.SaveChangesAsync();
 
             return poll;
         }
+
     }
 }

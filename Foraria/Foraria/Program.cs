@@ -157,6 +157,11 @@ builder.Services.AddScoped<IGetResidenceById, GetResidenceById>();
 builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByConsortium>();
 builder.Services.AddScoped<ITransferPermission, TransferPermission>();
 builder.Services.AddScoped<IRevokePermission, RevokePermission>();
+builder.Services.AddScoped<GetLastUploadDate>();
+builder.Services.AddScoped<UpdatePoll>();
+builder.Services.AddScoped<ChangePollState>();
+builder.Services.AddScoped<GetUserDocumentsByCategory>();
+builder.Services.AddScoped<GetUserDocumentStats>();
 
 
 
