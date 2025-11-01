@@ -16,13 +16,13 @@ public class CreateExpense : ICreateExpense
 {
     private readonly IExpenseRepository _expenseRepository;
     private readonly IInvoiceRepository _invoiceRepository;
-    private readonly IGetAllInvoicesByMonth _getAllInvoicesByMonth;
+    private readonly IGetAllInvoicesByMonthAndConsortium _getAllInvoicesByMonthAndConsortium;
     private readonly IGetConsortiumById _getConsortiumById;
 
-    public CreateExpense(IExpenseRepository expenseRepository, IGetAllInvoicesByMonth getAllInvoicesByMonth, IGetConsortiumById getConsortiumById, IInvoiceRepository invoiceRepository)
+    public CreateExpense(IExpenseRepository expenseRepository, IGetAllInvoicesByMonthAndConsortium getAllInvoicesByMonthAndConsortium, IGetConsortiumById getConsortiumById, IInvoiceRepository invoiceRepository)
     {
         _expenseRepository = expenseRepository;
-        _getAllInvoicesByMonth = getAllInvoicesByMonth;
+        _getAllInvoicesByMonthAndConsortium = getAllInvoicesByMonthAndConsortium;
         _getConsortiumById = getConsortiumById;
         _invoiceRepository = invoiceRepository;
     }
@@ -50,7 +50,7 @@ public class CreateExpense : ICreateExpense
             throw new KeyNotFoundException($"No se encontró ningún consorcio con ID {consortiumId}.");
 
 
-        var invoices = await _getAllInvoicesByMonth.Execute(inicio);
+        var invoices = await _getAllInvoicesByMonthAndConsortium.Execute(inicio, consortiumId); // checkear de pasar consortium? 
         if (invoices == null || !invoices.Any())
             throw new InvalidOperationException($"No existen facturas registradas para el consorcio {consortiumId} en {inicio:MMMM yyyy}.");
 

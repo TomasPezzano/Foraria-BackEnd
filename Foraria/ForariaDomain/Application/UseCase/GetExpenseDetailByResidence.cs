@@ -19,10 +19,39 @@ public class GetExpenseDetailByResidence : IGetExpenseDetailByResidence
         _expenseDetailRepository = expenseDetailRepository;
     }
 
-    public async Task<ICollection<ExpenseDetailByResidence>> ExecuteAsync(int id) {
+    public async Task<ICollection<ExpenseDetailByResidence>> ExecuteAsync(int id)
+    {
+        try
+        {
+            if (id <= 0)
+                throw new ArgumentException("El ID de la residencia no es válido.", nameof(id));
 
-       return  await _expenseDetailRepository.GetExpenseDetailByResidence(id);
+            var expenseDetails = await _expenseDetailRepository.GetExpenseDetailByResidence(id);
 
+            if (expenseDetails == null)
+                throw new InvalidOperationException("El repositorio devolvió un valor nulo al obtener los detalles de expensa.");
+
+            if (!expenseDetails.Any())
+                throw new KeyNotFoundException($"No se encontraron detalles de expensa para la residencia con ID {id}.");
+
+            return expenseDetails;
+        }
+        catch (ArgumentException)
+        {
+            throw; 
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (InvalidOperationException)
+        {
+            throw; 
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Ocurrió un error inesperado al obtener los detalles de expensa.", ex);
+        }
     }
 
 }

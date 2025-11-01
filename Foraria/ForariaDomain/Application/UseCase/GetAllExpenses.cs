@@ -21,6 +21,29 @@ public class GetAllExpenses : IGetAllExpenses
 
     public async Task<IEnumerable<Expense>> Execute()
     {
-        return await _expensesRepository.GetAllExpenses();
+        try
+        {
+            var expenses = await _expensesRepository.GetAllExpenses();
+
+            if (expenses == null)
+                throw new InvalidOperationException("El repositorio devolvió un valor nulo al obtener las expensas.");
+
+            if (!expenses.Any())
+                throw new KeyNotFoundException("No se encontraron expensas registradas.");
+
+            return expenses;
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (InvalidOperationException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Ocurrió un error inesperado al obtener las expensas.", ex);
+        }
     }
 }

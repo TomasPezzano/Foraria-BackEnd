@@ -25,24 +25,74 @@ public class CreateExpenseDetail : ICreateExpenseDetail
     }
     public async Task<ICollection<ExpenseDetailByResidence>> ExecuteAsync(Expense expense)
     {
-       var result = new List<ExpenseDetailByResidence>();
-
-        var residences = await _getAllResidencesByConsortiumWithOwner.ExecuteAsync(expense.ConsortiumId);
-
-        foreach (var residence in residences)
+        try
         {
-            double residenceShare = expense.TotalAmount * residence.Coeficient; // REVISAR FORMULA "dividido 100?"
-            ExpenseDetailByResidence expenseDetail = new ExpenseDetailByResidence
-            {
-                ExpenseId = expense.Id,
-                ResidenceId = residence.Id,
-                TotalAmount = residenceShare,
-                State = "Pending"
-            };
-            result.Add(await _expenseDetailRepository.AddExpenseDetailAsync(expenseDetail));
-        }
+            if (expense == null)
+                throw new ArgumentNullException(nameof(expense), "La expensa no puede ser nula.");
 
-        
-        return result;
+            if (expense.Id <= 0)
+                throw new ArgumentException("El ID de la expensa no es válido.", nameof(expense.Id));
+
+            if (expense.ConsortiumId <= 0)
+                throw new ArgumentException("El ID del consorcio no es válido.", nameof(expense.ConsortiumId));
+
+            if (expense.TotalAmount <= 0)
+                throw new InvalidOperationException("El monto total de la expensa debe ser mayor que cero.");
+
+            var residences = await _getAllResidencesByConsortiumWithOwner.ExecuteAsync(expense.ConsortiumId);
+
+            if (residences == null)
+                throw new InvalidOperationException("No se pudieron obtener las residencias del consorcio.");
+
+            if (!residences.Any())
+                throw new KeyNotFoundException($"No se encontraron residencias para el consorcio con ID {expense.ConsortiumId}.");
+
+            var result = new List<ExpenseDetailByResidence>();
+
+            foreach (var residence in residences)
+            {
+                if (residence.Coeficient <= 0)
+                    throw new InvalidOperationException($"La residencia con ID {residence.Id} tiene un coeficiente inválido ({residence.Coeficient}).");
+
+                double residenceShare = expense.TotalAmount * residence.Coeficient; // confirmar si debe dividirse por 100
+
+                var expenseDetail = new ExpenseDetailByResidence
+                {
+                    ExpenseId = expense.Id,
+                    ResidenceId = residence.Id,
+                    TotalAmount = residenceShare,
+                    State = "Pending"
+                };
+
+                var createdDetail = await _expenseDetailRepository.AddExpenseDetailAsync(expenseDetail);
+
+                if (createdDetail == null)
+                    throw new InvalidOperationException($"No se pudo crear el detalle de expensa para la residencia {residence.Id}.");
+
+                result.Add(createdDetail);
+            }
+
+            return result;
+        }
+        catch (ArgumentNullException)
+        {
+            throw;
+        }
+        catch (ArgumentException)
+        {
+            throw;
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (InvalidOperationException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Ocurrió un error inesperado al crear los detalles de expensa.", ex);
+        }
     }
 }

@@ -80,13 +80,47 @@ public class ExpenseController : ControllerBase
   }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllInvoices()
+    public async Task<IActionResult> GetAllExpenses()
     {
-        var expenses = await _getAllExpenses.Execute();
-        if (expenses == null || !expenses.Any())
-            return NotFound("No se encontraron facturas.");
-        return Ok(expenses);
+        try
+        {
+            var expenses = await _getAllExpenses.Execute();
 
+            if (expenses == null)
+                return NotFound("No se pudieron obtener las expensas (resultado nulo).");
+
+            if (!expenses.Any())
+                return NotFound("No se encontraron facturas o expensas registradas.");
+
+            var emptyExpenses = expenses.Where(e => e.Invoices == null || !e.Invoices.Any()).ToList();
+            if (emptyExpenses.Any())
+            {
+                return Ok(new
+                {
+                    message = "Se encontraron expensas, pero algunas no tienen facturas asociadas.",
+                    totalExpenses = expenses.Count(),
+                    expensesWithoutInvoices = emptyExpenses.Select(e => e.Id).ToList()
+                });
+            }
+
+            return Ok(expenses);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = $"Operación inválida: {ex.Message}" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "Error interno del servidor al obtener las expensas.",
+                error = ex.Message
+            });
+        }
     }
 
 
