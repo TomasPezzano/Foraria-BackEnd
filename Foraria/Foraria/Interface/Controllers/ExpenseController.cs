@@ -82,6 +82,14 @@ public class ExpenseController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllExpenses()
     {
+
+        //var expenses = await _getAllExpenses.Execute();
+        //if (expenses == null || !expenses.Any()) 
+        //    return NotFound("No se encontraron facturas."); 
+        
+        //return Ok(expenses);
+
+
         try
         {
             var expenses = await _getAllExpenses.Execute();
