@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251030132952_updateDatabaseR")]
+    partial class updateDatabaseR
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -492,47 +495,6 @@ namespace Foraria.Migrations
                     b.ToTable("message", (string)null);
                 });
 
-            modelBuilder.Entity("ForariaDomain.PasswordResetToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedByIp")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UsedByIp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("passwordResetToken", (string)null);
-                });
-
             modelBuilder.Entity("ForariaDomain.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -541,43 +503,20 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("ExpenseId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("InstallmentAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("Installments")
+                    b.Property<int>("PaymentMethodId")
                         .HasColumnType("int");
-
-                    b.Property<string>("MercadoPagoPaymentId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PaymentMethodId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PreferenceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ResidenceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StatusDetail")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Voucher")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -633,12 +572,6 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ApprovedByUserId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CategoryPoll_id")
                         .HasColumnType("int");
 
@@ -673,8 +606,6 @@ namespace Foraria.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApprovedByUserId");
 
                     b.HasIndex("CategoryPoll_id");
 
@@ -1140,9 +1071,6 @@ namespace Foraria.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsValid")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1338,17 +1266,6 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ForariaDomain.PasswordResetToken", b =>
-                {
-                    b.HasOne("ForariaDomain.User", "User")
-                        .WithMany("PasswordResetTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ForariaDomain.Payment", b =>
                 {
                     b.HasOne("ForariaDomain.Expense", "Expense")
@@ -1360,7 +1277,8 @@ namespace Foraria.Migrations
                     b.HasOne("ForariaDomain.PaymentMethod", "PaymentMethod")
                         .WithMany("Payments")
                         .HasForeignKey("PaymentMethodId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("ForariaDomain.Residence", "Residence")
                         .WithMany("Payments")
@@ -1377,10 +1295,6 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Poll", b =>
                 {
-                    b.HasOne("ForariaDomain.User", "ApprovedByUser")
-                        .WithMany()
-                        .HasForeignKey("ApprovedByUserId");
-
                     b.HasOne("ForariaDomain.CategoryPoll", "CategoryPoll")
                         .WithMany("Polls")
                         .HasForeignKey("CategoryPoll_id")
@@ -1397,8 +1311,6 @@ namespace Foraria.Migrations
                         .HasForeignKey("User_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("ApprovedByUser");
 
                     b.Navigation("CategoryPoll");
 
@@ -1734,8 +1646,6 @@ namespace Foraria.Migrations
                     b.Navigation("ClaimsResponse");
 
                     b.Navigation("Messages");
-
-                    b.Navigation("PasswordResetTokens");
 
                     b.Navigation("Polls");
 

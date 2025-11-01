@@ -16,4 +16,6 @@ public interface IUserRepository
     Task Update(User user);
     Task<int> GetAllInNumber();
     Task<List<User>> GetUsersByConsortiumIdAsync(int consortiumId);
+    Task<bool> ExistsUserWithRoleInResidence(int residenceId, string roleDescription);
+
 }
