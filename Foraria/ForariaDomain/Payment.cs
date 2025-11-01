@@ -36,6 +36,8 @@ namespace ForariaDomain
         public decimal Amount { get; set; }
 
         public int? Installments { get; set; } 
+
+
         public decimal? InstallmentAmount { get; set; } 
 
     }

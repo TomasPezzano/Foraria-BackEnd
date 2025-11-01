@@ -162,9 +162,10 @@ builder.Services.AddScoped<UpdatePoll>();
 builder.Services.AddScoped<ChangePollState>();
 builder.Services.AddScoped<GetUserDocumentsByCategory>();
 builder.Services.AddScoped<GetUserDocumentStats>();
-
-
-
+builder.Services.AddScoped<IPasswordResetTokenGenerator, PasswordResetTokenGenerator>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
+builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
+builder.Services.AddScoped<IResetPassword, ResetPassword>();
 
 
 builder.Services.AddCors(options =>

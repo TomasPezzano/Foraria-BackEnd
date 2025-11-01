@@ -18,13 +18,6 @@ namespace Foraria.Migrations
                 nullable: false,
                 defaultValue: false);
 
-            migrationBuilder.AddColumn<bool>(
-                name: "HasPermission",
-                table: "user",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
-
             migrationBuilder.AddColumn<DateTime>(
                 name: "ApprovedAt",
                 table: "poll",

@@ -71,6 +71,8 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<InvoiceItem> InvoiceItems { get; set; }
 
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("user");
@@ -102,6 +104,7 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<SupplierContract>().ToTable("supplierContract");
             modelBuilder.Entity<Invoice>().ToTable("invoice");
             modelBuilder.Entity<InvoiceItem>().ToTable("invoiceItem");
+            modelBuilder.Entity<PasswordResetToken>().ToTable("passwordResetToken");
 
 
             modelBuilder.Entity<User>()
@@ -360,6 +363,14 @@ namespace Foraria.Infrastructure.Persistence
                 .WithMany(i => i.Items)
                 .HasForeignKey(ii => ii.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PasswordResetToken>()
+               .HasOne (u => u.User)
+               .WithMany(i => i.PasswordResetTokens)
+               .HasForeignKey(u => u.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+
 
 
             foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))

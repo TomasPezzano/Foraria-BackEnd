@@ -25,8 +25,10 @@ public class UserController : ControllerBase
     private readonly IGetTotalTenantUsers _getTotalTenantUsers;
     private readonly IGetTotalOwnerUsers _getTotalOwnerUsers;
     private readonly IGetUsersByConsortium _getUsersByConsortium;
+    private readonly IResetPassword _resetPassword;
+    private readonly IForgotPassword _forgotPassword;
 
-    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, ILocalFileStorageService fileStorageService, IGetUserByEmail getUserByEmail, IGetUserById getUserById, IGetTotalTenantUsers getTotalTenantUsers, IGetTotalOwnerUsers getTotalOwnerUsers, IGetUsersByConsortium getUsersByConsortium)
+    public UserController(IRegisterUser registerUserService, ILoginUser loginUserService, ILogoutUser logoutUserService, IRefreshTokenUseCase refreshTokenUseCase, IUpdateUserFirstTime updateUserFirstTime, ILocalFileStorageService fileStorageService, IGetUserByEmail getUserByEmail, IGetUserById getUserById, IGetTotalTenantUsers getTotalTenantUsers, IGetTotalOwnerUsers getTotalOwnerUsers, IGetUsersByConsortium getUsersByConsortium, IResetPassword resetPassword, IForgotPassword forgotPassword)
     {
         _registerUserService = registerUserService;
         _loginUserService = loginUserService;
@@ -39,9 +41,10 @@ public class UserController : ControllerBase
         _getTotalTenantUsers = getTotalTenantUsers;
         _getTotalOwnerUsers = getTotalOwnerUsers;
         _getUsersByConsortium = getUsersByConsortium;
+        _resetPassword = resetPassword;
+        _forgotPassword = forgotPassword;
     }
 
-    //[Authorize(Policy = "ConsortiumAndAdmin")]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserRequestDto request)
     {
@@ -270,7 +273,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet ("totalTenants")]
-    //[Authorize(Policy = "All")]
+    [Authorize(Policy = "All")]
     public async Task<IActionResult> GetTotalTenantsByConsortiumIdAsync([FromQuery] int consortiumId)
     {
         try
@@ -289,7 +292,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("totalOwners")]
-    //[Authorize(Policy = "All")]
+    [Authorize(Policy = "All")]
     public async Task<IActionResult> GetTotalOwnersByConsortiumIdAsync([FromQuery] int consortiumId)
     {
         try
@@ -308,7 +311,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("consortium/{consortiumId}")]
-    //[Authorize(Policy = "All")]
+    [Authorize(Policy = "All")]
     public async Task<IActionResult> GetUsersByConsortium(int consortiumId)
     {
         try
@@ -347,6 +350,46 @@ public class UserController : ControllerBase
             return StatusCode(500, new { error = "Error al obtener usuarios del consorcio", detail = ex.Message });
         }
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var email = request.Email;
+
+        var ipAddress = GetIpAddress();
+        var result = await _forgotPassword.Execute(email, ipAddress);
+
+        return Ok(new { message = result.Message });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var token = request.Token;
+        var newPassworn = request.NewPassword;
+
+        var ipAddress = GetIpAddress();
+        var result = await _resetPassword.Execute(token, newPassworn, ipAddress);
+
+        if (!result.Success)
+        {
+            return BadRequest(new { message = result.Message });
+        }
+
+        return Ok(new { message = result.Message });
+    }
+
+
 
     private string GetIpAddress()
     {
