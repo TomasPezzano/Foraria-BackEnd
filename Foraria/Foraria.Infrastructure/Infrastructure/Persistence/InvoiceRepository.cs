@@ -33,4 +33,19 @@ public class InvoiceRepository : IInvoiceRepository
             .Include(i => i.Items)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Invoice>> GetAllInvoicesByMonth(DateTime inicio)
+    {
+        var fin = inicio.AddMonths(1).AddDays(-1);
+
+        return await _context.Invoices.Where(i => i.DateOfIssue >= inicio && i.DateOfIssue <= fin)
+            .Include(i => i.Items)
+            .ToListAsync();
+    }
+
+    public Task UpdateInvoiceAsync(Invoice invoice)
+    {
+        _context.Invoices.Update(invoice);
+        return Task.CompletedTask;
+    }
 }

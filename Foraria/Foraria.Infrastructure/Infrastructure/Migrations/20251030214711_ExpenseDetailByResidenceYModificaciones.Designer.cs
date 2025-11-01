@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251030214711_ExpenseDetailByResidenceYModificaciones")]
+    partial class ExpenseDetailByResidenceYModificaciones
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,9 +347,6 @@ namespace Foraria.Migrations
                     b.Property<float?>("ConfidenceScore")
                         .HasColumnType("real");
 
-                    b.Property<int?>("ConsortiumId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -362,7 +362,7 @@ namespace Foraria.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int?>("ExpenseId")
+                    b.Property<int>("ExpenseId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("ExpirationDate")
@@ -403,8 +403,6 @@ namespace Foraria.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
 
                     b.HasIndex("ExpenseId");
 
@@ -1240,17 +1238,11 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Invoice", b =>
                 {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("Invoices")
-                        .HasForeignKey("ConsortiumId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("ForariaDomain.Expense", "Expense")
                         .WithMany("Invoices")
                         .HasForeignKey("ExpenseId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Consortium");
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Expense");
                 });
@@ -1565,8 +1557,6 @@ namespace Foraria.Migrations
             modelBuilder.Entity("ForariaDomain.Consortium", b =>
                 {
                     b.Navigation("Expenses");
-
-                    b.Navigation("Invoices");
 
                     b.Navigation("Residences");
 

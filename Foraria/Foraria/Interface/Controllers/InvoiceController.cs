@@ -46,6 +46,7 @@ public class InvoiceController : ControllerBase
             PurchaseOrder = invoiceDto.PurchaseOrder,
             ConfidenceScore = invoiceDto.ConfidenceScore,
             ProcessedAt = invoiceDto.ProcessedAt ?? DateTime.UtcNow,
+            ConsortiumId = invoiceDto.ConsortiumId,
             Items = invoiceDto.Items.Select(itemDto => new InvoiceItem
             {
                 Description = itemDto.Description,
@@ -78,6 +79,7 @@ public class InvoiceController : ControllerBase
                 PurchaseOrder = result.PurchaseOrder,
                 ConfidenceScore = result.ConfidenceScore,
                 ProcessedAt = result.ProcessedAt,
+                ConsortiumId = result.ConsortiumId,
                 Items = result.Items.Select(item => new InvoiceItemDto
                 {
                     Description = item.Description,
@@ -118,6 +120,7 @@ public class InvoiceController : ControllerBase
             TotalTaxes = result.TotalTaxes,
             Description = result.Description,
             FilePath = result.FilePath,
+            ConsortiumId = result.ConsortiumId,
             Items = result.Items.Select(item => new InvoiceItemDto
             {
                 Description = item.Description,

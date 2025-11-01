@@ -87,16 +87,16 @@ builder.Services.AddScoped<ISignalRNotification, SignalRNotification>();
 builder.Services.AddScoped<GetSupplierById>();
 builder.Services.AddScoped<GetSupplierContractById>();
 builder.Services.AddScoped<GetSupplierContractsById>();
-builder.Services.AddScoped<GetMonthlyExpenseTotal>();
-builder.Services.AddScoped<GetExpenseByCategory>();
+//builder.Services.AddScoped<GetMonthlyExpenseTotal>();
+//builder.Services.AddScoped<GetExpenseByCategory>();
 builder.Services.AddScoped<GetActivePollCount>();
-builder.Services.AddScoped<GetPendingExpenses>();
-builder.Services.AddScoped<GetUserExpenseSummary>();
-builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
+//builder.Services.AddScoped<GetPendingExpenses>();
+//builder.Services.AddScoped<GetUserExpenseSummary>();
+//builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
 builder.Services.AddScoped<GetTotalUsers>();
 builder.Services.AddScoped<GetLatestPendingClaim>();
 builder.Services.AddScoped<GetPendingClaimsCount>();    
-builder.Services.AddScoped<GetCollectedExpensesPercentage>();
+//builder.Services.AddScoped<GetCollectedExpensesPercentage>();
 builder.Services.AddScoped<GetUpcomingReserves>();
 builder.Services.AddScoped<GetForumWithThreads>();
 builder.Services.AddScoped<DeleteForum>();
@@ -149,8 +149,14 @@ builder.Services.AddScoped<IGetResidenceById, GetResidenceById>();
 builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByConsortium>();
 builder.Services.AddScoped<ITransferPermission, TransferPermission>();
 builder.Services.AddScoped<IRevokePermission, RevokePermission>();
-
-
+builder.Services.AddScoped<ICreateExpense, CreateExpense>();
+builder.Services.AddScoped<IGetAllInvoicesByMonth, GetAllInvoicesByMonth>();
+builder.Services.AddScoped<IGetAllExpenses, GetAllExpenses>();
+builder.Services.AddScoped<ICreateExpenseDetail, CreateExpenseDetail>();
+builder.Services.AddScoped<IExpenseDetailRepository, ExpenseDatailRepository>();
+builder.Services.AddScoped<IGetAllResidencesByConsortiumWithOwner, GetAllResidencesByConsortiumWithOwner>();
+builder.Services.AddScoped<IGetExpenseWithDto, GetExpenseWithDto>();
+builder.Services.AddScoped<IGetExpenseDetailByResidence, GetExpenseDetailByResidence>();
 
 
 builder.Services.AddCors(options =>

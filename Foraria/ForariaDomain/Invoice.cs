@@ -72,5 +72,13 @@ public class Invoice
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<InvoiceItem> Items { get; set; } = new List<InvoiceItem>();
+
+    public int? ExpenseId { get; set; }
+
+    public Expense? Expense { get; set;}
+
+    public int? ConsortiumId { get; set; }
+
+    public Consortium? Consortium { get; set; }
 }
 

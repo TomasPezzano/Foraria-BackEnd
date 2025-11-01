@@ -12,35 +12,35 @@ namespace Foraria.Interface.Controllers
     [Route("api/dashboard")]
     public class DashboardController : ControllerBase
     {
-        private readonly GetMonthlyExpenseTotal _getMonthlyExpenseTotal;
-        private readonly GetExpenseByCategory _getExpenseByCategory;
-        private readonly GetPendingExpenses _getPendingExpenses;
-        private readonly GetUserExpenseSummary _getUserExpenseSummary;
-        private readonly GetUserMonthlyExpenseHistory _getUserMonthlyExpenseHistory;
+        //private readonly GetMonthlyExpenseTotal _getMonthlyExpenseTotal;
+        //private readonly GetExpenseByCategory _getExpenseByCategory;
+        //private readonly GetPendingExpenses _getPendingExpenses;
+        //private readonly GetUserExpenseSummary _getUserExpenseSummary;
+        //private readonly GetUserMonthlyExpenseHistory _getUserMonthlyExpenseHistory;
         private readonly GetActivePollCount _getActivePollCount;
         private readonly GetUpcomingReserves _getUpcomingReserves;
         private readonly GetActiveReserveCount _getActiveReserveCount;
 
         public DashboardController(
-            GetMonthlyExpenseTotal getMonthlyExpenseTotal,
-            GetExpenseByCategory getExpenseByCategory,
-            GetPendingExpenses getPendingExpenses,
-            GetUserExpenseSummary getUserExpenseSummary,
-            GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
+            //GetMonthlyExpenseTotal getMonthlyExpenseTotal,
+            //GetExpenseByCategory getExpenseByCategory,
+            //GetPendingExpenses getPendingExpenses,
+            //GetUserExpenseSummary getUserExpenseSummary,
+            //GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
             GetActivePollCount getActivePollCount,
             GetUpcomingReserves getUpcomingReserves,
             GetActiveReserveCount getActiveReserveCount)
         {
-            _getMonthlyExpenseTotal = getMonthlyExpenseTotal;
-            _getExpenseByCategory = getExpenseByCategory;
-            _getPendingExpenses = getPendingExpenses;
-            _getUserExpenseSummary = getUserExpenseSummary;
-            _getUserMonthlyExpenseHistory = getUserMonthlyExpenseHistory;
+            //_getMonthlyExpenseTotal = getMonthlyExpenseTotal;
+            //_getExpenseByCategory = getExpenseByCategory;
+            //_getPendingExpenses = getPendingExpenses;
+            //_getUserExpenseSummary = getUserExpenseSummary;
+            //_getUserMonthlyExpenseHistory = getUserMonthlyExpenseHistory;
             _getActivePollCount = getActivePollCount;
             _getUpcomingReserves = getUpcomingReserves;
             _getActiveReserveCount = getActiveReserveCount;
         }
-
+        /*
         [HttpGet("expenses/total")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(
@@ -67,32 +67,8 @@ namespace Foraria.Interface.Controllers
             });
         }
 
-        [HttpGet("expenses/category")]
-        [Authorize(Policy = "All")]
-        [SwaggerOperation(
-            Summary = "Obtiene el desglose de gastos por categoría.",
-            Description = "Devuelve un listado de categorías con los montos de expensas asociados a cada una, para el mes actual o la fecha indicada."
-        )]
-        public async Task<IActionResult> GetExpenseByCategory(
-            [FromQuery] int consortiumId,
-            [FromQuery] DateTime? date = null)
-        {
-            if (consortiumId <= 0)
-                throw new ValidationException("Debe proporcionar un ID de consorcio válido.");
-
-            var result = await _getExpenseByCategory.ExecuteAsync(consortiumId, date);
-
-            if (result == null || !result.Any())
-                throw new NotFoundException("No se encontraron gastos para las categorías especificadas.");
-
-            return Ok(new
-            {
-                consortiumId,
-                month = (date ?? DateTime.UtcNow).ToString("MMMM yyyy"),
-                data = result
-            });
-        }
-
+        */
+        /*
         [HttpGet("expenses/pending")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(
@@ -116,7 +92,8 @@ namespace Foraria.Interface.Controllers
                 pendingExpenses = result
             });
         }
-
+        */
+        /*
         [HttpGet("expenses/summary")]
         [Authorize(Policy = "OwnerAndTenant")]
         [SwaggerOperation(
@@ -164,7 +141,7 @@ namespace Foraria.Interface.Controllers
 
             return Ok(result);
         }
-
+        */
         [HttpGet("polls/active")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(

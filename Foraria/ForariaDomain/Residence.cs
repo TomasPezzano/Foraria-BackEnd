@@ -20,11 +20,13 @@ namespace ForariaDomain
 
         public string Tower { get; set; }
 
+        public double Coeficient { get; set; }
+
         public ICollection<User> Users { get; set; }
 
         public ICollection<Reserve> Reserves { get; set; }
 
-        public ICollection<Expense> Expenses { get; set; }
+        public ICollection<ExpenseDetailByResidence> ExpenseDetailByResidence { get; set; }
 
         public ICollection<Payment> Payments { get; set; }
 

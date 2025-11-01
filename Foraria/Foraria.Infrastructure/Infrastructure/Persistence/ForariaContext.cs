@@ -55,8 +55,6 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        public DbSet<ExpenseDetail> ExpenseDetails { get; set; }
-
         public DbSet<Payment> Payments { get; set; }
 
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
@@ -70,6 +68,8 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<Invoice> Invoices { get; set; }
 
         public DbSet<InvoiceItem> InvoiceItems { get; set; }
+
+        public DbSet<ExpenseDetailByResidence> ExpenseDetailByResidences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -94,7 +94,6 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<UserDocument>().ToTable("userDocument");
             modelBuilder.Entity<Reaction>().ToTable("reaction");
             modelBuilder.Entity<BlockchainProof>().ToTable("blockchainProof");
-            modelBuilder.Entity<ExpenseDetail>().ToTable("expenseDetail");
             modelBuilder.Entity<Payment>().ToTable("payment");
             modelBuilder.Entity<PaymentMethod>().ToTable("paymentMethod");
             modelBuilder.Entity<RefreshToken>().ToTable("refreshToken");
@@ -102,6 +101,7 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<SupplierContract>().ToTable("supplierContract");
             modelBuilder.Entity<Invoice>().ToTable("invoice");
             modelBuilder.Entity<InvoiceItem>().ToTable("invoiceItem");
+            modelBuilder.Entity<ExpenseDetailByResidence>().ToTable("ExpenseDetailByResidences");
 
 
             modelBuilder.Entity<User>()
@@ -280,10 +280,16 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
 
-            modelBuilder.Entity<Expense>()
+            modelBuilder.Entity<ExpenseDetailByResidence>()
                 .HasOne(e => e.Residence)
-                .WithMany(r => r.Expenses)
+                .WithMany(r => r.ExpenseDetailByResidence)
                 .HasForeignKey(e => e.ResidenceId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ExpenseDetailByResidence>()
+                .HasOne(e => e.Expense)
+                .WithMany(r => r.ExpenseDetailsByResidence)
+                .HasForeignKey(e => e.ExpenseId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Expense>()
@@ -293,16 +299,11 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Expense>()
-                .HasMany(e => e.ExpenseDetails)
+                .HasMany(e => e.Invoices)
                 .WithOne(d => d.Expense)
                 .HasForeignKey(d => d.ExpenseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Expense>()
-                .HasMany(e => e.Payments)
-                .WithOne(p => p.Expense)
-                .HasForeignKey(p => p.ExpenseId)
-                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Residence)
@@ -311,9 +312,9 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Payment>()
-                .HasOne(p => p.Expense)
+                .HasOne(p => p.ExpenseDetailByResidence)
                 .WithMany(e => e.Payments)
-                .HasForeignKey(p => p.ExpenseId)
+                .HasForeignKey(p => p.ExpenseDetailByResidenceId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Payment>()
@@ -355,6 +356,12 @@ namespace Foraria.Infrastructure.Persistence
                 .HasOne(ii => ii.Invoice)
                 .WithMany(i => i.Items)
                 .HasForeignKey(ii => ii.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Consortium>()
+                .HasMany(e => e.Invoices)
+                .WithOne(d => d.Consortium)
+                .HasForeignKey(d => d.ConsortiumId)
                 .OnDelete(DeleteBehavior.Cascade);
 
 

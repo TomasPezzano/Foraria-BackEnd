@@ -17,9 +17,9 @@ namespace ForariaDomain
         public string Voucher { get; set; } = string.Empty;
         public DateTime Date { get; set; }
 
-        [ForeignKey(nameof(Expense))]
-        public int ExpenseId { get; set; }
-        public Expense Expense { get; set; }
+        [ForeignKey(nameof(ExpenseDetailByResidence))]
+        public int ExpenseDetailByResidenceId { get; set; }
+        public ExpenseDetailByResidence ExpenseDetailByResidence { get; set; }
 
         [ForeignKey(nameof(Residence))]
         public int ResidenceId { get; set; }
