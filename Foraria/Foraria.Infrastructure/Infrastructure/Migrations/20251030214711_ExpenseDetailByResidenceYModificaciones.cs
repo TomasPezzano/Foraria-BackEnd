@@ -47,12 +47,7 @@ namespace Foraria.Migrations
                 table: "payment",
                 newName: "IX_payment_ExpenseDetailByResidenceId");
 
-            migrationBuilder.AddColumn<bool>(
-                name: "HasPermission",
-                table: "user",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
+           
 
             migrationBuilder.AddColumn<double>(
                 name: "Coeficient",

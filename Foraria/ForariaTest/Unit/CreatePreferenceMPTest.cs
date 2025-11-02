@@ -12,20 +12,20 @@ namespace ForariaTest.Unit
         [Fact]
         public async Task ExecuteAsync_ShouldCreatePreferenceAndSavePayment()
         {
-            var expenseRepoMock = new Mock<IExpenseRepository>();
+            var expenseRepoMock = new Mock<IExpenseDetailRepository>();
             var paymentRepoMock = new Mock<IPaymentRepository>();
             var paymentGatewayMock = new Mock<IPaymentGateway>();
 
-            var expense = new Expense { Id = 1, TotalAmount = 5000 };
-            expenseRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(expense);
+            var expense = new ExpenseDetailByResidence { Id = 1, TotalAmount = 5000 };
+            expenseRepoMock.Setup(r => r.GetExpenseDetailById(1)).ReturnsAsync(expense);
 
             paymentGatewayMock.Setup(g => g.CreatePreferenceAsync(5000m, 1, 10))
                 .ReturnsAsync(("pref_123", "https://init-point"));
 
             var useCase = new CreatePreferenceMP(
-                expenseRepoMock.Object,
                 paymentRepoMock.Object,
-                paymentGatewayMock.Object
+                paymentGatewayMock.Object,
+                 expenseRepoMock.Object
             );
 
             var result = await useCase.ExecuteAsync(1, 10);

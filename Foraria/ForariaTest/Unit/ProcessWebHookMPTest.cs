@@ -16,7 +16,7 @@ namespace ForariaTest.Unit
         {
             // Arrange
             var paymentRepo = new Mock<IPaymentRepository>();
-            var expenseRepo = new Mock<IExpenseRepository>();
+            var expenseRepo = new Mock<IExpenseDetailRepository>();
             var paymentMethodRepo = new Mock<IPaymentMethodRepository>();
             var gateway = new Mock<IPaymentGateway>();
 
@@ -47,17 +47,17 @@ namespace ForariaTest.Unit
             gateway.Setup(g => g.GetPaymentAsync(9999)).ReturnsAsync(mpPayment);
             gateway.Setup(g => g.VerifyMerchantOrderAsync(123)).ReturnsAsync(true);
 
-            var existingPayment = new Payment { Id = 1, ExpenseId = 1, Status = "pending" };
-            var expense = new Expense { Id = 1, State = "unpaid" };
+            var existingPayment = new Payment { Id = 1, ExpenseDetailByResidenceId = 1, Status = "pending" };
+            var expense = new ExpenseDetailByResidence { Id = 1, State = "unpaid" };
 
             paymentRepo.Setup(r => r.FindByMercadoPagoMetadataAsync(
                 It.IsAny<Dictionary<string, object>>(), "123", "9999"))
                 .ReturnsAsync(existingPayment);
 
-            expenseRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(expense);
+            expenseRepo.Setup(r => r.GetExpenseDetailById(1)).ReturnsAsync(expense);
 
             var useCase = new ProcessWebHookMP(
-                paymentRepo.Object, expenseRepo.Object, paymentMethodRepo.Object, gateway.Object
+                paymentRepo.Object, paymentMethodRepo.Object, gateway.Object, expenseRepo.Object
             );
 
             await useCase.ExecuteAsync(body);
