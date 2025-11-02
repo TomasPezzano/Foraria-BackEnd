@@ -26,9 +26,19 @@ public class ExpenseDatailRepository : IExpenseDetailRepository
         return newExpenseDetail;
     }
 
+    public async Task<ExpenseDetailByResidence> GetExpenseDetailById(int id)
+    {
+       return await _context.ExpenseDetailByResidences.FindAsync(id);
+    }
+
     public async Task<ICollection<ExpenseDetailByResidence>> GetExpenseDetailByResidence(int id)
     {
         return await _context.ExpenseDetailByResidences.Where(ed => ed.ResidenceId == id).Include(e => e.Expense).ThenInclude(ex => ex.Invoices).ToListAsync();
         
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
     }
 }
