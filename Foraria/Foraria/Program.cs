@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using MercadoPago.Config;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
@@ -142,6 +144,12 @@ builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<IGetAllInvoices, GetAllInvoices>();
 builder.Services.AddScoped<IGetConsortiumById, GetConsortiumById>();
 builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentGateway, MercadoPagoService>();
+builder.Services.AddScoped<CreatePreferenceMP>();
+builder.Services.AddScoped<ProcessWebHookMP>();
+builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
 builder.Services.AddScoped<IGetTotalTenantUsers, GetTotalTenantUsers>();
 builder.Services.AddScoped<IGetTotalOwnerUsers, GetTotalOwnerUsers>();
 builder.Services.AddScoped<IGetUsersByConsortium, GetUsersByConsortium>();
@@ -150,13 +158,22 @@ builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByCons
 builder.Services.AddScoped<ITransferPermission, TransferPermission>();
 builder.Services.AddScoped<IRevokePermission, RevokePermission>();
 builder.Services.AddScoped<ICreateExpense, CreateExpense>();
-builder.Services.AddScoped<IGetAllInvoicesByMonth, GetAllInvoicesByMonth>();
+//builder.Services.AddScoped<IGetAllInvoicesByMonth, GetAllInvoicesByMonth>();
 builder.Services.AddScoped<IGetAllExpenses, GetAllExpenses>();
 builder.Services.AddScoped<ICreateExpenseDetail, CreateExpenseDetail>();
 builder.Services.AddScoped<IExpenseDetailRepository, ExpenseDatailRepository>();
 builder.Services.AddScoped<IGetAllResidencesByConsortiumWithOwner, GetAllResidencesByConsortiumWithOwner>();
 builder.Services.AddScoped<IGetExpenseWithDto, GetExpenseWithDto>();
 builder.Services.AddScoped<IGetExpenseDetailByResidence, GetExpenseDetailByResidence>();
+builder.Services.AddScoped<GetLastUploadDate>();
+builder.Services.AddScoped<UpdatePoll>();
+builder.Services.AddScoped<ChangePollState>();
+builder.Services.AddScoped<GetUserDocumentsByCategory>();
+builder.Services.AddScoped<GetUserDocumentStats>();
+builder.Services.AddScoped<IPasswordResetTokenGenerator, PasswordResetTokenGenerator>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
+builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
+builder.Services.AddScoped<IResetPassword, ResetPassword>();
 
 
 builder.Services.AddCors(options =>
@@ -305,6 +322,8 @@ builder.Services.AddScoped<CreatePoll>();
 builder.Services.AddScoped<IVoteRepository, VoteRepositoryImplementation>();
 builder.Services.AddScoped<CreateVote>();
 builder.Services.AddScoped<GetPolls>();
+
+MercadoPagoConfig.AccessToken = builder.Configuration["MercadoPago:AccessToken"];
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
