@@ -1,8 +1,10 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Foraria.Interface.Controllers;
 
@@ -14,18 +16,42 @@ public class UserDocumentController : ControllerBase
 {
     private readonly ICreateUserDocument _createUserDocument;
     private readonly IGetUserDocuments _getUserDocuments;
+    private readonly UpdateUserDocument _updateUserDocument;
+    private readonly GetUserDocumentsByCategory _getUserDocumentsByCategory;
+    private readonly GetLastUploadDate _getLastUploadDate;
+    private readonly GetUserDocumentStats _getUserDocumentStats;
+    private ICreateUserDocument object1;
+    private IGetUserDocuments object2;
 
-    public UserDocumentController(ICreateUserDocument createUserDocument, IGetUserDocuments getUserDocuments)
+    public UserDocumentController(
+        ICreateUserDocument createUserDocument,
+        IGetUserDocuments getUserDocuments,
+        UpdateUserDocument updateUserDocument,
+        GetUserDocumentsByCategory getUserDocumentsByCategory,
+        GetLastUploadDate getLastUploadDate,
+        GetUserDocumentStats getUserDocumentStats)
     {
         _createUserDocument = createUserDocument;
         _getUserDocuments = getUserDocuments;
+        _updateUserDocument = updateUserDocument;
+        _getUserDocumentsByCategory = getUserDocumentsByCategory;
+        _getLastUploadDate = getLastUploadDate;
+        _getUserDocumentStats = getUserDocumentStats;
     }
 
+    public UserDocumentController(ICreateUserDocument object1, IGetUserDocuments object2)
+    {
+        this.object1 = object1;
+        this.object2 = object2;
+    }
 
     [HttpGet]
     [Authorize(Policy = "All")]
-    [ProducesResponseType(typeof(List<UserDocumentDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "Obtiene todos los documentos existentes",
+        Description = "Devuelve la lista completa de documentos de usuario y consorcio.")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Lista de documentos obtenida correctamente", typeof(List<UserDocumentDto>))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
     public async Task<IActionResult> GetAll()
     {
         var documents = await _getUserDocuments.Execute();
@@ -45,12 +71,14 @@ public class UserDocumentController : ControllerBase
         return Ok(result);
     }
 
-
     [HttpPost]
     [Authorize(Policy = "All")]
-    [ProducesResponseType(typeof(UserDocumentDto), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "Crea un nuevo documento de usuario",
+        Description = "Permite subir un documento validado por URL, categoría y formato. Cualquier usuario autenticado puede crear un documento.")]
+    [SwaggerResponse(StatusCodes.Status201Created, "Documento creado correctamente", typeof(UserDocumentDto))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos inválidos o error de validación")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
     public async Task<IActionResult> Add([FromBody] CreateUserDocumentDto dto)
     {
         if (!ModelState.IsValid)
@@ -58,12 +86,6 @@ public class UserDocumentController : ControllerBase
 
         try
         {
-            // Validaciones de existencia (si aplican)
-            // Ejemplo: validar si el usuario o consorcio existen antes de crear el documento
-            // var user = await _getUserById.Execute(dto.User_id);
-            // if (user == null)
-            //     return NotFound(new { message = "Usuario no encontrado" });
-
             var document = new UserDocument
             {
                 Title = dto.Title,
@@ -94,9 +116,106 @@ public class UserDocumentController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
-        catch (Exception ex)
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Administrador,Consorcio,Usuario")]
+    [SwaggerOperation(
+        Summary = "Actualiza un documento existente",
+        Description = "Permite modificar los datos de un documento si el usuario es el propietario, un administrador o un consorcio.")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Documento actualizado correctamente", typeof(UserDocumentDto))]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "El usuario no tiene permisos para modificar este documento")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "No se encontró el documento especificado")]
+    public async Task<IActionResult> UpdateUserDocument(int id, [FromBody] UpdateUserDocumentRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
         {
-            return StatusCode(500, new { message = "Error interno del servidor", details = ex.Message });
+            var updated = await _updateUserDocument.ExecuteAsync(
+                id,
+                request.UserId,
+                request.Title,
+                request.Description,
+                request.Category,
+                request.Url
+            );
+
+            var dto = new UserDocumentDto
+            {
+                Id = updated.Id,
+                Title = updated.Title,
+                Description = updated.Description,
+                Category = updated.Category,
+                CreatedAt = updated.CreatedAt,
+                Url = updated.Url,
+                User_id = updated.User_id,
+                Consortium_id = updated.Consortium_id
+            };
+
+            return Ok(dto);
         }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("category/{category}")]
+    [Authorize(Policy = "All")]
+    [SwaggerOperation(
+        Summary = "Filtra documentos por categoría",
+        Description = "Devuelve los documentos de una categoría específica, opcionalmente filtrados por usuario.")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Documentos filtrados correctamente", typeof(List<UserDocumentDto>))]
+    public async Task<IActionResult> GetByCategory(string category, [FromQuery] int? userId = null)
+    {
+        var documents = await _getUserDocumentsByCategory.ExecuteAsync(category, userId);
+
+        var result = documents.Select(d => new UserDocumentDto
+        {
+            Id = d.Id,
+            Title = d.Title,
+            Description = d.Description,
+            Category = d.Category,
+            CreatedAt = d.CreatedAt,
+            Url = d.Url,
+            User_id = d.User_id,
+            Consortium_id = d.Consortium_id
+        }).ToList();
+
+        return Ok(result);
+    }
+
+    [HttpGet("last-upload")]
+    [Authorize(Policy = "All")]
+    [SwaggerOperation(
+        Summary = "Obtiene la fecha del último documento subido",
+        Description = "Devuelve la fecha del último documento subido por un usuario o globalmente.")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Fecha obtenida correctamente", typeof(DateTime))]
+    public async Task<IActionResult> GetLastUpload([FromQuery] int? userId = null)
+    {
+        var date = await _getLastUploadDate.ExecuteAsync(userId);
+        return Ok(date);
+    }
+
+    [HttpGet("stats")]
+    [Authorize(Policy = "All")]
+    [SwaggerOperation(
+        Summary = "Obtiene estadísticas de documentos",
+        Description = "Devuelve totales, totales por categoría y fecha de la última carga de documentos.")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Estadísticas obtenidas correctamente", typeof(UserDocumentStatsDto))]
+    public async Task<IActionResult> GetStats([FromQuery] int? userId = null)
+    {
+        var stats = await _getUserDocumentStats.ExecuteAsync(userId);
+        return Ok(stats);
     }
 }

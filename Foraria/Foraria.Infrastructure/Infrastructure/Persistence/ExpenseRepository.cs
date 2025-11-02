@@ -75,6 +75,7 @@ return await _context.Expenses
 .ToListAsync();
 }
 
+
 public async Task<(int totalCount, int paidCount, double totalPaidAmount, double totalUnpaidAmount)>
 GetMonthlyCollectionStatsAsync(int consortiumId, DateTime monthStart, DateTime monthEnd)
 {
@@ -84,6 +85,21 @@ var expenses = await _context.Expenses
          e.CreatedAt < monthEnd)
 .ToListAsync();
 
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<(int totalCount, int paidCount, double totalPaidAmount, double totalUnpaidAmount)>
+           GetMonthlyCollectionStatsAsync(int consortiumId, DateTime monthStart, DateTime monthEnd)
+        {
+            var expenses = await _context.Expenses
+                .Where(e => e.ConsortiumId == consortiumId &&
+                            e.CreatedAt >= monthStart &&
+                            e.CreatedAt < monthEnd)
+                .ToListAsync();
+
+
 var totalCount = expenses.Count;
 var paidExpenses = expenses.Where(e => e.State == "Paid").ToList();
 var unpaidExpenses = expenses.Where(e => e.State == "Pending").ToList();
@@ -92,8 +108,19 @@ var paidCount = paidExpenses.Count;
 var totalPaidAmount = paidExpenses.Sum(e => e.TotalAmount);
 var totalUnpaidAmount = unpaidExpenses.Sum(e => e.TotalAmount);
 
+
 return (totalCount, paidCount, totalPaidAmount, totalUnpaidAmount);
 }
+
+       
+
+            return (totalCount, paidCount, totalPaidAmount, totalUnpaidAmount);
+        }
+
+        public async Task<Expense?> GetByIdAsync(int id)
+        {
+            return await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id);
+        }
 */
     }
  }

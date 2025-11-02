@@ -77,6 +77,16 @@ public class RegisterUser : IRegisterUser
             };
         }
 
+        var roleAlreadyAssigned = await _userRepository.ExistsUserWithRoleInResidence(residenceId, user.Role.Description);
+        if (roleAlreadyAssigned)
+        {
+            return new UserDto
+            {
+                Success = false,
+                Message = $"This residence already has a user with the role '{role.Description}' assigned. Each residence can only have one user per role."
+            };
+        }
+
         var temporaryPassword = await _generatePasswordUseCase.Generate();
         var passwordHash = _passwordHashUseCase.HashPassword(temporaryPassword);
         user.Password = passwordHash;

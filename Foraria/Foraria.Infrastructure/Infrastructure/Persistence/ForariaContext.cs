@@ -70,6 +70,7 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<InvoiceItem> InvoiceItems { get; set; }
 
         public DbSet<ExpenseDetailByResidence> ExpenseDetailByResidences { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -102,6 +103,7 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<Invoice>().ToTable("invoice");
             modelBuilder.Entity<InvoiceItem>().ToTable("invoiceItem");
             modelBuilder.Entity<ExpenseDetailByResidence>().ToTable("ExpenseDetailByResidences");
+            modelBuilder.Entity<PasswordResetToken>().ToTable("passwordResetToken");
 
 
             modelBuilder.Entity<User>()
@@ -352,17 +354,29 @@ namespace Foraria.Infrastructure.Persistence
                 .Property(s => s.Rating)
                 .HasPrecision(3, 2);
 
+            modelBuilder.Entity<Payment>()
+            .Property(p => p.Amount)
+            .HasPrecision(18, 2);
+
             modelBuilder.Entity<InvoiceItem>()
                 .HasOne(ii => ii.Invoice)
                 .WithMany(i => i.Items)
                 .HasForeignKey(ii => ii.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+
             modelBuilder.Entity<Consortium>()
                 .HasMany(e => e.Invoices)
                 .WithOne(d => d.Consortium)
                 .HasForeignKey(d => d.ConsortiumId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PasswordResetToken>()
+               .HasOne (u => u.User)
+               .WithMany(i => i.PasswordResetTokens)
+               .HasForeignKey(u => u.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
+
 
 
             foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))

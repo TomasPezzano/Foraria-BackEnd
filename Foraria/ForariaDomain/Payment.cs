@@ -14,8 +14,8 @@ namespace ForariaDomain
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string Voucher { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
+        public string? Voucher { get; set; } = string.Empty;
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
         [ForeignKey(nameof(ExpenseDetailByResidence))]
         public int ExpenseDetailByResidenceId { get; set; }
@@ -26,7 +26,19 @@ namespace ForariaDomain
         public Residence Residence { get; set; }
 
         [ForeignKey(nameof(PaymentMethod))]
-        public int PaymentMethodId { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
+        public int? PaymentMethodId { get; set; } 
+        public PaymentMethod? PaymentMethod { get; set; }
+
+        public string? MercadoPagoPaymentId { get; set; }  
+        public string PreferenceId { get; set; } = string.Empty;
+        public string Status { get; set; } = "pending";
+        public string? StatusDetail { get; set; }
+        public decimal Amount { get; set; }
+
+        public int? Installments { get; set; } 
+
+
+        public decimal? InstallmentAmount { get; set; } 
+
     }
 }

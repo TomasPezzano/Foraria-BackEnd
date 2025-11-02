@@ -22,6 +22,117 @@ namespace Foraria.Infrastructure.Email
             await SendEmailAsync(toEmail, subject, body);
         }
 
+        public async Task SendPasswordResetEmail(string toEmail, string firstName, string resetToken)
+        {
+            var subject = "Restablecimiento de Contraseña - Foraria";
+            var body = BuildPasswordResetEmailBody(toEmail, firstName, resetToken);
+            await SendEmailAsync(toEmail, subject, body);
+        }
+
+        private string BuildPasswordResetEmailBody(string email, string firstName, string resetToken)
+        {
+            var resetLink = $"http://localhost:3000/reset-password?token={resetToken}";
+
+            return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }}
+        .content {{
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+        }}
+        .header {{
+            background-color: #2196F3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }}
+        .button {{
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }}
+        .warning {{
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }}
+        .footer {{
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 12px;
+        }}
+        .expiration {{
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+            text-align: center;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='content'>
+            <div class='header'>
+                <h1>Restablecimiento de Contraseña</h1>
+            </div>
+            
+            <p>Hola <strong>{firstName}</strong>,</p>
+            
+            <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en Foraria.</p>
+            
+            <p style='text-align: center;'>
+                <a href='{resetLink}' class='button'>Restablecer Contraseña</a>
+            </p>
+            
+            <div class='expiration'>
+                <strong>⏱️ Este enlace expirará en 15 minutos</strong>
+            </div>
+            
+            <p>Si el botón no funciona, puedes copiar y pegar el siguiente enlace en tu navegador:</p>
+            <p style='word-break: break-all; background-color: #f9f9f9; padding: 10px; border-radius: 3px;'>
+                {resetLink}
+            </p>
+            
+            <div class='warning'>
+                <strong>⚠️ ¿No solicitaste este cambio?</strong><br/>
+                Si no fuiste tú quien solicitó restablecer la contraseña, ignora este correo. Tu contraseña permanecerá sin cambios.
+            </div>
+            
+            <p>Saludos,<br/>
+            <strong>El equipo de Foraria</strong></p>
+            
+            <div class='footer'>
+                <p>Este es un correo automático, por favor no responder.</p>
+                <p>&copy; 2025 Foraria. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>";
+        }
+
         private string BuildWelcomeEmailBody(string email, string firstName, string lastName, string password)
         {
             return $@"

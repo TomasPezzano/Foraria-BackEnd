@@ -13,7 +13,9 @@ namespace Foraria.Domain.Repository
         */
         Task<Expense> AddExpenseAsync(Expense newExpense);
         Task<IEnumerable<Expense>> GetAllExpenses();
-
         Task<Expense?> GetExpenseByConsortiumAndMonthAsync(int consortiumId, string month);
+        Task<Expense?> GetByIdAsync(int id);
+        Task SaveChangesAsync();
+
     }
 }
