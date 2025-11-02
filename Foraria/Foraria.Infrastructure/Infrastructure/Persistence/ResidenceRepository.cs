@@ -39,4 +39,12 @@ public class ResidenceRepository : IResidenceRepository
             .Where(r => r.ConsortiumId == consortiumId)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner(int consortiumId)
+    {
+        return await _context.Residence
+             .Include(r => r.Users)
+             .Where(r => r.ConsortiumId == consortiumId && r.Users.Count() > 0)
+             .ToListAsync();
+    }
 }

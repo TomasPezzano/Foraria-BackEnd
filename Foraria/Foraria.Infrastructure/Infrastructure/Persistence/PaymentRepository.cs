@@ -41,7 +41,7 @@ namespace Foraria.Infrastructure.Infrastructure.Persistence
             if (expenseId > 0 && residenceId > 0)
             {
                 var found = await query.FirstOrDefaultAsync(p =>
-                    p.ExpenseId == expenseId &&
+                    p.ExpenseDetailByResidenceId == expenseId &&
                     p.ResidenceId == residenceId &&
                     p.MercadoPagoPaymentId == null);
                 if (found != null) return found;

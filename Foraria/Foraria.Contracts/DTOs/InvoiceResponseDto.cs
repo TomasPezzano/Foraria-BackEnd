@@ -28,5 +28,6 @@ public class InvoiceResponseDto
     public DateTime ProcessedAt { get; set; }
     public DateTime CreatedAt { get; set; }
 
+    public int? ConsortiumId { get; set; }
     public List<InvoiceItemDto> Items { get; set; } = new();
 }

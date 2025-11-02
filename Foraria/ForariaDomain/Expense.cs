@@ -15,9 +15,7 @@ namespace ForariaDomain
         public int Id { get; set; }
 
         public string Description { get; set; } = string.Empty;
-        public string State { get; set; } = string.Empty;
         public double TotalAmount { get; set; }
-        public string Category { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime ExpirationDate { get; set; }
 
@@ -25,11 +23,7 @@ namespace ForariaDomain
         public int ConsortiumId { get; set; }
         public Consortium Consortium { get; set; }
 
-        [ForeignKey("Residence")]
-        public int ResidenceId { get; set; }
-        public Residence Residence { get; set; }
-
-        public ICollection<ExpenseDetail> ExpenseDetails { get; set; }
-        public ICollection<Payment> Payments { get; set; }
+        public ICollection<ExpenseDetailByResidence?> ExpenseDetailsByResidence { get; set; }
+        public ICollection<Invoice> Invoices { get; set; }
     }
 }

@@ -10,4 +10,6 @@ public interface IInvoiceRepository
 {
     Task<Invoice> CreateInvoice(Invoice invoice);
     Task<IEnumerable<Invoice>> GetAllInvoices();
+    Task<IEnumerable<Invoice>> GetAllInvoicesByMonthAndConsortium(DateTime date, int consortiumId);
+    Task UpdateInvoiceAsync(Invoice invoice);
 }

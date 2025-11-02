@@ -25,5 +25,7 @@ public class Consortium
     public ICollection<Supplier> Suppliers { get; set; }
     public ICollection<Residence> Residences { get; set; }
 
+    public ICollection<Invoice> Invoices { get; set; }
+
 
 }

@@ -8,20 +8,23 @@ namespace ForariaDomain.Application.UseCase
     public class ProcessWebHookMP
     {
         private readonly IPaymentRepository _paymentRepository;
-        private readonly IExpenseRepository _expenseRepository;
+        //private readonly IExpenseRepository _expenseRepository;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
         private readonly IPaymentGateway _paymentGateway;
+        private readonly IExpenseDetailRepository _expenseDetailRepository;
 
         public ProcessWebHookMP(
             IPaymentRepository paymentRepository,
-            IExpenseRepository expenseRepository,
+            //IExpenseRepository expenseRepository,
             IPaymentMethodRepository paymentMethodRepository,
-            IPaymentGateway paymentGateway)
+            IPaymentGateway paymentGateway,
+            IExpenseDetailRepository expenseDetailRepository)
         {
             _paymentRepository = paymentRepository;
-            _expenseRepository = expenseRepository;
+            //_expenseRepository = expenseRepository;
             _paymentMethodRepository = paymentMethodRepository;
             _paymentGateway = paymentGateway;
+            _expenseDetailRepository = expenseDetailRepository;
         }
 
         public async Task ExecuteAsync(JsonElement body)
@@ -130,11 +133,11 @@ namespace ForariaDomain.Application.UseCase
 
             if (mpPayment.Status == "approved")
             {
-                var expense = await _expenseRepository.GetByIdAsync(existing.ExpenseId);
+                var expense = await _expenseDetailRepository.GetExpenseDetailById(existing.ExpenseDetailByResidenceId);
                 if (expense != null && expense.State != "paid")
                 {
                     expense.State = "paid";
-                    await _expenseRepository.SaveChangesAsync();
+                    await _expenseDetailRepository.SaveChangesAsync();
                     Console.WriteLine($"🏠 Expensa {expense.Id} marcada como pagada.");
                 }
             }

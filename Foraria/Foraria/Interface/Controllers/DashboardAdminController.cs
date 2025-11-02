@@ -14,20 +14,20 @@ namespace Foraria.Interface.Controllers
         private readonly GetTotalUsers _getTotalUsers;
         private readonly GetPendingClaimsCount _getPendingClaimsCount;
         private readonly GetLatestPendingClaim _getLatestPendingClaim;
-        private readonly GetCollectedExpensesPercentage _getCollectedExpensesPercentage;
+        //private readonly GetCollectedExpensesPercentage _getCollectedExpensesPercentage;
         private readonly GetUpcomingReserves _getUpcomingReserves;
 
         public DashboardAdminController(
             GetTotalUsers getTotalUsers,
             GetPendingClaimsCount getPendingClaimsCount,
             GetLatestPendingClaim getLatestPendingClaim,
-            GetCollectedExpensesPercentage getCollectedExpensesPercentage,
+            //GetCollectedExpensesPercentage getCollectedExpensesPercentage,
             GetUpcomingReserves getUpcomingReserves)
         {
             _getTotalUsers = getTotalUsers;
             _getPendingClaimsCount = getPendingClaimsCount;
             _getLatestPendingClaim = getLatestPendingClaim;
-            _getCollectedExpensesPercentage = getCollectedExpensesPercentage;
+            //_getCollectedExpensesPercentage = getCollectedExpensesPercentage;
             _getUpcomingReserves = getUpcomingReserves;
         }
 
@@ -78,7 +78,7 @@ namespace Foraria.Interface.Controllers
 
             return Ok(claim);
         }
-
+        /*
         [HttpGet("expenses/collected-percentage")]
         [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
@@ -95,7 +95,7 @@ namespace Foraria.Interface.Controllers
             var result = await _getCollectedExpensesPercentage.ExecuteAsync(consortiumId, date);
             return Ok(result);
         }
-
+        */
         [HttpGet("reservations/upcoming")]
         [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
