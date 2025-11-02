@@ -7,23 +7,26 @@ namespace ForariaDomain.Application.UseCase
 {
     public class CreatePreferenceMP
     {
-        private readonly IExpenseRepository _expenseRepository;
+        //private readonly IExpenseRepository _expenseRepository;
+        private readonly IExpenseDetailRepository _expenseDetailRepository;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IPaymentGateway _paymentGateway;
 
         public CreatePreferenceMP(
-            IExpenseRepository expenseRepository,
+           // IExpenseRepository expenseRepository,
             IPaymentRepository paymentRepository,
-            IPaymentGateway paymentGateway)
+            IPaymentGateway paymentGateway,
+            IExpenseDetailRepository expenseDetailRepository)
         {
-            _expenseRepository = expenseRepository;
+            //_expenseRepository = expenseRepository;
             _paymentRepository = paymentRepository;
             _paymentGateway = paymentGateway;
+            _expenseDetailRepository = expenseDetailRepository;
         }
 
         public async Task<CreatePreferenceResponse> ExecuteAsync(int expenseId, int residenceId)
         {
-            var expense = await _expenseRepository.GetByIdAsync(expenseId);
+            var expense = await _expenseDetailRepository.GetExpenseDetailById(expenseId);
 
             if (expense == null)
                 throw new Exception("Expense no encontrada.");
@@ -37,7 +40,7 @@ namespace ForariaDomain.Application.UseCase
             {
                 PreferenceId = preferenceId,
                 Date = DateTime.UtcNow,
-                ExpenseId = expenseId,
+                ExpenseDetailByResidenceId = expenseId,
                 ResidenceId = residenceId,
                 Status = "pending",
                 Amount = (decimal)amount

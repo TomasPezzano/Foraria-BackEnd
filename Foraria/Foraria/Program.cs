@@ -158,6 +158,7 @@ builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByCons
 builder.Services.AddScoped<ITransferPermission, TransferPermission>();
 builder.Services.AddScoped<IRevokePermission, RevokePermission>();
 builder.Services.AddScoped<ICreateExpense, CreateExpense>();
+//builder.Services.AddScoped<IGetAllInvoicesByMonth, GetAllInvoicesByMonth>();
 builder.Services.AddScoped<IGetAllInvoicesByMonthAndConsortium, GetAllInvoicesByMonthAndConsortium>();
 builder.Services.AddScoped<IGetAllExpenses, GetAllExpenses>();
 builder.Services.AddScoped<ICreateExpenseDetail, CreateExpenseDetail>();

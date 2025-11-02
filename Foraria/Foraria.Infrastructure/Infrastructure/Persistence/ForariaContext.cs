@@ -70,7 +70,9 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<InvoiceItem> InvoiceItems { get; set; }
 
         public DbSet<ExpenseDetailByResidence> ExpenseDetailByResidences { get; set; }
+
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

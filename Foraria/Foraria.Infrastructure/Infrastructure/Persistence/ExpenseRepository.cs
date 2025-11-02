@@ -109,18 +109,31 @@ var totalPaidAmount = paidExpenses.Sum(e => e.TotalAmount);
 var totalUnpaidAmount = unpaidExpenses.Sum(e => e.TotalAmount);
 
 
+
 return (totalCount, paidCount, totalPaidAmount, totalUnpaidAmount);
 }
 
        
 
+
+return (totalCount, paidCount, totalPaidAmount, totalUnpaidAmount);
+}
+
             return (totalCount, paidCount, totalPaidAmount, totalUnpaidAmount);
         }
+        */
 
         public async Task<Expense?> GetByIdAsync(int id)
         {
             return await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id);
         }
-*/
+
+
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
     }
  }

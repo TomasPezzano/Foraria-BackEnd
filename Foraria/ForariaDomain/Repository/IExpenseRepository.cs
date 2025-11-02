@@ -16,6 +16,5 @@ namespace Foraria.Domain.Repository
         Task<Expense?> GetExpenseByConsortiumAndMonthAsync(int consortiumId, string month);
         Task<Expense?> GetByIdAsync(int id);
         Task SaveChangesAsync();
-
     }
 }
