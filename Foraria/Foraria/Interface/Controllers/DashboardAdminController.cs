@@ -1,4 +1,5 @@
-﻿using Foraria.Application.UseCase;
+﻿using foraria.application.usecase;
+using Foraria.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,20 +15,20 @@ namespace Foraria.Interface.Controllers
         private readonly GetTotalUsers _getTotalUsers;
         private readonly GetPendingClaimsCount _getPendingClaimsCount;
         private readonly GetLatestPendingClaim _getLatestPendingClaim;
-        //private readonly GetCollectedExpensesPercentage _getCollectedExpensesPercentage;
+        private readonly GetCollectedExpensesPercentage _getCollectedExpensesPercentage;
         private readonly GetUpcomingReserves _getUpcomingReserves;
 
         public DashboardAdminController(
             GetTotalUsers getTotalUsers,
             GetPendingClaimsCount getPendingClaimsCount,
             GetLatestPendingClaim getLatestPendingClaim,
-            //GetCollectedExpensesPercentage getCollectedExpensesPercentage,
+            GetCollectedExpensesPercentage getCollectedExpensesPercentage,
             GetUpcomingReserves getUpcomingReserves)
         {
             _getTotalUsers = getTotalUsers;
             _getPendingClaimsCount = getPendingClaimsCount;
             _getLatestPendingClaim = getLatestPendingClaim;
-            //_getCollectedExpensesPercentage = getCollectedExpensesPercentage;
+            _getCollectedExpensesPercentage = getCollectedExpensesPercentage;
             _getUpcomingReserves = getUpcomingReserves;
         }
 
@@ -78,9 +79,9 @@ namespace Foraria.Interface.Controllers
 
             return Ok(claim);
         }
-        /*
+        
         [HttpGet("expenses/collected-percentage")]
-        [Authorize(Policy = "ConsortiumAndAdmin")]
+        //[Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Obtiene el porcentaje de expensas recaudadas.",
             Description = "Calcula el porcentaje total de expensas cobradas frente al total emitido, para el consorcio indicado y la fecha (opcional)."
@@ -95,7 +96,7 @@ namespace Foraria.Interface.Controllers
             var result = await _getCollectedExpensesPercentage.ExecuteAsync(consortiumId, date);
             return Ok(result);
         }
-        */
+       
         [HttpGet("reservations/upcoming")]
         [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(

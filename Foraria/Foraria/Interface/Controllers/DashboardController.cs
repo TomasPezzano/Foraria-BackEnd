@@ -12,37 +12,37 @@ namespace Foraria.Interface.Controllers
     [Route("api/dashboard")]
     public class DashboardController : ControllerBase
     {
-        //private readonly GetMonthlyExpenseTotal _getMonthlyExpenseTotal;
+        private readonly GetMonthlyExpenseTotal _getMonthlyExpenseTotal;
         //private readonly GetExpenseByCategory _getExpenseByCategory;
-        //private readonly GetPendingExpenses _getPendingExpenses;
-        //private readonly GetUserExpenseSummary _getUserExpenseSummary;
-        //private readonly GetUserMonthlyExpenseHistory _getUserMonthlyExpenseHistory;
+        private readonly GetPendingExpenses _getPendingExpenses;
+        private readonly GetUserExpenseSummary _getUserExpenseSummary;
+        private readonly GetUserMonthlyExpenseHistory _getUserMonthlyExpenseHistory;
         private readonly GetActivePollCount _getActivePollCount;
         private readonly GetUpcomingReserves _getUpcomingReserves;
         private readonly GetActiveReserveCount _getActiveReserveCount;
 
         public DashboardController(
-            //GetMonthlyExpenseTotal getMonthlyExpenseTotal,
+            GetMonthlyExpenseTotal getMonthlyExpenseTotal,
             //GetExpenseByCategory getExpenseByCategory,
-            //GetPendingExpenses getPendingExpenses,
-            //GetUserExpenseSummary getUserExpenseSummary,
-            //GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
+            GetPendingExpenses getPendingExpenses,
+            GetUserExpenseSummary getUserExpenseSummary,
+            GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
             GetActivePollCount getActivePollCount,
             GetUpcomingReserves getUpcomingReserves,
             GetActiveReserveCount getActiveReserveCount)
         {
-            //_getMonthlyExpenseTotal = getMonthlyExpenseTotal;
+            _getMonthlyExpenseTotal = getMonthlyExpenseTotal;
             //_getExpenseByCategory = getExpenseByCategory;
-            //_getPendingExpenses = getPendingExpenses;
-            //_getUserExpenseSummary = getUserExpenseSummary;
-            //_getUserMonthlyExpenseHistory = getUserMonthlyExpenseHistory;
+            _getPendingExpenses = getPendingExpenses;
+            _getUserExpenseSummary = getUserExpenseSummary;
+            _getUserMonthlyExpenseHistory = getUserMonthlyExpenseHistory;
             _getActivePollCount = getActivePollCount;
             _getUpcomingReserves = getUpcomingReserves;
             _getActiveReserveCount = getActiveReserveCount;
         }
-        /*
+        
         [HttpGet("expenses/total")]
-        [Authorize(Policy = "All")]
+        //[Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene el total mensual de gastos.",
             Description = "Devuelve el monto total de expensas del mes actual para un consorcio específico."
@@ -67,10 +67,10 @@ namespace Foraria.Interface.Controllers
             });
         }
 
-        */
-        /*
+       
+        
         [HttpGet("expenses/pending")]
-        [Authorize(Policy = "All")]
+        //[Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene las expensas pendientes.",
             Description = "Lista todas las expensas aún no pagadas correspondientes al consorcio indicado."
@@ -92,10 +92,10 @@ namespace Foraria.Interface.Controllers
                 pendingExpenses = result
             });
         }
-        */
-        /*
+       
+        
         [HttpGet("expenses/summary")]
-        [Authorize(Policy = "OwnerAndTenant")]
+        //[Authorize(Policy = "OwnerAndTenant")]
         [SwaggerOperation(
             Summary = "Obtiene el resumen de gastos del usuario.",
             Description = "Devuelve el estado de pagos del usuario, incluyendo expensas pagadas, vencidas y próximas a vencer."
@@ -119,7 +119,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("expenses/monthly-history")]
-        [Authorize(Policy = "OwnerAndTenant")]
+        //[Authorize(Policy = "OwnerAndTenant")]
         [SwaggerOperation(
             Summary = "Obtiene el historial mensual de gastos del usuario.",
             Description = "Devuelve la evolución de los gastos del usuario a lo largo del año actual o el año especificado."
@@ -141,9 +141,9 @@ namespace Foraria.Interface.Controllers
 
             return Ok(result);
         }
-        */
+
         [HttpGet("polls/active")]
-        [Authorize(Policy = "All")]
+        //[Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene la cantidad de votaciones activas.",
             Description = "Devuelve la cantidad de votaciones abiertas actualmente en el consorcio."
@@ -173,7 +173,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("reservations/active")]
-        [Authorize(Policy = "All")]
+        //[Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene las reservas activas.",
             Description = "Devuelve un listado de las próximas reservas activas para el consorcio indicado, ordenadas por fecha."
@@ -198,7 +198,7 @@ namespace Foraria.Interface.Controllers
         }
 
         [HttpGet("reservations/count")]
-        [Authorize (Policy = "All")]
+        //[Authorize (Policy = "All")]
         [SwaggerOperation(
             Summary = "Obtiene la cantidad de reservas activas.",
             Description = "Devuelve el número total de reservas activas o próximas dentro del consorcio especificado."

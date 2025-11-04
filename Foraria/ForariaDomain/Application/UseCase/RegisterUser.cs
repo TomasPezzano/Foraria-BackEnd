@@ -77,7 +77,7 @@ public class RegisterUser : IRegisterUser
             };
         }
 
-        var roleAlreadyAssigned = await _userRepository.ExistsUserWithRoleInResidence(residenceId, user.Role.Description);
+        var roleAlreadyAssigned = await _userRepository.ExistsUserWithRoleInResidence(residenceId, role.Description);
         if (roleAlreadyAssigned)
         {
             return new UserDto
