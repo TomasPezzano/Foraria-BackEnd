@@ -12,35 +12,32 @@ namespace Foraria.Interface.Controllers
     [Route("api/dashboard")]
     public class DashboardController : ControllerBase
     {
-        //private readonly GetMonthlyExpenseTotal _getMonthlyExpenseTotal;
-        //private readonly GetExpenseByCategory _getExpenseByCategory;
-        //private readonly GetPendingExpenses _getPendingExpenses;
-        //private readonly GetUserExpenseSummary _getUserExpenseSummary;
-        //private readonly GetUserMonthlyExpenseHistory _getUserMonthlyExpenseHistory;
+        private readonly GetMonthlyExpenseTotal _getMonthlyExpenseTotal;
+        private readonly GetPendingExpenses _getPendingExpenses;
+        private readonly GetUserExpenseSummary _getUserExpenseSummary;
+        private readonly GetUserMonthlyExpenseHistory _getUserMonthlyExpenseHistory;
         private readonly GetActivePollCount _getActivePollCount;
         private readonly GetUpcomingReserves _getUpcomingReserves;
         private readonly GetActiveReserveCount _getActiveReserveCount;
 
         public DashboardController(
-            //GetMonthlyExpenseTotal getMonthlyExpenseTotal,
-            //GetExpenseByCategory getExpenseByCategory,
-            //GetPendingExpenses getPendingExpenses,
-            //GetUserExpenseSummary getUserExpenseSummary,
-            //GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
+            GetMonthlyExpenseTotal getMonthlyExpenseTotal,
+            GetPendingExpenses getPendingExpenses,
+            GetUserExpenseSummary getUserExpenseSummary,
+            GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
             GetActivePollCount getActivePollCount,
             GetUpcomingReserves getUpcomingReserves,
             GetActiveReserveCount getActiveReserveCount)
         {
-            //_getMonthlyExpenseTotal = getMonthlyExpenseTotal;
-            //_getExpenseByCategory = getExpenseByCategory;
-            //_getPendingExpenses = getPendingExpenses;
-            //_getUserExpenseSummary = getUserExpenseSummary;
-            //_getUserMonthlyExpenseHistory = getUserMonthlyExpenseHistory;
+            _getMonthlyExpenseTotal = getMonthlyExpenseTotal;
+            _getPendingExpenses = getPendingExpenses;
+            _getUserExpenseSummary = getUserExpenseSummary;
+            _getUserMonthlyExpenseHistory = getUserMonthlyExpenseHistory;
             _getActivePollCount = getActivePollCount;
             _getUpcomingReserves = getUpcomingReserves;
             _getActiveReserveCount = getActiveReserveCount;
         }
-        /*
+        
         [HttpGet("expenses/total")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(
@@ -67,8 +64,8 @@ namespace Foraria.Interface.Controllers
             });
         }
 
-        */
-        /*
+       
+        
         [HttpGet("expenses/pending")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(
@@ -92,8 +89,8 @@ namespace Foraria.Interface.Controllers
                 pendingExpenses = result
             });
         }
-        */
-        /*
+       
+        
         [HttpGet("expenses/summary")]
         [Authorize(Policy = "OwnerAndTenant")]
         [SwaggerOperation(
@@ -141,7 +138,7 @@ namespace Foraria.Interface.Controllers
 
             return Ok(result);
         }
-        */
+
         [HttpGet("polls/active")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(
