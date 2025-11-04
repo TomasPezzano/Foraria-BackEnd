@@ -3,7 +3,6 @@ using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
-using Foraria.Filters;
 using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
@@ -16,16 +15,15 @@ using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
 using ForariaDomain.Services;
+using MercadoPago.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using MercadoPago.Config;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 using System.Text;
+
 
 
 var builder = WebApplication.CreateBuilder(args);

@@ -21,8 +21,4 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Foraria.Contracts\Foraria.Contracts.csproj" />
-  </ItemGroup>
-
 </Project>

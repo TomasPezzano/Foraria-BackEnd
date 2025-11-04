@@ -1,5 +1,5 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Interface.Controllers;
+using Foraria.Controllers;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;

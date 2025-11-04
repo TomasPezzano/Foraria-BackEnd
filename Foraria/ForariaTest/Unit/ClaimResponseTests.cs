@@ -1,10 +1,10 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Interface.Controllers;
 using Foraria.Interface.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Foraria.Controllers;
 
 public class ClaimResponseTests
 {

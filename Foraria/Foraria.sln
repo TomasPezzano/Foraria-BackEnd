@@ -4,23 +4,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foraria", "Foraria\Foraria.csproj", "{7BE1E849-07FE-492E-8731-477E6A06AF4A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{AA0258C1-53BA-48FA-88B8-E26C540028C2} = {AA0258C1-53BA-48FA-88B8-E26C540028C2}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForariaTest", "ForariaTest\ForariaTest.csproj", "{C24C0CF2-DFD4-43EA-9285-471F1252F919}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForariaDomain", "ForariaDomain\ForariaDomain.csproj", "{43D75E14-E410-4E89-8040-E03FE26208E6}"
-	ProjectSection(ProjectDependencies) = postProject
-		{AA0258C1-53BA-48FA-88B8-E26C540028C2} = {AA0258C1-53BA-48FA-88B8-E26C540028C2}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foraria.Contracts", "Foraria.Contracts\Foraria.Contracts.csproj", "{AA0258C1-53BA-48FA-88B8-E26C540028C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foraria.Infrastructure", "Foraria.Infrastructure\Foraria.Infrastructure.csproj", "{5B7C6659-69ED-C9B4-4B55-8CD3F5974508}"
-	ProjectSection(ProjectDependencies) = postProject
-		{AA0258C1-53BA-48FA-88B8-E26C540028C2} = {AA0258C1-53BA-48FA-88B8-E26C540028C2}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,10 +29,6 @@ Global
 		{43D75E14-E410-4E89-8040-E03FE26208E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43D75E14-E410-4E89-8040-E03FE26208E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43D75E14-E410-4E89-8040-E03FE26208E6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA0258C1-53BA-48FA-88B8-E26C540028C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA0258C1-53BA-48FA-88B8-E26C540028C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA0258C1-53BA-48FA-88B8-E26C540028C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA0258C1-53BA-48FA-88B8-E26C540028C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5B7C6659-69ED-C9B4-4B55-8CD3F5974508}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5B7C6659-69ED-C9B4-4B55-8CD3F5974508}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B7C6659-69ED-C9B4-4B55-8CD3F5974508}.Release|Any CPU.ActiveCfg = Release|Any CPU

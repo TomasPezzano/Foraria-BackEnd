@@ -2,13 +2,14 @@
 using Foraria.Domain.Service;
 using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Exceptions;
 
 namespace Foraria.Application.UseCase;
 
 public interface IRegisterUser
 {
     Task<int> GetAllUsersInNumber();
-    Task<UserDto> Register(User user, int residenceId);
+    Task<User> Register(User user, int residenceId);
 }
 
 public class RegisterUser : IRegisterUser
@@ -36,56 +37,27 @@ public class RegisterUser : IRegisterUser
         _residenceRepository = residenceRepository;
     }
 
-    public async Task<UserDto> Register(User user, int residenceId)
+    public async Task<User> Register(User user, int residenceId)
     {
         if (await _userRepository.ExistsEmail(user.Mail))
-        {
-            return new UserDto
-            {
-                Success = false,
-                Message = "Email is already registered in the system"
-            };
-        }
+            throw new BusinessException("Email is already registered in the system");
 
         Role role = await _roleRepository.GetById(user.Role_id);
         if (role == null)
-        {
-            return new UserDto
-            {
-                Success = false,
-                Message = "Selected role is not valid"
-            };
-        }
+            throw new NotFoundException("Selected role is not valid");
 
         var residenceExists = await _residenceRepository.Exists(residenceId);
         if (!residenceExists)
-        {
-            return new UserDto
-            {
-                Success = false,
-                Message = $"Residence with ID {residenceId} does not exist"
-            };
-        }
+            throw new NotFoundException($"Residence with ID {residenceId} does not exist");
 
         var residence = await _residenceRepository.GetById(residenceId);
         if (residence == null)
-        {
-            return new UserDto
-            {
-                Success = false,
-                Message = "Error retrieving residence information"
-            };
-        }
+            throw new BusinessException("Error retrieving residence information");
 
         var roleAlreadyAssigned = await _userRepository.ExistsUserWithRoleInResidence(residenceId, role.Description);
         if (roleAlreadyAssigned)
-        {
-            return new UserDto
-            {
-                Success = false,
-                Message = $"This residence already has a user with the role '{role.Description}' assigned. Each residence can only have one user per role."
-            };
-        }
+            throw new BusinessException($"This residence already has a user with the role '{role.Description}' assigned.");
+
 
         var temporaryPassword = await _generatePasswordUseCase.Generate();
         var passwordHash = _passwordHashUseCase.HashPassword(temporaryPassword);
@@ -108,9 +80,9 @@ public class RegisterUser : IRegisterUser
             Console.WriteLine($"Failed to send email: {ex.Message}");
         }
 
-        var residenceDtos = new List<ResidenceDto>
+        var residenceList = new List<Residence>
         {
-            new ResidenceDto
+            new Residence
             {
                 Id = residence.Id,
                 Number = residence.Number,
@@ -119,18 +91,16 @@ public class RegisterUser : IRegisterUser
             }
         };
 
-        return new UserDto
+        return new User
         {
-            Success = true,
-            Message = "User registered successfully. An email has been sent with the credentials.",
             Id = savedUser.Id,
-            Email = savedUser.Mail,
-            FirstName = user.Name,
+            Mail = savedUser.Mail,
+            Name = user.Name,
             LastName = user.LastName,
             PhoneNumber = user.PhoneNumber,
-            RoleId = savedUser.Role_id,
-            TemporaryPassword = temporaryPassword,
-            Residences = residenceDtos
+            Role_id = savedUser.Role_id,
+            Password = temporaryPassword,
+            Residences = residenceList
         };
     }
 

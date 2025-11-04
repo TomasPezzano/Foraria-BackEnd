@@ -1,11 +1,11 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain.Exceptions;
 
 namespace Foraria.Application.UseCase;
 
 public interface ILogoutUser
 {
-    Task<LogoutResponseDto> Logout(string refreshToken, string ipAddress);
+    Task Logout(string refreshToken, string ipAddress);
 }
 
 public class LogoutUser : ILogoutUser
@@ -17,21 +17,15 @@ public class LogoutUser : ILogoutUser
         _refreshTokenRepository = refreshTokenRepository;
     }
 
-    public async Task<LogoutResponseDto> Logout(string refreshToken, string ipAddress)
+    public async Task Logout(string refreshToken, string ipAddress)
     {
-        // 1. Get refresh token from database
         var storedToken = await _refreshTokenRepository.GetByToken(refreshToken);
 
         if (storedToken == null)
         {
-            return new LogoutResponseDto
-            {
-                Success = false,
-                Message = "Invalid refresh token"
-            };
+            throw new NotFoundException("Invalid refresh token");
         }
 
-        // 2. Revoke the refresh token
         if (storedToken.IsActive)
         {
             storedToken.IsRevoked = true;
@@ -39,11 +33,5 @@ public class LogoutUser : ILogoutUser
             storedToken.RevokedByIp = ipAddress;
             await _refreshTokenRepository.Update(storedToken);
         }
-
-        return new LogoutResponseDto
-        {
-            Success = true,
-            Message = "Logout successful"
-        };
     }
 }

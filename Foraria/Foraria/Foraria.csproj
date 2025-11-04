@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageReference Include="mercadopago-sdk" Version="2.10.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
@@ -23,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Foraria.Infrastructure\Foraria.Infrastructure.csproj" />
-    <ProjectReference Include="..\Foraria.Contracts\Foraria.Contracts.csproj" />
     <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
   </ItemGroup>
 

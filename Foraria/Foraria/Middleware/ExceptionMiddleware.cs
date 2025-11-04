@@ -44,6 +44,7 @@ namespace Foraria
                 ThreadLockedException => (int)HttpStatusCode.Conflict,
                 ThreadOwnershipException or ForbiddenAccessException => (int)HttpStatusCode.Forbidden,
                 ThreadUpdateException => (int)HttpStatusCode.BadRequest,
+                UnauthorizedException => (int)HttpStatusCode.Unauthorized,
                 _ => (int)HttpStatusCode.InternalServerError
             };
 
