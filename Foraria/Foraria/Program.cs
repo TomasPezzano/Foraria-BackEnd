@@ -4,7 +4,6 @@ using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
-using Foraria.Filters;
 using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
@@ -23,10 +22,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 using System.Text;
-using System.Text;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -91,7 +89,6 @@ builder.Services.AddScoped<GetSupplierById>();
 builder.Services.AddScoped<GetSupplierContractById>();
 builder.Services.AddScoped<GetSupplierContractsById>();
 builder.Services.AddScoped<GetMonthlyExpenseTotal>();
-//builder.Services.AddScoped<GetExpenseByCategory>();
 builder.Services.AddScoped<GetActivePollCount>();
 builder.Services.AddScoped<GetPendingExpenses>();
 builder.Services.AddScoped<GetUserExpenseSummary>();
