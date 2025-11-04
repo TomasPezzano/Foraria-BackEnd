@@ -22,8 +22,8 @@ public class ExpenseController : ControllerBase
 
 
     [HttpPost]
-  public async Task<IActionResult> CreateExpense([FromBody] ExpenseDto expenseDto) // si no se puede generar mas de 1 expensa el mismo mes, preguntar si ya hay una creada y devolverla 
-  {
+  public async Task<IActionResult> CreateExpense([FromBody] ExpenseDto expenseDto) // ARROJAR EXCEPCION SI SE INTENTA CREAR UNA FATURA QUE YA ESTA CREADA
+    {
         if (expenseDto == null)
             return BadRequest("El cuerpo de la solicitud está vacío.");
 
