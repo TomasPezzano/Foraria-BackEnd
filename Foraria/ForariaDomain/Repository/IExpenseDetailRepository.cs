@@ -13,5 +13,8 @@ public interface IExpenseDetailRepository
     Task<ExpenseDetailByResidence> GetExpenseDetailById(int id);
     Task SaveChangesAsync();
 
+    Task<IEnumerable<ExpenseDetailByResidence>> GetUserExpensesByState(int userId, string state);
+
+    Task<IEnumerable<ExpenseDetailByResidence>> GetUserExpenses(int userId);
 
 }

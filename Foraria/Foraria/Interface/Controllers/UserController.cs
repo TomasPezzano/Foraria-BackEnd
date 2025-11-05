@@ -259,6 +259,10 @@ public class UserController : ControllerBase
         {
             return NotFound(new { message = "Usuario no encontrado" });
         }
+        var residence = user.Residences?.FirstOrDefault();
+        int? residenceId = residence?.Id;
+        int? consortiumId = residence?.ConsortiumId;
+
         var response = new UserDto
         {
             Id = user.Id,
@@ -266,7 +270,9 @@ public class UserController : ControllerBase
             LastName = user.LastName,
             Email = user.Mail,
             PhoneNumber = user.PhoneNumber,
-            RoleId = user.Role_id,           
+            RoleId = user.Role_id,
+            ResidenceId = residenceId,
+            ConsortiumId = consortiumId,
             Success = true
         };
         return Ok(response);

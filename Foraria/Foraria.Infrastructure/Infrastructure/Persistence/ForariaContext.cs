@@ -108,7 +108,6 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<PasswordResetToken>().ToTable("passwordResetToken");
 
 
-
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)

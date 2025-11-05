@@ -1,6 +1,7 @@
 ﻿using Foraria.Infrastructure.Persistence;
 using ForariaDomain;
 using ForariaDomain.Repository;
+using MercadoPago.Resource.User;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -41,4 +42,28 @@ public class ExpenseDatailRepository : IExpenseDetailRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<ExpenseDetailByResidence>> GetUserExpensesByState(int userId, string state)
+    {
+        return await _context.ExpenseDetailByResidences
+        .Include(e => e.Residence)
+         .ThenInclude(r => r.Users)
+        .Where(e =>
+         e.Residence.Users.Any(u => u.Id == userId) &&
+         e.State == state)
+        .ToListAsync();
+    }
+
+    public async Task<IEnumerable<ExpenseDetailByResidence>> GetUserExpenses(int userId)
+    {
+        return await _context.ExpenseDetailByResidences
+            .Include(e => e.Expense)
+                .ThenInclude(ex => ex.Invoices)
+            .Include(e => e.Residence)
+                .ThenInclude(r => r.Users)
+            .Where(e => e.Residence.Users.Any(u => u.Id == userId))
+            .ToListAsync();
+    }
+
+
 }

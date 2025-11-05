@@ -27,4 +27,8 @@ public class UserDto
     public bool Success { get; set; }
     public List<ResidenceDto>? Residences { get; set; }
 
+    public int? ResidenceId { get; set; }
+
+    public int? ConsortiumId { get; set; }
+
 }

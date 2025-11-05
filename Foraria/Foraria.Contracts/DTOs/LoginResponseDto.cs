@@ -18,4 +18,7 @@ public class UserInfoDto
     public string LastName { get; set; }
     public int RoleId { get; set; }
     public string RoleName { get; set; }
+
+    public int? ResidenceId { get; set; }
+    public int? ConsortiumId { get; set; }
 }
