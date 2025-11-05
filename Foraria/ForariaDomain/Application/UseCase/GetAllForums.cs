@@ -1,5 +1,7 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain;
+using ForariaDomain.Exceptions;
+
 
 
 namespace Foraria.Application.UseCase
@@ -13,18 +15,14 @@ namespace Foraria.Application.UseCase
             _repository = repository;
         }
 
-        public async Task<IEnumerable<ForumResponse>> Execute()
+        public async Task<IEnumerable<Forum>> Execute()
         {
             var forums = await _repository.GetAll();
 
-            var activeForums = forums.Where(f => f.IsActive);
+            if (forums == null || !forums.Any())
+                throw new NotFoundException("No se encontraron foros disponibles.");
 
-            return activeForums.Select(f => new ForumResponse
-            {
-                Id = f.Id,
-                Category = f.Category,
-                CategoryName = f.Category.ToString()
-            });
+            return forums.Where(f => f.IsActive);
         }
     }
 }

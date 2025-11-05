@@ -1,6 +1,5 @@
-﻿using Foraria.Domain.Repository;
-using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+﻿using Foraria.Domain.Repository.Foraria.Domain.Repository;
+using ForariaDomain;
 
 namespace Foraria.Application.UseCase
 {
@@ -13,20 +12,9 @@ namespace Foraria.Application.UseCase
             _repository = repository;
         }
 
-        public async Task<IEnumerable<MessageResponse>> Execute(int threadId)
+        public async Task<IEnumerable<Message>> Execute(int threadId)
         {
-            var messages = await _repository.GetByThread(threadId);
-
-            return messages.Select(m => new MessageResponse
-            {
-                Id = m.Id,
-                Content = m.Content,
-                CreatedAt = m.CreatedAt,
-                State = m.State,
-                Thread_id = m.Thread_id,
-                User_id = m.User_id,
-                optionalFile = m.optionalFile
-            });
+            return await _repository.GetByThread(threadId);
         }
     }
 }

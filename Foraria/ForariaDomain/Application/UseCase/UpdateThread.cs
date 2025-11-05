@@ -1,5 +1,4 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
 using ForariaDomain.Repository;
@@ -18,10 +17,10 @@ namespace Foraria.Application.UseCase
             _userRepository = userRepository;
         }
 
-        public async Task<Thread> ExecuteAsync(int threadId, UpdateThreadRequest request)
+        public async Task<Thread> ExecuteAsync(int threadId, Thread threadd)
         {
-            var user = await _userRepository.GetById(request.UserId)
-                ?? throw new NotFoundException($"No se encontró el usuario con id {request.UserId}");
+            var user = await _userRepository.GetById(threadd.UserId)
+                ?? throw new NotFoundException($"No se encontró el usuario con id {threadd.UserId}");
 
             var thread = await _threadRepository.GetById(threadId)
                 ?? throw new NotFoundException($"No se encontró el hilo con id {threadId}");
@@ -36,19 +35,19 @@ namespace Foraria.Application.UseCase
             if (!isAdminOrConsortium && thread.State is "Closed" or "Archived")
                 throw new ForbiddenAccessException("No puedes modificar un hilo cerrado o archivado.");
 
-            if (!string.IsNullOrWhiteSpace(request.Theme))
-                thread.Theme = request.Theme;
+            if (!string.IsNullOrWhiteSpace(threadd.Theme))
+                thread.Theme = threadd.Theme;
 
-            if (!string.IsNullOrWhiteSpace(request.Description))
-                thread.Description = request.Description;
+            if (!string.IsNullOrWhiteSpace(threadd.Description))
+                thread.Description = threadd.Description;
 
-            if (!string.IsNullOrWhiteSpace(request.State))
+            if (!string.IsNullOrWhiteSpace(threadd.State))
             {
                 if (!isAdminOrConsortium)
                     throw new ForbiddenAccessException("No tienes permisos para cambiar el estado del hilo.");
 
                 var current = thread.State;
-                var target = request.State;
+                var target = threadd.State;
 
                 if (current == "Archived" && target != "Archived")
                     throw new ForbiddenAccessException("No se puede modificar el estado de un hilo archivado.");

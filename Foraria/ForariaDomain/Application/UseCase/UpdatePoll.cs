@@ -1,5 +1,4 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
 
@@ -18,15 +17,15 @@ namespace Foraria.Application.UseCase
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Poll> ExecuteAsync(int pollId, UpdatePollRequest request)
+        public async Task<Poll> ExecuteAsync(int pollId, int userId, Poll pollData)
         {
             var poll = await _pollRepository.GetById(pollId)
                 ?? throw new NotFoundException($"La votación con ID {pollId} no existe.");
 
-            var user = await _userRepository.GetById(request.UserId)
-                ?? throw new NotFoundException($"El usuario con ID {request.UserId} no existe.");
+            var user = await _userRepository.GetById(userId)
+                ?? throw new NotFoundException($"El usuario con ID {userId} no existe.");
 
-            bool isOwner = poll.User_id == request.UserId;
+            bool isOwner = poll.User_id == userId;
             bool isConsortium = user.Role.Description == "Consorcio";
 
             if (!isOwner && !isConsortium)
@@ -35,20 +34,20 @@ namespace Foraria.Application.UseCase
             if (poll.State == "Active" || poll.State == "Closed" || poll.State == "Rejected")
                 throw new InvalidOperationException("No se pueden modificar votaciones activas, cerradas o rechazadas.");
 
-            if (!string.IsNullOrWhiteSpace(request.Title))
-                poll.Title = request.Title;
+            if (!string.IsNullOrWhiteSpace(pollData.Title))
+                poll.Title = pollData.Title;
 
-            if (!string.IsNullOrWhiteSpace(request.Description))
-                poll.Description = request.Description;
+            if (!string.IsNullOrWhiteSpace(pollData.Description))
+                poll.Description = pollData.Description;
 
-            if (request.StartDate.HasValue)
-                poll.StartDate = request.StartDate.Value;
+            if (pollData.StartDate != default)
+                poll.StartDate = pollData.StartDate;
 
-            if (request.EndDate.HasValue)
-                poll.EndDate = request.EndDate.Value;
+            if (pollData.EndDate != default)
+                poll.EndDate = pollData.EndDate;
 
-            if (!string.IsNullOrWhiteSpace(request.State))
-                poll.State = request.State;
+            if (!string.IsNullOrWhiteSpace(pollData.State))
+                poll.State = pollData.State;
 
             await _pollRepository.UpdatePoll(poll);
             await _unitOfWork.SaveChangesAsync();

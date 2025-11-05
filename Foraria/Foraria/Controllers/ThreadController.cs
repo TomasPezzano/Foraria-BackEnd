@@ -1,8 +1,9 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Interface.DTOs;
+using Foraria.DTOs;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Nethereum.Contracts.QueryHandlers.MultiCall;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
@@ -63,12 +64,31 @@ namespace Foraria.Controllers
             if (request.ForumId <= 0)
                 throw new ValidationException("Debe especificar un foro válido.");
 
-            var createdThread = await _createThread.Execute(request);
+            var thread = new ForariaDomain.Thread
+            {
+                Theme = request.Theme.Trim(),
+                Description = request.Description.Trim(),
+                ForumId = request.ForumId,
+                UserId = request.UserId,
+                CreatedAt = DateTime.UtcNow,
+                State = "Active"
+            };
+
+            var createdThread = await _createThread.Execute(thread);
 
             if (createdThread == null)
                 throw new BusinessException("No se pudo crear el hilo. Verifique los datos ingresados.");
 
-            return CreatedAtAction(nameof(GetById), new { id = createdThread.Id }, createdThread);
+            return CreatedAtAction(nameof(GetById), new { id = createdThread.Id }, new ThreadResponse
+            {
+                Id = createdThread.Id,
+                Theme = createdThread.Theme,
+                Description = createdThread.Description,
+                Forum_id = createdThread.ForumId,
+                User_id = createdThread.UserId,
+                CreatedAt = createdThread.CreatedAt,
+                State = createdThread.State
+            });
         }
 
         [HttpGet("{id}")]
@@ -84,10 +104,22 @@ namespace Foraria.Controllers
             if (id <= 0)
                 throw new ValidationException("El ID del hilo debe ser mayor que cero.");
 
-            var response = await _getThreadById.Execute(id);
+            var threadResponse = await _getThreadById.Execute(id);
 
-            if (response == null)
+            if (threadResponse == null)
                 throw new ThreadNotFoundException($"No se encontró el hilo con ID {id}.");
+
+
+            var response = new ThreadResponse
+            {
+                Id = threadResponse.Id,
+                Theme = threadResponse.Theme,
+                Description = threadResponse.Description,
+                CreatedAt = threadResponse.CreatedAt,
+                State = threadResponse.State,
+                Forum_id = threadResponse.ForumId,
+                User_id = threadResponse.UserId
+            };
 
             return Ok(response);
         }
@@ -109,7 +141,18 @@ namespace Foraria.Controllers
             if (threads == null || !threads.Any())
                 throw new NotFoundException("No se encontraron hilos para este foro.");
 
-            return Ok(threads);
+            var result = threads.Select(t => new ThreadDto
+            {
+                Id = t.Id,
+                Theme = t.Theme,
+                Description = t.Description,
+                CreatedAt = t.CreatedAt,
+                State = t.State,
+                UserId = t.UserId,
+                ForumId = t.ForumId
+            });
+
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
@@ -152,18 +195,39 @@ namespace Foraria.Controllers
             if (request == null)
                 throw new ValidationException("Debe proporcionar datos para actualizar el hilo.");
 
+            var threadToUpdate = new ForariaDomain.Thread
+            {
+                Theme = request.Theme,
+                Description = request.Description,
+                State = request.State
+            };
+
+
             try
             {
-                var updated = await _updateThread.ExecuteAsync(id, request);
-                if (updated == null)
+                var result = await _updateThread.ExecuteAsync(id, threadToUpdate);
+                if (result == null)
                     throw new ThreadNotFoundException($"No se encontró el hilo con ID {id} para actualizar.");
 
-                return Ok(updated);
+                var response = new ThreadDto
+                {
+                    Id = result.Id,
+                    Theme = result.Theme,
+                    Description = result.Description,
+                    CreatedAt = result.CreatedAt,
+                    UpdatedAt = result.UpdatedAt,
+                    State = result.State,
+                    UserId = result.UserId,
+                    ForumId = result.ForumId
+                };
+
+                return Ok(response);
             }
             catch (InvalidOperationException ex)
             {
                 throw new ThreadUpdateException(ex.Message);
             }
+
         }
 
         [HttpGet("{id}/messages")]
@@ -184,7 +248,27 @@ namespace Foraria.Controllers
             if (thread == null)
                 throw new ThreadNotFoundException($"No se encontró el hilo con ID {id}.");
 
-            return Ok(thread);
+            var result = new ThreadWithMessagesDto
+            {
+                Id = thread.Id,
+                Theme = thread.Theme,
+                Description = thread.Description,
+                CreatedAt = thread.CreatedAt,
+                State = thread.State,
+                UserId = thread.UserId,
+                ForumId = thread.ForumId,
+                Messages = thread.Messages.Select(m => new MessageDto
+                {
+                    Id = m.Id,
+                    Content = m.Content,
+                    CreatedAt = m.CreatedAt,
+                    State = m.State,
+                    OptionalFile = m.optionalFile,
+                    UserId = m.User_id
+                }).ToList()
+            };
+
+            return Ok(result);
         }
 
         [HttpPatch("{id}/close")]
@@ -200,15 +284,21 @@ namespace Foraria.Controllers
             if (id <= 0)
                 throw new ValidationException("Debe especificar un ID de hilo válido.");
 
-            try
+            var thread = await _closeThread.ExecuteAsync(id);
+
+            // ✅ Map domain → DTO
+            var response = new ThreadDto
             {
-                var closed = await _closeThread.ExecuteAsync(id);
-                return Ok(closed);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new ThreadLockedException(ex.Message);
-            }
+                Id = thread.Id,
+                Theme = thread.Theme,
+                Description = thread.Description,
+                CreatedAt = thread.CreatedAt,
+                State = thread.State,
+                UserId = thread.UserId,
+                ForumId = thread.ForumId
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("{threadId}/comment-count")]

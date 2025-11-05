@@ -1,7 +1,7 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Interface.DTOs;
+using Foraria.DTOs;
+using ForariaDomain;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -50,13 +50,15 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromForm] CreateMessageWithFileRequest request)
         {
+            string? filePath = null;
+
             if (request.File != null)
             {
                 var uploadsFolder = Path.Combine(_env.ContentRootPath, "Infrastructure/Storage/ForumFiles");
                 Directory.CreateDirectory(uploadsFolder);
 
                 var fileName = $"{Guid.NewGuid()}_{request.File.FileName}";
-                var filePath = Path.Combine(uploadsFolder, fileName);
+                filePath = Path.Combine(uploadsFolder, fileName);
 
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await request.File.CopyToAsync(stream);
@@ -64,7 +66,19 @@ namespace Foraria.Controllers
                 request.FilePath = Path.Combine("Infrastructure/Storage/ForumFiles", fileName);
             }
 
-            var message = await _createMessage.Execute(request);
+            var message = new Message
+            {
+                Content = request.Content.Trim(),
+                Thread_id = request.Thread_id,
+                User_id = request.User_id,
+                CreatedAt = DateTime.UtcNow,
+                State = "active",
+                optionalFile = filePath
+            };
+
+
+            var result = await _createMessage.Execute(message);
+
             return Ok(message);
         }
 
@@ -78,8 +92,19 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _getMessageById.Execute(id);
-            if (response == null) return NotFound();
+            var message = await _getMessageById.Execute(id);
+            if (message == null) return NotFound();
+
+            var response = new MessageResponse
+            {
+                Id = message.Id,
+                Content = message.Content,
+                CreatedAt = message.CreatedAt,
+                State = message.State,
+                Thread_id = message.Thread_id,
+                User_id = message.User_id,
+                optionalFile = message.optionalFile
+            };
             return Ok(response);
         }
 
@@ -92,7 +117,19 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByThread(int threadId)
         {
-            var responses = await _getMessagesByThread.Execute(threadId);
+            var messages = await _getMessagesByThread.Execute(threadId);
+
+            var responses = messages.Select(m => new MessageResponse
+            {
+                Id = m.Id,
+                Content = m.Content,
+                CreatedAt = m.CreatedAt,
+                State = m.State,
+                Thread_id = m.Thread_id,
+                User_id = m.User_id,
+                optionalFile = m.optionalFile
+            });
+
             return Ok(responses);
         }
 
@@ -120,28 +157,39 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, [FromForm] UpdateMessageRequest request)
         {
+            string? filePath = null;
+
             if (request.File != null)
             {
                 var uploadsFolder = Path.Combine(_env.ContentRootPath, "Infrastructure/Storage/ForumFiles");
                 Directory.CreateDirectory(uploadsFolder);
 
                 var fileName = $"{Guid.NewGuid()}_{request.File.FileName}";
-                var filePath = Path.Combine(uploadsFolder, fileName);
+                var savedPath = Path.Combine(uploadsFolder, fileName);
 
-                using var stream = new FileStream(filePath, FileMode.Create);
+                using var stream = new FileStream(savedPath, FileMode.Create);
                 await request.File.CopyToAsync(stream);
 
-                request.FilePathToUpdate = Path.Combine("Infrastructure/Storage/ForumFiles", fileName);
+                filePath = Path.Combine("Infrastructure/Storage/ForumFiles", fileName);
             }
 
-            var updated = await _updateMessage.ExecuteAsync(id, request);
+            var messageToUpdate = new Message
+            {
+                Id = id,
+                Content = request.Content,
+                optionalFile = filePath
+            };
+
+            var userId = request.UserId;
+
+            var updatedMessage = await _updateMessage.ExecuteAsync(messageToUpdate, userId);
 
             return Ok(new
             {
-                updated.Id,
-                updated.Content,
-                updated.optionalFile,
-                updated.UpdatedAt
+                updatedMessage.Id,
+                updatedMessage.Content,
+                updatedMessage.optionalFile,
+                updatedMessage.UpdatedAt
             });
         }
 
@@ -176,7 +224,18 @@ namespace Foraria.Controllers
         public async Task<IActionResult> GetByUser(int userId)
         {
             var messages = await _getMessagesByUser.ExecuteAsync(userId);
-            return Ok(messages);
+
+            var response = messages.Select(m => new MessageDto
+            {
+                Id = m.Id,
+                Content = m.Content,
+                CreatedAt = m.CreatedAt,
+                State = m.State,
+                OptionalFile = m.optionalFile,
+                UserId = m.User_id
+            });
+
+            return Ok(response);
         }
     }
 }

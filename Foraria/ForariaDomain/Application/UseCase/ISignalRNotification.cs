@@ -1,6 +1,4 @@
-﻿using Foraria.Contracts.DTOs;
-
-namespace ForariaDomain.Application.UseCase
+﻿namespace ForariaDomain.Application.UseCase
 {
 
     public interface ISignalRNotification

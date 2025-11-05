@@ -1,5 +1,5 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain.Exceptions;
 
 namespace Foraria.Application.UseCase
 {
@@ -12,21 +12,15 @@ namespace Foraria.Application.UseCase
             _repository = repository;
         }
 
-        public async Task<ThreadResponse?> Execute(int id)
+        public async Task<ForariaDomain.Thread?> Execute(int id)
         {
             var thread = await _repository.GetById(id);
-            if (thread == null) return null;
 
-            return new ThreadResponse
-            {
-                Id = thread.Id,
-                Theme = thread.Theme,
-                Description = thread.Description,
-                CreatedAt = thread.CreatedAt,
-                State = thread.State,
-                Forum_id = thread.ForumId,
-                User_id = thread.UserId
-            };
+            if (thread == null)
+                throw new NotFoundException($"No se encontró el hilo con ID {id}.");
+
+            return thread;
+
         }
     }
 }

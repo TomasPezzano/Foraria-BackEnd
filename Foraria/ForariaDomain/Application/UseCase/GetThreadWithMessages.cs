@@ -1,6 +1,5 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using Foraria.Interface.DTOs.Foraria.Interface.DTOs;
+using ForariaDomain.Exceptions;
 
 namespace Foraria.Application.UseCase
 {
@@ -13,31 +12,14 @@ namespace Foraria.Application.UseCase
             _repository = repository;
         }
 
-        public async Task<ThreadWithMessagesDto?> ExecuteAsync(int id)
+        public async Task<ForariaDomain.Thread?> ExecuteAsync(int id)
         {
             var thread = await _repository.GetByIdWithMessagesAsync(id);
-            if (thread == null)
-                return null;
 
-            return new ThreadWithMessagesDto
-            {
-                Id = thread.Id,
-                Theme = thread.Theme,
-                Description = thread.Description,
-                CreatedAt = thread.CreatedAt,
-                State = thread.State,
-                UserId = thread.UserId,
-                ForumId = thread.ForumId,
-                Messages = thread.Messages.Select(m => new MessageDto
-                {
-                    Id = m.Id,
-                    Content = m.Content,
-                    CreatedAt = m.CreatedAt,
-                    State = m.State,
-                    OptionalFile = m.optionalFile,
-                    UserId = m.User_id
-                }).ToList()
-            };
+            if (thread == null)
+                throw new NotFoundException($"No se encontró el hilo con ID {id}");
+
+            return thread;
         }
     }
 }

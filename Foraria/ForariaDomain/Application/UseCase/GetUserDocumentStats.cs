@@ -1,5 +1,6 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain;
+
 
 namespace Foraria.Application.UseCase
 {
@@ -12,7 +13,7 @@ namespace Foraria.Application.UseCase
             _repository = repository;
         }
 
-        public async Task<UserDocumentStatsDto> ExecuteAsync(int? userId = null)
+        public async Task<UserDocument> ExecuteAsync(int? userId = null)
         {
             return await _repository.GetStatsAsync(userId);
         }

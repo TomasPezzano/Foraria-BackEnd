@@ -11,6 +11,7 @@ namespace Foraria.DTOs
         public string State { get; set; }
         public int UserId { get; set; }
         public int ForumId { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
     public class CreateThreadRequest
     {
@@ -29,6 +30,10 @@ namespace Foraria.DTOs
         [Required(ErrorMessage = "El usuario es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El ID del usuario debe ser un número válido.")]
         public int UserId { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public string State { get; set; }
     }
 
     public class UpdateThreadRequest
@@ -43,6 +48,7 @@ namespace Foraria.DTOs
         public string? State { get; set; }
         public int UserId { get; set; }
     }
+
 
     public class ThreadResponse
     {

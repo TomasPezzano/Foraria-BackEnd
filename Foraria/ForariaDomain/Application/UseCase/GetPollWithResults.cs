@@ -1,6 +1,4 @@
-﻿
-using Foraria.Contracts.DTOs;
-using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
 
 namespace ForariaDomain.Application.UseCase
 {

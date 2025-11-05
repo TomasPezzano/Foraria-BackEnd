@@ -1,5 +1,6 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Interface.DTOs;
+using Foraria.DTOs;
+using ForariaDomain;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -51,12 +52,20 @@ namespace Foraria.Controllers
             if (string.IsNullOrWhiteSpace(request.Category.ToString()))
                 throw new ValidationException("Debe especificar una categoría válida para el foro.");
 
-            var createdForum = await _createForum.Execute(request);
+            var forum = new Forum
+            {
+                Category = request.Category
+            };
 
-            if (createdForum == null)
-                throw new BusinessException("No se pudo crear el foro. Verifique los datos ingresados.");
+            var createdForum = await _createForum.Execute(forum);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdForum.Id }, createdForum);
+            var response = new ForumResponse
+            {
+                Id = createdForum.Id,
+                Category = createdForum.Category
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
 
         [HttpGet("{id}")]
@@ -72,10 +81,17 @@ namespace Foraria.Controllers
             if (id <= 0)
                 throw new ValidationException("El ID del foro debe ser mayor que cero.");
 
-            var response = await _getForumById.Execute(id);
+            var forum = await _getForumById.Execute(id);
 
-            if (response == null)
-                throw new NotFoundException($"No se encontró el foro con ID {id}.");
+            var response = new ForumResponse
+            {
+                Id = forum.Id,
+                Category = forum.Category,
+                CategoryName = forum.Category.ToString(),
+                CountThreads = forum.CountThreads,
+                CountResponses = forum.CountResponses,
+                CountUserActives = forum.CountUserActives
+            };
 
             return Ok(response);
         }
@@ -89,10 +105,14 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
-            var responses = await _getAllForums.Execute();
+            var forums = await _getAllForums.Execute();
 
-            if (responses == null || !responses.Any())
-                throw new NotFoundException("No se encontraron foros disponibles.");
+            var responses = forums.Select(f => new ForumResponse
+            {
+                Id = f.Id,
+                Category = f.Category,
+                CategoryName = f.Category.ToString()
+            });
 
             return Ok(responses);
         }
@@ -112,10 +132,22 @@ namespace Foraria.Controllers
 
             var forum = await _getForumWithThreads.Execute(id);
 
-            if (forum == null)
-                throw new NotFoundException($"No se encontró el foro con ID {id}.");
+            var response = new ForumDto
+            {
+                Id = forum.Id,
+                Category = forum.Category,
+                Threads = forum.Threads.Select(t => new ThreadDto
+                {
+                    Id = t.Id,
+                    Theme = t.Theme,
+                    Description = t.Description,
+                    CreatedAt = t.CreatedAt,
+                    State = t.State,
+                    UserId = t.UserId
+                }).ToList()
+            };
 
-            return Ok(forum);
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
@@ -146,10 +178,15 @@ namespace Foraria.Controllers
 
             var forum = await _getForumWithCategory.Execute(id);
 
-            if (forum == null)
-                throw new NotFoundException($"No se encontró el foro con ID {id}.");
+            var response = new ForumWithCategoryDto
+            {
+                Id = forum.Id,
+                Category = forum.Category,
+                CategoryName = forum.Category.ToString(),
+                IsActive = forum.IsActive,
+            };
 
-            return Ok(forum);
+            return Ok(response);
         }
     }
 }

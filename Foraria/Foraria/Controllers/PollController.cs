@@ -1,6 +1,5 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Contracts.DTOs;
-using Foraria.Interface.DTOs;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -8,6 +7,7 @@ using MercadoPago.Resource.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace Foraria.Controllers
 {
@@ -262,7 +262,23 @@ namespace Foraria.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "La votación no fue encontrada")]
         public async Task<IActionResult> UpdatePoll(int pollId, [FromBody] UpdatePollRequest request)
         {
-            var result = await _updatePoll.ExecuteAsync(pollId, request);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                throw new UnauthorizedException("Token inválido");
+            }
+
+            var pollData = new Poll
+            {
+                Title = request.Title,
+                Description = request.Description,
+                State = request.State,
+                StartDate = request.StartDate ?? default,
+                EndDate = request.EndDate ?? default,
+            };
+
+            var result = await _updatePoll.ExecuteAsync(pollId, userId, pollData);
             return Ok(result);
         }
     }

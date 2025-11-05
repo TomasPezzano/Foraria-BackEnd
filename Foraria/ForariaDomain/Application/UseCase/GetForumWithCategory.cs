@@ -1,5 +1,6 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain;
+using ForariaDomain.Exceptions;
 
 namespace Foraria.Application.UseCase
 {
@@ -12,19 +13,12 @@ namespace Foraria.Application.UseCase
             _repository = repository;
         }
 
-        public async Task<ForumWithCategoryResponse?> Execute(int id)
+        public async Task<Forum?> Execute(int id)
         {
-            var forum = await _repository.GetById(id);
-            if (forum == null)
-                return null;
+            var forum = await _repository.GetById(id)
+                ?? throw new NotFoundException($"No se encontró el foro con ID {id}.");
 
-            return new ForumWithCategoryResponse
-            {
-                Id = forum.Id,
-                CategoryName = forum.Category.ToString(),
-                CategoryValue = (int)forum.Category,
-                ThreadCount = forum.Threads?.Count ?? 0
-            };
+            return forum;
         }
     }
 }

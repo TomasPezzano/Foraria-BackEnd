@@ -1,5 +1,7 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Models;
 
 namespace Foraria.Application.UseCase
 {
@@ -12,20 +14,19 @@ namespace Foraria.Application.UseCase
             _repository = repository;
         }
 
-        public async Task<ForumResponse?> Execute(int id)
+        public async Task<ForumWithStats?> Execute(int id)
         {
+            var forum = await _repository.GetById(id)
+                ?? throw new NotFoundException($"No se encontró el foro con ID {id}.");
+
             var countThreads = await _repository.TotalThreads(id);
             var countResponses = await _repository.TotalResponses(id);
             var countUserActives = await _repository.TotalUniqueParticipantsIncludingThreadCreators(id);
-            var forum = await _repository.GetById(id);
 
-            if (forum == null) return null;
-
-            return new ForumResponse
+            return new ForumWithStats
             {
                 Id = forum.Id,
                 Category = forum.Category,
-                CategoryName = forum.Category.ToString(),
                 CountThreads = countThreads,
                 CountResponses = countResponses,
                 CountUserActives = countUserActives

@@ -205,37 +205,18 @@ public class UserController : ControllerBase
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto request)
     {
-        var refreshToken = Request.Cookies["refreshToken"];
 
-        if (string.IsNullOrEmpty(refreshToken))
+        if (!ModelState.IsValid)
         {
-            throw new NotFoundException("Refresh token not found in cookies");
+            return BadRequest(ModelState);
         }
 
-        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var ipAddress = GetIpAddress();
+        var refreshToken = request.RefreshToken;
 
         await _logoutUserService.Logout(refreshToken, ipAddress);
 
-        // Eliminar la cookie
-        Response.Cookies.Delete("refreshToken");
-
         return Ok(new { message = "Logout successful" });
-        //if (!ModelState.IsValid)
-        //{
-        //    return BadRequest(ModelState);
-        //}
-
-        //var ipAddress = GetIpAddress();
-        //var refreshToken = request.RefreshToken;
-
-        //await _logoutUserService.Logout(refreshToken, ipAddress);
-
-        //if (!result.Success)
-        //{
-        //    return BadRequest(new { message = result.Message });
-        //}
-
-        //return Ok(result);
     }
 
     [Authorize(Policy = "ConsortiumAndAdmin")]

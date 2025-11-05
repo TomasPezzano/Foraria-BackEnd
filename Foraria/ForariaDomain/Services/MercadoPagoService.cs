@@ -1,5 +1,4 @@
-﻿using Foraria.Contracts.DTOs;
-using MercadoPago.Client.MerchantOrder;
+﻿using MercadoPago.Client.MerchantOrder;
 using MercadoPago.Client.Payment;
 using MercadoPago.Client.Preference;
 using MercadoPago.Resource.Preference;

@@ -1,5 +1,5 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Interface.DTOs;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;

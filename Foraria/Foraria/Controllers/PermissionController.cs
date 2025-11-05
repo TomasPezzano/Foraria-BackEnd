@@ -1,6 +1,5 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Contracts.DTOs;
-using Microsoft.AspNetCore.Authorization;
+using Foraria.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -35,14 +34,13 @@ public class PermissionController : ControllerBase
             return Unauthorized(new { message = "Token inválido" });
         }
 
-        var result = await _transferPermission.Execute(ownerId, request.TenantId);
+        await _transferPermission.Execute(ownerId, request.TenantId);
 
-        if (!result.Success)
+        return Ok(new
         {
-            return BadRequest(result);
-        }
-
-        return Ok(result);
+            message = "Permisos transferidos exitosamente. El inquilino debe iniciar sesión nuevamente para obtener los nuevos permisos.",
+            tenantId = request.TenantId
+        });
     }
 
 
@@ -61,13 +59,15 @@ public class PermissionController : ControllerBase
             return Unauthorized(new { message = "Token inválido" });
         }
 
-        var result = await _revokePermission.Execute(ownerId, request.TenantId);
+        var tenantId = request.TenantId;
 
-        if (!result.Success)
+        await _revokePermission.Execute(ownerId, tenantId);
+
+
+        return Ok(new
         {
-            return BadRequest(result);
-        }
-
-        return Ok(result);
+            message = "Permisos revocados exitosamente. El inquilino debe iniciar sesión nuevamente.",
+            tenantId = request.TenantId
+        });
     }
 }
