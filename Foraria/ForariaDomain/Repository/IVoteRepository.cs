@@ -7,7 +7,7 @@ namespace Foraria.Domain.Repository
         Task AddAsync(Vote vote);
         Task<Vote?> GetByUserAndPollAsync(int userId, int pollId);
 
-        Task<IEnumerable<PollResultDto>> GetPollResultsAsync(int pollId);
+        Task<IEnumerable<ResultPoll>> GetPollResultsAsync(int pollId);
 
     }
 }

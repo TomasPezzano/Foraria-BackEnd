@@ -3,7 +3,7 @@
 
     public interface ISignalRNotification
     {
-        Task NotifyPollUpdatedAsync(int pollId, IEnumerable<PollResultDto> results);
+        Task NotifyPollUpdatedAsync(int pollId, IEnumerable<ResultPoll> results);
     }
 
 }

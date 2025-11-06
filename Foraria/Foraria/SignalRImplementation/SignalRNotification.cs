@@ -1,5 +1,5 @@
-﻿using Foraria.Contracts.DTOs;
-using Foraria.Hubs;
+﻿using Foraria.Hubs;
+using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.SignalR;
 
@@ -14,7 +14,7 @@ namespace Foraria.SignalRImplementation
             _hubContext = hubContext;
         }
 
-        public async Task NotifyPollUpdatedAsync(int pollId, IEnumerable<PollResultDto> results)
+        public async Task NotifyPollUpdatedAsync(int pollId, IEnumerable<ResultPoll> results)
         {
             await _hubContext.Clients.All.SendAsync("PollUpdated", new { pollId, results });
         }
