@@ -240,7 +240,7 @@ public class RegisterUserTests
         _mockResidenceRepo.Setup(r => r.GetById(5)).ReturnsAsync(residence);
         _mockUserRepo.Setup(r => r.ExistsUserWithRoleInResidence(5, "Inquilino")).ReturnsAsync(false);
         _mockPasswordGenerator.Setup(s => s.Generate()).ReturnsAsync("TempPass123!");
-        _mockPasswordHash.Setup(s => s.HashPassword("TempPass123!")).Returns("$2a$11$hashedpassword");
+        _mockPasswordHash.Setup(s => s.Execute("TempPass123!")).Returns("$2a$11$hashedpassword");
         _mockUserRepo.Setup(r => r.Add(It.IsAny<User>())).ReturnsAsync((User u) => { u.Id = 1; return u; });
         _mockEmailService.Setup(s => s.SendWelcomeEmail(It.IsAny<string>(), It.IsAny<string>(),
             It.IsAny<string>(), It.IsAny<string>()))
@@ -284,7 +284,7 @@ public class RegisterUserTests
         _mockResidenceRepo.Setup(r => r.GetById(5)).ReturnsAsync(residence);
         _mockUserRepo.Setup(r => r.ExistsUserWithRoleInResidence(5, "Inquilino")).ReturnsAsync(false);
         _mockPasswordGenerator.Setup(s => s.Generate()).ReturnsAsync("TempPass123!");
-        _mockPasswordHash.Setup(s => s.HashPassword("TempPass123!")).Returns("$2a$11$hashedpassword");
+        _mockPasswordHash.Setup(s => s.Execute("TempPass123!")).Returns("$2a$11$hashedpassword");
         _mockUserRepo.Setup(r => r.Add(It.IsAny<User>())).ReturnsAsync((User u) => { u.Id = 1; return u; });
 
         var service = CreateService();

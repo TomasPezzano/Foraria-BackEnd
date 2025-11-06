@@ -12,7 +12,7 @@ public interface IPasswordResetTokenGenerator
     string Generate();
 }
 
-public class PasswordResetTokenGenerator : IPasswordResetTokenGenerator
+public class ResetTokenGeneratorPassword : IPasswordResetTokenGenerator
 {
     public string Generate()
     {

@@ -4,14 +4,14 @@ namespace Foraria.Application.UseCase;
 
 public interface IPasswordHash
 {
-    string HashPassword(string password);
+    string Execute(string password);
     bool VerifyPassword(string password, string hashedPassword);
 }
 
-public class PasswordHash : IPasswordHash
+public class HashPassword : IPasswordHash
 {
 
-    public string HashPassword(string password)
+    public string Execute(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password);
     }
