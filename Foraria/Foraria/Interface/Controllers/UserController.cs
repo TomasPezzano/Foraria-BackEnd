@@ -235,7 +235,7 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "All")]
     [HttpGet("count")]
     public async Task<IActionResult> GetUsersCount()
     {
@@ -251,7 +251,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "All")]
     public async Task<IActionResult> GetUserById([FromQuery] int id)
     {
         var user = await _getUserById.Execute(id);
