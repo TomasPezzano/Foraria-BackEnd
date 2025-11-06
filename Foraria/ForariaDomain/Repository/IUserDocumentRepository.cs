@@ -1,4 +1,5 @@
 ﻿using ForariaDomain;
+using ForariaDomain.Models;
 
 namespace Foraria.Domain.Repository;
 
@@ -11,5 +12,5 @@ public interface IUserDocumentRepository
     void Update(UserDocument userDocument);
     Task<List<UserDocument>> GetByCategoryAsync(string category, int? userId = null);
     Task<DateTime?> GetLastUploadDateAsync(int? userId = null);
-    Task<UserDocument> GetStatsAsync(int? userId = null);
+    Task<UserDocumentStatsResult> GetStatsAsync(int? userId = null);
 }

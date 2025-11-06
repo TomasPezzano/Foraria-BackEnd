@@ -1,5 +1,4 @@
-﻿using Foraria.Contracts.DTOs;
-using Foraria.Interface.DTOs;
+﻿using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.Authorization;

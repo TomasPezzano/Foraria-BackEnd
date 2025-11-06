@@ -1,4 +1,4 @@
-﻿using Foraria.Domain.Model;
+﻿using ForariaDomain;
 using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.DTOs

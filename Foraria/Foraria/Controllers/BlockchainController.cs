@@ -1,11 +1,10 @@
 ﻿using Foraria.Application.UseCase;
-using ForariaDomain.Exceptions;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
-using Foraria.Interface.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
+using Foraria.DTOs;
 
 namespace Foraria.Controllers
 {

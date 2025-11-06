@@ -1,8 +1,7 @@
-﻿using Foraria.Contracts.DTOs;
+﻿using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foraria.Controllers;

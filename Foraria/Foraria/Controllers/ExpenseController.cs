@@ -1,9 +1,7 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Contracts.DTOs;
+﻿using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+
 
 namespace Foraria.Controllers;
 
