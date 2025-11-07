@@ -1,11 +1,12 @@
-﻿using Nethereum.ABI.FunctionEncoding.Attributes;
-using System.Numerics;
+﻿using System.Numerics;
+using Nethereum.ABI.FunctionEncoding.Attributes;
 
-namespace Foraria.DTOs;
+namespace ForariaDomain.Models;
 
 [FunctionOutput]
-public class RecordDto
+public class RecordResult
 {
+
     [Parameter("string", "uri", 1)]
     public string Uri { get; set; }
 
