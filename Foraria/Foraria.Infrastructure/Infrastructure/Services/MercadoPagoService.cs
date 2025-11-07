@@ -1,19 +1,14 @@
-﻿using MercadoPago.Client.MerchantOrder;
+﻿using ForariaDomain.Models;
+using MercadoPago.Client.MerchantOrder;
 using MercadoPago.Client.Payment;
 using MercadoPago.Client.Preference;
 using MercadoPago.Resource.Preference;
 using MP = MercadoPago.Resource.Payment;
 
+
 namespace ForariaDomain.Services
 {
-    public interface IPaymentGateway
-    {
-        Task<(string PreferenceId, string InitPoint)> CreatePreferenceAsync(decimal amount, int expenseId, int residenceId);
-        Task<MercadoPagoPaymentDto> GetPaymentAsync(long id);
-        Task<bool> VerifyMerchantOrderAsync(long orderId);
-
-    }
-    public class MercadoPagoService : IPaymentGateway
+    public class MercadoPagoService : IPaymentService
     {
         private readonly PaymentClient _paymentClient;
         private readonly MerchantOrderClient _orderClient;
@@ -60,23 +55,23 @@ namespace ForariaDomain.Services
         }
 
 
-        public async Task<MercadoPagoPaymentDto> GetPaymentAsync(long paymentId)
+        public async Task<MercadoPagoPayment> GetPaymentAsync(long paymentId)
         {
             var payment = await _paymentClient.GetAsync(paymentId);
 
-            return new MercadoPagoPaymentDto
+            return new MercadoPagoPayment
             {
                 Id = (long)payment.Id,
                 Status = payment.Status,
                 StatusDetail = payment.StatusDetail,
                 TransactionAmount = payment.TransactionAmount,
                 Metadata = payment.Metadata,
-                Order = new MercadoPagoOrderDto { Id = payment.Order?.Id },
+                Order = new MercadoPagoOrder { Id = payment.Order?.Id },
                 PaymentMethodId = payment.PaymentMethodId,
                 DateCreated = payment.DateCreated,
                 DateApproved = payment.DateApproved,
                 Installments = payment.Installments,
-                TransactionDetails = new TransactionDetailsDto
+                TransactionDetails = new TransactionDetails
                 {
                     InstallmentAmount = payment.TransactionDetails?.InstallmentAmount
                 }

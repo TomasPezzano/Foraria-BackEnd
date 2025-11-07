@@ -206,7 +206,7 @@ public class UserDocumentController : ControllerBase
         var date = await _getLastUploadDate.ExecuteAsync(userId);
         return Ok(date);
     }
-
+    
     [HttpGet("stats")]
     [Authorize(Policy = "All")]
     [SwaggerOperation(

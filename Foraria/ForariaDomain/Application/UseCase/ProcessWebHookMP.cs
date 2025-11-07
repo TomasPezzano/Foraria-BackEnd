@@ -10,14 +10,14 @@ namespace ForariaDomain.Application.UseCase
         private readonly IPaymentRepository _paymentRepository;
         //private readonly IExpenseRepository _expenseRepository;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
-        private readonly IPaymentGateway _paymentGateway;
+        private readonly IPaymentService _paymentGateway;
         private readonly IExpenseDetailRepository _expenseDetailRepository;
 
         public ProcessWebHookMP(
             IPaymentRepository paymentRepository,
             //IExpenseRepository expenseRepository,
             IPaymentMethodRepository paymentMethodRepository,
-            IPaymentGateway paymentGateway,
+            IPaymentService paymentGateway,
             IExpenseDetailRepository expenseDetailRepository)
         {
             _paymentRepository = paymentRepository;

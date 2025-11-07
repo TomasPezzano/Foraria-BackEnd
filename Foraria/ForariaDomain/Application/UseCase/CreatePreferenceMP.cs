@@ -1,4 +1,5 @@
-﻿using ForariaDomain.Repository;
+﻿using ForariaDomain.Models;
+using ForariaDomain.Repository;
 using ForariaDomain.Services;
 
 namespace ForariaDomain.Application.UseCase
@@ -8,12 +9,12 @@ namespace ForariaDomain.Application.UseCase
         //private readonly IExpenseRepository _expenseRepository;
         private readonly IExpenseDetailRepository _expenseDetailRepository;
         private readonly IPaymentRepository _paymentRepository;
-        private readonly IPaymentGateway _paymentGateway;
+        private readonly IPaymentService _paymentGateway;
 
         public CreatePreferenceMP(
            // IExpenseRepository expenseRepository,
             IPaymentRepository paymentRepository,
-            IPaymentGateway paymentGateway,
+            IPaymentService paymentGateway,
             IExpenseDetailRepository expenseDetailRepository)
         {
             //_expenseRepository = expenseRepository;
