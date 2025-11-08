@@ -1,10 +1,11 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
+using Foraria.DTOs;
+using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
-using Foraria.DTOs;
 
 namespace Foraria.Controllers
 {
@@ -26,10 +27,11 @@ namespace Foraria.Controllers
         [HttpPost("notarize-file")]
         [SwaggerOperation(
             Summary = "Notariza un archivo en la blockchain.",
-            Description = "Recibe un archivo, genera su hash SHA-256 y lo registra en la blockchain (actualmente en Polygon) junto con un identificador de documento único. Devuelve los datos de la prueba creada, incluyendo el hash, el hash de transacción y la red utilizada."
+            Description = "Registra el hash del archivo en la blockchain junto con metadatos de prueba."
         )]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> NotarizeFile([FromForm] NotarizeFileRequestDto request)
         {
             if (request.File == null || request.File.Length == 0)
@@ -43,7 +45,9 @@ namespace Foraria.Controllers
                     await request.File.CopyToAsync(stream);
 
                 var documentId = Guid.NewGuid();
-                var proof = await _notarizeFile.ExecuteAsync(documentId, tempPath);
+
+                var proof = await _notarizeFile.ExecuteAsync(documentId, tempPath)
+                    ?? throw new BlockchainException("Error al generar la prueba en blockchain.");
 
                 return Ok(new
                 {
@@ -58,6 +62,10 @@ namespace Foraria.Controllers
                     proof.CreatedAtUtc
                 });
             }
+            catch (BlockchainException)
+            {
+                throw;
+            }
             finally
             {
                 if (System.IO.File.Exists(tempPath))
@@ -68,10 +76,12 @@ namespace Foraria.Controllers
         [HttpPost("verify-file")]
         [SwaggerOperation(
             Summary = "Verifica un archivo contra su prueba registrada en blockchain.",
-            Description = "Recibe un archivo y un ID de documento, calcula su hash y verifica si coincide con la prueba registrada previamente en la blockchain. Devuelve si la verificación es válida o si el archivo fue alterado."
+            Description = "Comprueba si el archivo coincide con la prueba registrada."
         )]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> VerifyFile([FromForm] VerifyFileRequestDto request)
         {
             if (request.File == null || request.File.Length == 0)
@@ -94,6 +104,10 @@ namespace Foraria.Controllers
                         ? "El archivo coincide con la prueba registrada en blockchain."
                         : "El archivo fue modificado o no fue notarizado."
                 });
+            }
+            catch (NotFoundException)
+            {
+                throw new BlockchainException("No se encontró la prueba de blockchain asociada al documento.");
             }
             finally
             {

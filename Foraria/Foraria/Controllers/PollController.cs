@@ -3,7 +3,6 @@ using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
-using MercadoPago.Resource.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -24,7 +23,17 @@ namespace Foraria.Controllers
         private readonly GetActivePollCount _getActivePollCount;
         private readonly ChangePollState _changePollState;
         private readonly UpdatePoll _updatePoll;
-        public PollController(CreatePoll poll, GetPolls polls, GetPollById getPollById, NotarizePoll notarizePoll, GetPollWithResults getPollWithResults, GetAllPollsWithResults getAllPollsWithResults, GetActivePollCount getActivePollCount, ChangePollState changePollState, UpdatePoll updatePoll)
+
+        public PollController(
+            CreatePoll poll,
+            GetPolls polls,
+            GetPollById getPollById,
+            NotarizePoll notarizePoll,
+            GetPollWithResults getPollWithResults,
+            GetAllPollsWithResults getAllPollsWithResults,
+            GetActivePollCount getActivePollCount,
+            ChangePollState changePollState,
+            UpdatePoll updatePoll)
         {
             _createPoll = poll;
             _polls = polls;
@@ -39,46 +48,59 @@ namespace Foraria.Controllers
 
         [HttpPost]
         [Authorize(Policy = "ConsortiumAndAdmin")]
+        [SwaggerOperation(
+            Summary = "Crea una nueva votación.",
+            Description = "Permite crear una nueva votación con opciones y fechas de expiración, asignada a un usuario y categoría."
+        )]
+        [ProducesResponseType(typeof(Poll), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] PollDto request)
         {
-            try
+            if (request == null)
+                throw new DomainValidationException("El cuerpo de la solicitud no puede estar vacío.");
+
+            if (string.IsNullOrWhiteSpace(request.Title))
+                throw new DomainValidationException("El título de la votación es obligatorio.");
+
+            if (request.Options == null || !request.Options.Any())
+                throw new DomainValidationException("Debe incluir al menos una opción para la votación.");
+
+            var poll = new Poll
             {
-                var poll = new Poll
+                Title = request.Title,
+                Description = request.Description,
+                CategoryPoll_id = request.CategoryPollId,
+                User_id = request.UserId,
+                CreatedAt = DateTime.UtcNow,
+                DeletedAt = DateTime.UtcNow.AddDays(7),
+                State = "Activa",
+                PollOptions = request.Options.Select(optionText => new PollOption
                 {
-                    Title = request.Title,
-                    Description = request.Description,
-                    CategoryPoll_id = request.CategoryPollId,
-                    User_id = request.UserId,
-                    CreatedAt = DateTime.UtcNow,
-                    DeletedAt = DateTime.UtcNow.AddDays(7),
-                    State = "Activa",
-                    PollOptions = request.Options.Select(optionText => new PollOption
-                    {
-                        Text = optionText
-                    }).ToList()
-                };
+                    Text = optionText
+                }).ToList()
+            };
 
-                var result = await _createPoll.ExecuteAsync(poll);
-                return Ok(result);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Ocurrió un error inesperado", detail = ex.Message });
-            }
+            var result = await _createPoll.ExecuteAsync(poll);
+            return Ok(result);
         }
-
 
         [HttpGet]
         [Authorize(Policy = "All")]
+        [SwaggerOperation(
+            Summary = "Obtiene todas las votaciones.",
+            Description = "Devuelve una lista con todas las votaciones activas o finalizadas del sistema."
+        )]
+        [ProducesResponseType(typeof(IEnumerable<PollDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll()
         {
-            List<Poll> polls = await _polls.ExecuteAsync();
+            var polls = await _polls.ExecuteAsync();
 
-            List<PollDto> pollsDto = polls.Select(p => new PollDto
+            if (polls == null || !polls.Any())
+                throw new NotFoundException("No se encontraron votaciones.");
+
+            var pollsDto = polls.Select(p => new PollDto
             {
                 Id = p.Id,
                 Title = p.Title,
@@ -92,19 +114,24 @@ namespace Foraria.Controllers
                            ? p.PollOptions.Select(o => o.Text).ToList()
                            : new List<string>()
             }).ToList();
+
             return Ok(pollsDto);
         }
 
         [HttpGet("with-results/{id}")]
         [Authorize(Policy = "All")]
+        [SwaggerOperation(
+            Summary = "Obtiene una votación con sus resultados.",
+            Description = "Devuelve los detalles de una votación específica junto con la cantidad de votos por opción."
+        )]
+        [ProducesResponseType(typeof(PollWithResultsDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPollWithResults(int id)
         {
             var poll = await _getPollWithResults.ExecuteAsync(id);
 
             if (poll == null)
-            {
-                return NotFound(new { error = "Encuesta no encontrada" });
-            }
+                throw new NotFoundException("Encuesta no encontrada.");
 
             var pollResults = poll.Votes
                 .GroupBy(v => v.PollOption_id)
@@ -135,17 +162,20 @@ namespace Foraria.Controllers
             return Ok(pollDto);
         }
 
-
         [HttpGet("with-results")]
         [Authorize(Policy = "All")]
+        [SwaggerOperation(
+            Summary = "Obtiene todas las votaciones con resultados.",
+            Description = "Devuelve todas las votaciones existentes con su información agregada de resultados."
+        )]
+        [ProducesResponseType(typeof(IEnumerable<PollWithResultsDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllPollsWithResults()
         {
             var polls = await _getAllPollsWithResults.ExecuteAsync();
 
             if (polls == null || !polls.Any())
-            {
-                return NotFound(new { error = "No se encontraron encuestas." });
-            }
+                throw new NotFoundException("No se encontraron encuestas.");
 
             var pollsDto = polls.Select(poll => new PollWithResultsDto
             {
@@ -175,11 +205,17 @@ namespace Foraria.Controllers
 
         [HttpGet("{id:int}")]
         [Authorize(Policy = "All")]
+        [SwaggerOperation(
+            Summary = "Obtiene una votación por ID.",
+            Description = "Devuelve los datos de una votación específica."
+        )]
+        [ProducesResponseType(typeof(PollDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             var poll = await _getPollById.ExecuteAsync(id);
             if (poll == null)
-                return NotFound();
+                throw new NotFoundException("La votación solicitada no existe.");
 
             var pollReceived = new PollDto
             {
@@ -192,8 +228,8 @@ namespace Foraria.Controllers
                 State = poll.State,
                 UserId = poll.User_id,
                 Options = poll.PollOptions != null
-             ? poll.PollOptions.Select(option => option.Text).ToList()
-             : new List<string>()
+                    ? poll.PollOptions.Select(option => option.Text).ToList()
+                    : new List<string>()
             };
 
             return Ok(pollReceived);
@@ -201,15 +237,19 @@ namespace Foraria.Controllers
 
         [HttpPost("{id:int}/notarize")]
         [Authorize(Policy = "OwnerAndTenant")]
-
+        [SwaggerOperation(
+            Summary = "Notariza una votación en blockchain.",
+            Description = "Registra en la blockchain la información de una votación para garantizar su integridad."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Notarize(int id)
         {
             var poll = await _getPollById.ExecuteAsync(id);
             if (poll == null)
-                return NotFound(new { error = "La votación no existe." });
+                throw new NotFoundException("La votación no existe.");
 
             var text = $"{poll.Title} - {poll.Description}";
-
             var proof = await _notarizePoll.ExecuteAsync(id, text);
 
             return Ok(new
@@ -223,12 +263,18 @@ namespace Foraria.Controllers
 
         [HttpGet("polls/active-count")]
         [Authorize(Policy = "All")]
-
-        public async Task<IActionResult> GetActivePollCount(
-        [FromQuery] int consortiumId,
-        [FromQuery] DateTime? dateTime = null)
+        [SwaggerOperation(
+            Summary = "Obtiene la cantidad de votaciones activas.",
+            Description = "Cuenta las votaciones activas en el consorcio indicado y devuelve la fecha de chequeo."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetActivePollCount([FromQuery] int consortiumId, [FromQuery] DateTime? dateTime = null)
         {
+            if (consortiumId <= 0)
+                throw new DomainValidationException("Debe indicar un ID de consorcio válido.");
+
             var count = await _getActivePollCount.ExecuteAsync(consortiumId, dateTime);
+
             return Ok(new
             {
                 activePolls = count,
@@ -247,6 +293,9 @@ namespace Foraria.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "La votación o el usuario no fueron encontrados")]
         public async Task<IActionResult> ChangePollState(int pollId, [FromBody] ChangePollStateRequest request)
         {
+            if (pollId <= 0)
+                throw new DomainValidationException("El ID de la votación debe ser válido.");
+
             var result = await _changePollState.ExecuteAsync(pollId, request.UserId, request.NewState);
             return Ok(result);
         }
@@ -265,9 +314,7 @@ namespace Foraria.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(userIdClaim, out int userId))
-            {
-                throw new UnauthorizedException("Token inválido");
-            }
+                throw new UnauthorizedException("Token inválido.");
 
             var pollData = new Poll
             {

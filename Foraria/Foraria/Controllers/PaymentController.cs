@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using ForariaDomain.Application.UseCase;
+using ForariaDomain.Exceptions;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Foraria.Controllers
 {
@@ -21,26 +23,46 @@ namespace Foraria.Controllers
         }
 
         [HttpPost("create-preference")]
+        [SwaggerOperation(
+            Summary = "Crea una preferencia de pago en Mercado Pago.",
+            Description = "Genera una preferencia de pago asociada a una expensa y una residencia, retornando el enlace de pago y detalles del proceso."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreatePreference(int expenseId, int residenceId)
         {
+            if (expenseId <= 0)
+                throw new DomainValidationException("Debe especificar un ID de expensa válido.");
+
+            if (residenceId <= 0)
+                throw new DomainValidationException("Debe especificar un ID de residencia válido.");
+
             var result = await _createPreferenceMP.ExecuteAsync(expenseId, residenceId);
+
+            if (result == null)
+                throw new BusinessException("No se pudo generar la preferencia de pago.");
+
             return Ok(result);
         }
 
         [HttpPost("webhook")]
+        [SwaggerOperation(
+            Summary = "Procesa el webhook de Mercado Pago.",
+            Description = "Recibe las notificaciones enviadas por Mercado Pago sobre el estado de las transacciones y las procesa de forma asincrónica."
+        )]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Webhook([FromBody] JsonElement body)
         {
-            try
-            {
-                Console.WriteLine("🟡 Webhook recibido.");
-                await _processWebHookMP.ExecuteAsync(body);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Error procesando webhook: {ex.Message}");
-                return Ok(); 
-            }
+            if (body.ValueKind == JsonValueKind.Undefined || body.ValueKind == JsonValueKind.Null)
+                throw new DomainValidationException("El cuerpo del webhook está vacío o no es válido.");
+
+            await _processWebHookMP.ExecuteAsync(body);
+
+            return Ok();
         }
     }
 }

@@ -42,7 +42,7 @@ namespace Foraria.Controllers
         public async Task<IActionResult> GetTotalUsers([FromQuery] int? consortiumId = null)
         {
             if (consortiumId is < 0)
-                throw new ValidationException("El ID del consorcio no puede ser negativo.");
+                throw new DomainValidationException("El ID del consorcio no puede ser negativo.");
 
             var count = await _getTotalUsers.ExecuteAsync(consortiumId);
             return Ok(new { consortiumId, totalUsers = count });
@@ -57,7 +57,7 @@ namespace Foraria.Controllers
         public async Task<IActionResult> GetPendingClaimsCount([FromQuery] int? consortiumId = null)
         {
             if (consortiumId is < 0)
-                throw new ValidationException("El ID del consorcio no puede ser negativo.");
+                throw new DomainValidationException("El ID del consorcio no puede ser negativo.");
 
             var count = await _getPendingClaimsCount.ExecuteAsync(consortiumId);
             return Ok(new { consortiumId, pendingClaims = count });
@@ -90,7 +90,7 @@ namespace Foraria.Controllers
             [FromQuery] DateTime? date = null)
         {
             if (consortiumId <= 0)
-                throw new ValidationException("Debe especificar un ID de consorcio válido.");
+                throw new DomainValidationException("Debe especificar un ID de consorcio válido.");
 
             var result = await _getCollectedExpensesPercentage.ExecuteAsync(consortiumId, date);
             return Ok(result);
@@ -107,7 +107,7 @@ namespace Foraria.Controllers
             [FromQuery] int limit = 5)
         {
             if (limit <= 0)
-                throw new ValidationException("El límite debe ser mayor a cero.");
+                throw new DomainValidationException("El límite debe ser mayor a cero.");
 
             var result = await _getUpcomingReserves.ExecuteAsync(consortiumId, limit);
 
