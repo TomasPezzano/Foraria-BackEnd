@@ -1,8 +1,10 @@
 ﻿using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
+using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Foraria.Controllers;
 
@@ -20,12 +22,21 @@ public class InvoiceController : ControllerBase
 
     [HttpPost]
     [Authorize(Policy = "ConsortiumAndAdmin")]
+    [SwaggerOperation(
+        Summary = "Crea una nueva factura.",
+        Description = "Registra una nueva factura para un consorcio con los datos proporcionados, incluyendo los ítems asociados."
+    )]
+    [ProducesResponseType(typeof(InvoiceResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateInvoice([FromBody] InvoiceRequestDto invoiceDto)
     {
         if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+            throw new DomainValidationException("Los datos de la factura no son válidos.");
+
+        if (invoiceDto.ConsortiumId <= 0)
+            throw new DomainValidationException("Debe especificar un ConsortiumId válido.");
 
         var invoice = new Invoice
         {
@@ -55,55 +66,60 @@ public class InvoiceController : ControllerBase
             }).ToList()
         };
 
-        try
-        {
-            var result = await _createInvoice.Execute(invoice);
+        var result = await _createInvoice.Execute(invoice);
+        if (result == null)
+            throw new BusinessException("No se pudo crear la factura.");
 
-            var response = new InvoiceResponseDto
+        var response = new InvoiceResponseDto
+        {
+            Id = result.Id,
+            Concept = result.Concept,
+            Category = result.Category,
+            InvoiceNumber = result.InvoiceNumber,
+            SupplierName = result.SupplierName,
+            DateOfIssue = result.DateOfIssue,
+            ExpirationDate = result.ExpirationDate,
+            Amount = result.Amount,
+            Cuit = result.Cuit,
+            SubTotal = result.SubTotal,
+            TotalTaxes = result.TotalTaxes,
+            Description = result.Description,
+            FilePath = result.FilePath,
+            SupplierAddress = result.SupplierAddress,
+            PurchaseOrder = result.PurchaseOrder,
+            ConfidenceScore = result.ConfidenceScore,
+            ProcessedAt = result.ProcessedAt,
+            ConsortiumId = result.ConsortiumId,
+            Items = result.Items.Select(item => new InvoiceItemDto
             {
-                Id = result.Id,
-                Concept = result.Concept,
-                Category = result.Category,
-                InvoiceNumber = result.InvoiceNumber,
-                SupplierName = result.SupplierName,
-                DateOfIssue = result.DateOfIssue,
-                ExpirationDate = result.ExpirationDate,
-                Amount = result.Amount,
-                Cuit = result.Cuit,
-                SubTotal = result.SubTotal,
-                TotalTaxes = result.TotalTaxes,
-                Description = result.Description,
-                FilePath = result.FilePath,
-                SupplierAddress = result.SupplierAddress,
-                PurchaseOrder = result.PurchaseOrder,
-                ConfidenceScore = result.ConfidenceScore,
-                ProcessedAt = result.ProcessedAt,
-                ConsortiumId = result.ConsortiumId,
-                Items = result.Items.Select(item => new InvoiceItemDto
-                {
-                    Description = item.Description,
-                    Amount = item.Amount,
-                    Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice
-                }).ToList()
-            };
+                Description = item.Description,
+                Amount = item.Amount,
+                Quantity = item.Quantity,
+                UnitPrice = item.UnitPrice
+            }).ToList()
+        };
 
-            return Ok(response);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Error al crear la factura", details = ex.Message });
-        }
+        return Ok(response);
     }
 
     [HttpGet]
+    [SwaggerOperation(
+        Summary = "Obtiene todas las facturas registradas.",
+        Description = "Devuelve la lista completa de facturas junto con sus ítems asociados."
+    )]
+    [ProducesResponseType(typeof(IEnumerable<InvoiceResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
     {
         var invoices = await _getAllInvoices.Execute();
+
+        if (invoices == null)
+            throw new NotFoundException("No se pudieron obtener las facturas.");
+
+        if (!invoices.Any())
+            throw new NotFoundException("No se encontraron facturas registradas.");
+
         var response = invoices.Select(result => new InvoiceResponseDto
         {
             Id = result.Id,
@@ -128,7 +144,7 @@ public class InvoiceController : ControllerBase
                 UnitPrice = item.UnitPrice
             }).ToList()
         });
+
         return Ok(response);
     }
-
 }

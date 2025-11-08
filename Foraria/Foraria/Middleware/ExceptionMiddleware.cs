@@ -45,6 +45,8 @@ namespace Foraria
                 ThreadOwnershipException or ForbiddenAccessException => (int)HttpStatusCode.Forbidden,
                 ThreadUpdateException => (int)HttpStatusCode.BadRequest,
                 UnauthorizedException => (int)HttpStatusCode.Unauthorized,
+                BlockchainException => (int)HttpStatusCode.BadRequest,
+                DomainValidationException => (int)HttpStatusCode.UnprocessableEntity,
                 _ => (int)HttpStatusCode.InternalServerError
             };
 

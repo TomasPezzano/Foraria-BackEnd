@@ -20,8 +20,6 @@ public class UserDocumentController : ControllerBase
     private readonly GetUserDocumentsByCategory _getUserDocumentsByCategory;
     private readonly GetLastUploadDate _getLastUploadDate;
     private readonly GetUserDocumentStats _getUserDocumentStats;
-    private ICreateUserDocument object1;
-    private IGetUserDocuments object2;
 
     public UserDocumentController(
         ICreateUserDocument createUserDocument,
@@ -39,22 +37,17 @@ public class UserDocumentController : ControllerBase
         _getUserDocumentStats = getUserDocumentStats;
     }
 
-    public UserDocumentController(ICreateUserDocument object1, IGetUserDocuments object2)
-    {
-        this.object1 = object1;
-        this.object2 = object2;
-    }
-
     [HttpGet]
     [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Obtiene todos los documentos existentes",
         Description = "Devuelve la lista completa de documentos de usuario y consorcio.")]
     [SwaggerResponse(StatusCodes.Status200OK, "Lista de documentos obtenida correctamente", typeof(List<UserDocumentDto>))]
-    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
     public async Task<IActionResult> GetAll()
     {
         var documents = await _getUserDocuments.Execute();
+        if (documents == null || !documents.Any())
+            throw new NotFoundException("No se encontraron documentos registrados.");
 
         var result = documents.Select(d => new UserDocumentDto
         {
@@ -77,45 +70,38 @@ public class UserDocumentController : ControllerBase
         Summary = "Crea un nuevo documento de usuario",
         Description = "Permite subir un documento validado por URL, categoría y formato. Cualquier usuario autenticado puede crear un documento.")]
     [SwaggerResponse(StatusCodes.Status201Created, "Documento creado correctamente", typeof(UserDocumentDto))]
-    [SwaggerResponse(StatusCodes.Status400BadRequest, "Datos inválidos o error de validación")]
-    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
     public async Task<IActionResult> Add([FromBody] CreateUserDocumentDto dto)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+            throw new DomainValidationException("Los datos del documento son inválidos.");
 
-        try
+        var document = new UserDocument
         {
-            var document = new UserDocument
-            {
-                Title = dto.Title,
-                Description = dto.Description,
-                Category = dto.Category,
-                Url = dto.Url,
-                User_id = dto.User_id,
-                Consortium_id = dto.Consortium_id
-            };
+            Title = dto.Title,
+            Description = dto.Description,
+            Category = dto.Category,
+            Url = dto.Url,
+            User_id = dto.User_id,
+            Consortium_id = dto.Consortium_id
+        };
 
-            var createdDocument = await _createUserDocument.Execute(document);
+        var createdDocument = await _createUserDocument.Execute(document);
+        if (createdDocument == null)
+            throw new BusinessException("No se pudo crear el documento.");
 
-            var result = new UserDocumentDto
-            {
-                Id = createdDocument.Id,
-                Title = createdDocument.Title,
-                Description = createdDocument.Description,
-                Category = createdDocument.Category,
-                CreatedAt = createdDocument.CreatedAt,
-                Url = createdDocument.Url,
-                User_id = createdDocument.User_id,
-                Consortium_id = createdDocument.Consortium_id
-            };
-
-            return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
-        }
-        catch (ArgumentException ex)
+        var result = new UserDocumentDto
         {
-            return BadRequest(new { message = ex.Message });
-        }
+            Id = createdDocument.Id,
+            Title = createdDocument.Title,
+            Description = createdDocument.Description,
+            Category = createdDocument.Category,
+            CreatedAt = createdDocument.CreatedAt,
+            Url = createdDocument.Url,
+            User_id = createdDocument.User_id,
+            Consortium_id = createdDocument.Consortium_id
+        };
+
+        return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
     }
 
     [HttpPut("{id}")]
@@ -129,45 +115,33 @@ public class UserDocumentController : ControllerBase
     public async Task<IActionResult> UpdateUserDocument(int id, [FromBody] UpdateUserDocumentRequest request)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+            throw new DomainValidationException("Datos inválidos para actualización de documento.");
 
-        try
-        {
-            var updated = await _updateUserDocument.ExecuteAsync(
-                id,
-                request.UserId,
-                request.Title,
-                request.Description,
-                request.Category,
-                request.Url
-            );
+        var updated = await _updateUserDocument.ExecuteAsync(
+            id,
+            request.UserId,
+            request.Title,
+            request.Description,
+            request.Category,
+            request.Url
+        );
 
-            var dto = new UserDocumentDto
-            {
-                Id = updated.Id,
-                Title = updated.Title,
-                Description = updated.Description,
-                Category = updated.Category,
-                CreatedAt = updated.CreatedAt,
-                Url = updated.Url,
-                User_id = updated.User_id,
-                Consortium_id = updated.Consortium_id
-            };
+        if (updated == null)
+            throw new NotFoundException("No se pudo actualizar el documento o no existe.");
 
-            return Ok(dto);
-        }
-        catch (NotFoundException ex)
+        var dto = new UserDocumentDto
         {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+            Id = updated.Id,
+            Title = updated.Title,
+            Description = updated.Description,
+            Category = updated.Category,
+            CreatedAt = updated.CreatedAt,
+            Url = updated.Url,
+            User_id = updated.User_id,
+            Consortium_id = updated.Consortium_id
+        };
+
+        return Ok(dto);
     }
 
     [HttpGet("category/{category}")]
@@ -178,7 +152,12 @@ public class UserDocumentController : ControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Documentos filtrados correctamente", typeof(List<UserDocumentDto>))]
     public async Task<IActionResult> GetByCategory(string category, [FromQuery] int? userId = null)
     {
+        if (string.IsNullOrWhiteSpace(category))
+            throw new DomainValidationException("Debe especificar una categoría válida.");
+
         var documents = await _getUserDocumentsByCategory.ExecuteAsync(category, userId);
+        if (documents == null || !documents.Any())
+            throw new NotFoundException("No se encontraron documentos en la categoría indicada.");
 
         var result = documents.Select(d => new UserDocumentDto
         {
@@ -204,9 +183,12 @@ public class UserDocumentController : ControllerBase
     public async Task<IActionResult> GetLastUpload([FromQuery] int? userId = null)
     {
         var date = await _getLastUploadDate.ExecuteAsync(userId);
+        if (date == null)
+            throw new NotFoundException("No se encontraron documentos para calcular la última carga.");
+
         return Ok(date);
     }
-    
+
     [HttpGet("stats")]
     [Authorize(Policy = "All")]
     [SwaggerOperation(
@@ -216,6 +198,9 @@ public class UserDocumentController : ControllerBase
     public async Task<IActionResult> GetStats([FromQuery] int? userId = null)
     {
         var stats = await _getUserDocumentStats.ExecuteAsync(userId);
+        if (stats == null)
+            throw new NotFoundException("No se pudieron calcular las estadísticas.");
+
         return Ok(stats);
     }
 }
