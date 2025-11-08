@@ -57,6 +57,7 @@ public class RegisterUser : IRegisterUser
         if (roleAlreadyAssigned)
             throw new BusinessException($"This residence already has a user with the role '{role.Description}' assigned.");
 
+        user.HasPermission = role.Description == "Propietario";
 
         var temporaryPassword = await _generatePasswordUseCase.Generate();
         var passwordHash = _passwordHashUseCase.HashPassword(temporaryPassword);

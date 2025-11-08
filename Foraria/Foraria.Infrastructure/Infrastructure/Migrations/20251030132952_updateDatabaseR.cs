@@ -14,7 +14,7 @@ namespace Foraria.Migrations
                 name: "HasPermission",
                 table: "user",
                 type: "bit",
-                nullable: false,
+                nullable: true,
                 defaultValue: false);
         }
 

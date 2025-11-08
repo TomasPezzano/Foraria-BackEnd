@@ -13,11 +13,13 @@ public class TransferPermission : ITransferPermission
 {
     private readonly IUserRepository _userRepository;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly IResidenceRepository _residenceRepository;
 
-    public TransferPermission(IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository)
+    public TransferPermission(IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository, IResidenceRepository residenceRepository)
     {
         _userRepository = userRepository;
         _refreshTokenRepository = refreshTokenRepository;
+        _residenceRepository = residenceRepository;
     }
 
     public async Task Execute(int ownerId, int tenantId)
@@ -48,16 +50,28 @@ public class TransferPermission : ITransferPermission
         var ownerResidenceIds = owner.Residences?.Select(r => r.Id).ToList() ?? new List<int>();
         var tenantResidenceIds = tenant.Residences?.Select(r => r.Id).ToList() ?? new List<int>();
 
-        var sharedResidences = ownerResidenceIds.Intersect(tenantResidenceIds).Any();
+        var residenceOwnerId = await _residenceRepository.GetResidenceByUserId(ownerId);
+        var residenceTenantId = await _residenceRepository.GetResidenceByUserId(tenantId);
+
+        bool sharedResidences = false;
+        foreach (var residenceId in residenceOwnerId)
+        {
+            foreach (var residenceId2 in residenceTenantId)
+            {
+                if (residenceId == residenceId2) 
+                    sharedResidences = true;
+                break;
+            }
+        }
 
         if (!sharedResidences)
         {
             throw new BusinessException("El propietario y el inquilino deben compartir al menos una residencia");
         }
 
-        if (!owner.HasPermission)
+        if (owner.HasPermission != null && owner.HasPermission == true)
         {
-            throw new BusinessException("El propietario no tiene permisos de votación para transferir");
+            throw new BusinessException("El propietario no tiene permisos para transferir");
         }
 
         owner.HasPermission = false;

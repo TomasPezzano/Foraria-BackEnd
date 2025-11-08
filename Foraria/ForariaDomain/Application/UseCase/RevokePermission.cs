@@ -41,7 +41,7 @@ public class RevokePermission : IRevokePermission
             throw new BusinessException("El usuario especificado no es un Inquilino");
         }
 
-        if (!tenant.HasPermission)
+        if (tenant.HasPermission != null && tenant.HasPermission == true)
         {
             throw new BusinessException("El inquilino no tiene permisos activos para revocar");
         }

@@ -9,4 +9,6 @@ public interface IResidenceRepository
     Task<Residence?> GetById(int id);
     Task<List<Residence>> GetResidenceByConsortiumIdAsync(int consortiumId);
     Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner(int consortiumId);
+
+    Task<IEnumerable<Residence>> GetResidenceByUserId(int userId);
 }

@@ -1,5 +1,6 @@
 ﻿using Foraria.Application.UseCase;
 using Foraria.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -20,7 +21,7 @@ public class PermissionController : ControllerBase
 
 
     [HttpPost("transfer")]
-    //[Authorize(Policy = "Owner")]
+    [Authorize(Policy = "Owner")]
     public async Task<IActionResult> TransferPermission([FromBody] TransferPermissionRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -45,7 +46,7 @@ public class PermissionController : ControllerBase
 
 
     [HttpPost("revoke")]
-    //[Authorize(Policy = "Owner")]
+    [Authorize(Policy = "Owner")]
     public async Task<IActionResult> RevokePermission([FromBody] TransferPermissionRequestDto request)
     {
         if (!ModelState.IsValid)

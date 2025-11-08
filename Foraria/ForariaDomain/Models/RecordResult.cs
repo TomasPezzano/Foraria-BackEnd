@@ -6,7 +6,6 @@ namespace ForariaDomain.Models;
 [FunctionOutput]
 public class RecordResult
 {
-
     [Parameter("string", "uri", 1)]
     public string Uri { get; set; }
 

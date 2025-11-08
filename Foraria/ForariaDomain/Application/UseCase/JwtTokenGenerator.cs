@@ -9,7 +9,7 @@ namespace Foraria.Application.UseCase;
 
 public interface IJwtTokenGenerator
 {
-    string Generate(int userId, string email, int roleId, string roleName, bool requiresPasswordChange, bool hasPermission);
+    string Generate(int userId, string email, int roleId, string roleName, bool requiresPasswordChange, bool? hasPermission);
 }
 
 
@@ -22,7 +22,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _jwtSettings = jwtSettings.Value;
     }
 
-    public string Generate(int userId, string email, int roleId, string roleName, bool requiresPasswordChange, bool hasPermission)
+    public string Generate(int userId, string email, int roleId, string roleName, bool requiresPasswordChange, bool? hasPermission)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
