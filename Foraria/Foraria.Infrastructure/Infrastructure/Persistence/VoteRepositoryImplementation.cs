@@ -26,9 +26,9 @@ namespace Foraria.Infrastructure.Persistence
                 .FirstOrDefaultAsync(v => v.User_id == userId && v.Poll_id == pollId);
         }
 
-        public async Task<IEnumerable<ResultPoll>> GetPollResultsAsync(int pollId)
+        public async Task<IEnumerable<PollResult>> GetPollResultsAsync(int pollId)
         {
-            return (IEnumerable<ResultPoll>)await _context.Votes
+            return await _context.Votes
                 .Where(v => v.Poll_id == pollId)
                 .GroupBy(v => v.PollOption_id)
                 .Select(g => new PollResult
@@ -39,9 +39,5 @@ namespace Foraria.Infrastructure.Persistence
                 .ToListAsync();
         }
 
-        Task<IEnumerable<ResultPoll>> IVoteRepository.GetPollResultsAsync(int pollId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

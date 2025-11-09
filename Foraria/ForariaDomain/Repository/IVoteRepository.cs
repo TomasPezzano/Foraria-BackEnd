@@ -1,4 +1,5 @@
 ﻿using ForariaDomain;
+using ForariaDomain.Models;
 
 namespace Foraria.Domain.Repository
 {
@@ -7,7 +8,7 @@ namespace Foraria.Domain.Repository
         Task AddAsync(Vote vote);
         Task<Vote?> GetByUserAndPollAsync(int userId, int pollId);
 
-        Task<IEnumerable<ResultPoll>> GetPollResultsAsync(int pollId);
+        Task<IEnumerable<PollResult>> GetPollResultsAsync(int pollId);
 
     }
 }
