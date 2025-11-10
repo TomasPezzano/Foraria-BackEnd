@@ -1,4 +1,5 @@
 ﻿using Foraria;
+using Foraria.Application.Services;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;
@@ -172,6 +173,7 @@ builder.Services.AddScoped<IPasswordResetTokenGenerator, PasswordResetTokenGener
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
 builder.Services.AddScoped<IResetPassword, ResetPassword>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 
 
 builder.Services.AddCors(options =>

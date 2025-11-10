@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -19,6 +20,7 @@ namespace Foraria.Controllers
         private readonly GetForumWithThreads _getForumWithThreads;
         private readonly DeleteForum _deleteForum;
         private readonly GetForumWithCategory _getForumWithCategory;
+        private readonly IPermissionService _permissionService;
 
         public ForumController(
             CreateForum createForum,
@@ -26,7 +28,8 @@ namespace Foraria.Controllers
             GetAllForums getAllForums,
             GetForumWithThreads getForumWithThreads,
             DeleteForum deleteForum,
-            GetForumWithCategory getForumWithCategory)
+            GetForumWithCategory getForumWithCategory,
+            IPermissionService permissionService)
         {
             _createForum = createForum;
             _getForumById = getForumById;
@@ -34,7 +37,9 @@ namespace Foraria.Controllers
             _getForumWithThreads = getForumWithThreads;
             _deleteForum = deleteForum;
             _getForumWithCategory = getForumWithCategory;
+            _permissionService = permissionService;
         }
+
 
         [HttpPost]
         [Authorize(Policy = "All")]
@@ -46,6 +51,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateForumRequest request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Forums.Create");
+
             if (request == null)
                 throw new ValidationException("El cuerpo de la solicitud no puede estar vacío.");
 
@@ -78,6 +85,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Forums.View");
+
             if (id <= 0)
                 throw new ValidationException("El ID del foro debe ser mayor que cero.");
 
@@ -105,6 +114,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
+            await _permissionService.EnsurePermissionAsync(User, "Forums.ViewAll");
+
             var forums = await _getAllForums.Execute();
 
             var responses = forums.Select(f => new ForumResponse
@@ -127,6 +138,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetForumWithThreads(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Forums.ViewThreads");
+
             if (id <= 0)
                 throw new ValidationException("El ID del foro debe ser mayor que cero.");
 
@@ -159,6 +172,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Disable(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Forums.Disable");
+
             await _deleteForum.Execute(id);
             return Ok(new { message = "Foro deshabilitado correctamente." });
         }
@@ -173,6 +188,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetForumWithCategory(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Forums.ViewWithCategory");
+
             if (id <= 0)
                 throw new ValidationException("El ID del foro debe ser mayor que cero.");
 

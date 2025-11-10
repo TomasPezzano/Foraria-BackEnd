@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +20,7 @@ namespace Foraria.Controllers
         private readonly UpdateMessage _updateMessage;
         private readonly HideMessage _hideMessage;
         private readonly GetMessagesByUser _getMessagesByUser;
+        private readonly IPermissionService _permissionService;
 
         public MessageController(
             CreateMessage createMessage,
@@ -28,7 +30,8 @@ namespace Foraria.Controllers
             IWebHostEnvironment env,
             UpdateMessage updateMessage,
             HideMessage hideMessage,
-            GetMessagesByUser getMessagesByUser)
+            GetMessagesByUser getMessagesByUser,
+            IPermissionService permissionService)
         {
             _createMessage = createMessage;
             _deleteMessage = deleteMessage;
@@ -38,7 +41,9 @@ namespace Foraria.Controllers
             _updateMessage = updateMessage;
             _hideMessage = hideMessage;
             _getMessagesByUser = getMessagesByUser;
+            _permissionService = permissionService;
         }
+
 
         [HttpPost]
         [Authorize(Policy = "All")]
@@ -50,6 +55,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromForm] CreateMessageWithFileRequest request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Messages.Create");
+
             string? filePath = null;
 
             if (request.File != null)
@@ -92,6 +99,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Messages.View");
+
             var message = await _getMessageById.Execute(id);
             if (message == null) return NotFound();
 
@@ -117,6 +126,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByThread(int threadId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Messages.ViewByThread");
+
             var messages = await _getMessagesByThread.Execute(threadId);
 
             var responses = messages.Select(m => new MessageResponse
@@ -143,6 +154,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id, [FromQuery] int userId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Messages.DeleteOwn");
+
             await _deleteMessage.ExecuteAsync(id, userId);
             return NoContent();
         }
@@ -157,6 +170,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, [FromForm] UpdateMessageRequest request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Messages.UpdateOwn");
+
             string? filePath = null;
 
             if (request.File != null)
@@ -203,6 +218,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Hide(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Messages.Hide");
+
             try
             {
                 await _hideMessage.ExecuteAsync(id);
@@ -223,6 +240,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByUser(int userId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Messages.ViewByUser");
+
             var messages = await _getMessagesByUser.ExecuteAsync(userId);
 
             var response = messages.Select(m => new MessageDto

@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +14,18 @@ public class ResidenceController : ControllerBase
     private readonly ICreateResidence _createResidenceUseCase;
     private readonly IGetAllResidencesByConsortium _getAllResidencesByConsortium;
     private readonly IGetResidenceById _getResidenceById;
+     private readonly IPermissionService _permissionService;
 
     public ResidenceController(
         ICreateResidence createResidenceUseCase,
         IGetAllResidencesByConsortium getAllResidencesByConsortium,
-        IGetResidenceById getResidenceById)
+        IGetResidenceById getResidenceById,
+        IPermissionService permissionService)
     {
         _createResidenceUseCase = createResidenceUseCase;
         _getAllResidencesByConsortium = getAllResidencesByConsortium;
         _getResidenceById = getResidenceById;
+        _permissionService = permissionService;
     }
 
     [HttpPost("create")]
@@ -36,6 +40,8 @@ public class ResidenceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateResidence([FromBody] ResidenceRequestDto residenceDto)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Residences.Create");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos de la residencia no son válidos.");
 
@@ -76,6 +82,8 @@ public class ResidenceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetResidenceById(int id)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Residences.View");
+
         if (id <= 0)
             throw new DomainValidationException("El ID de la residencia debe ser válido.");
 
@@ -109,6 +117,8 @@ public class ResidenceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllResidencesByConsortium(int idConsortium)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Residences.ViewAllByConsortium");
+
         if (idConsortium <= 0)
             throw new DomainValidationException("Debe especificar un ID de consorcio válido.");
 

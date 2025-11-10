@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +22,7 @@ namespace Foraria.Controllers
         private readonly GetThreadWithMessages _getThreadWithMessages;
         private readonly CloseThread _closeThread;
         private readonly GetThreadCommentCount _getThreadCommentCount;
+        private readonly IPermissionService _permissionService;
 
         public ThreadController(
             CreateThread createThread,
@@ -30,7 +32,8 @@ namespace Foraria.Controllers
             UpdateThread updateThread,
             GetThreadWithMessages getThreadWithMessages,
             CloseThread closeThread,
-            GetThreadCommentCount getThreadCommentCount)
+            GetThreadCommentCount getThreadCommentCount,
+            IPermissionService permissionService)
         {
             _createThread = createThread;
             _getThreadById = getThreadById;
@@ -40,7 +43,9 @@ namespace Foraria.Controllers
             _getThreadWithMessages = getThreadWithMessages;
             _closeThread = closeThread;
             _getThreadCommentCount = getThreadCommentCount;
+            _permissionService = permissionService;
         }
+
 
         [HttpPost]
         [Authorize(Policy = "All")]
@@ -52,6 +57,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateThreadRequest request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Threads.Create");
+
             if (request == null)
                 throw new ValidationException("El cuerpo de la solicitud no puede estar vacío.");
 
@@ -101,6 +108,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Threads.View");
+
             if (id <= 0)
                 throw new ValidationException("El ID del hilo debe ser mayor que cero.");
 
@@ -133,6 +142,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] int? forumId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Threads.ViewAll");
+
             if (forumId is < 0)
                 throw new ValidationException("El ID de foro no puede ser negativo.");
 
@@ -165,6 +176,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Threads.Delete");
+
             if (id <= 0)
                 throw new ValidationException("Debe especificar un ID de hilo válido.");
 
@@ -189,6 +202,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateThreadRequest request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Threads.Update");
+
             if (id <= 0)
                 throw new ValidationException("Debe especificar un ID de hilo válido.");
 
@@ -240,6 +255,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetThreadWithMessages(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Threads.ViewWithMessages");
+
             if (id <= 0)
                 throw new ValidationException("El ID del hilo debe ser mayor que cero.");
 
@@ -281,12 +298,13 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Close(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Threads.Close");
+
             if (id <= 0)
                 throw new ValidationException("Debe especificar un ID de hilo válido.");
 
             var thread = await _closeThread.ExecuteAsync(id);
 
-            // ✅ Map domain → DTO
             var response = new ThreadDto
             {
                 Id = thread.Id,
@@ -311,6 +329,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCommentCount(int threadId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Threads.ViewCommentCount");
+
             if (threadId <= 0)
                 throw new ValidationException("Debe especificar un ID de hilo válido.");
 

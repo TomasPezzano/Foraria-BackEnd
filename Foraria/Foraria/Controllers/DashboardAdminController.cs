@@ -1,4 +1,5 @@
-﻿using ForariaDomain.Application.UseCase;
+﻿using Foraria.Application.Services;
+using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,19 +17,22 @@ namespace Foraria.Controllers
         private readonly GetLatestPendingClaim _getLatestPendingClaim;
         //private readonly GetCollectedExpensesPercentage _getCollectedExpensesPercentage;
         private readonly GetUpcomingReserves _getUpcomingReserves;
+        private readonly IPermissionService _permissionService;
 
         public DashboardAdminController(
             GetTotalUsers getTotalUsers,
             GetPendingClaimsCount getPendingClaimsCount,
             GetLatestPendingClaim getLatestPendingClaim,
             //GetCollectedExpensesPercentage getCollectedExpensesPercentage,
-            GetUpcomingReserves getUpcomingReserves)
+            GetUpcomingReserves getUpcomingReserves,
+            IPermissionService permissionService)
         {
             _getTotalUsers = getTotalUsers;
             _getPendingClaimsCount = getPendingClaimsCount;
             _getLatestPendingClaim = getLatestPendingClaim;
             //_getCollectedExpensesPercentage = getCollectedExpensesPercentage;
             _getUpcomingReserves = getUpcomingReserves;
+            _permissionService = permissionService;
         }
 
         [HttpGet("users/count")]
@@ -41,6 +45,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetTotalUsers([FromQuery] int? consortiumId = null)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewUsersCount");
+
             if (consortiumId is < 0)
                 throw new DomainValidationException("El ID del consorcio no puede ser negativo.");
 
@@ -56,6 +62,8 @@ namespace Foraria.Controllers
         )]
         public async Task<IActionResult> GetPendingClaimsCount([FromQuery] int? consortiumId = null)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewPendingClaims");
+
             if (consortiumId is < 0)
                 throw new DomainValidationException("El ID del consorcio no puede ser negativo.");
 
@@ -71,6 +79,8 @@ namespace Foraria.Controllers
         )]
         public async Task<IActionResult> GetLatestPendingClaim([FromQuery] int? consortiumId = null)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewLatestClaim");
+
             var claim = await _getLatestPendingClaim.ExecuteAsync(consortiumId);
 
             if (claim == null)
@@ -106,6 +116,8 @@ namespace Foraria.Controllers
             [FromQuery] int consortiumId,
             [FromQuery] int limit = 5)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewUpcomingReservations");
+
             if (limit <= 0)
                 throw new DomainValidationException("El límite debe ser mayor a cero.");
 

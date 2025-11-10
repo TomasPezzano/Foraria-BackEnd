@@ -1,4 +1,5 @@
-﻿using ForariaDomain.Application.UseCase;
+﻿using Foraria.Application.Services;
+using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,8 @@ namespace Foraria.Controllers
         private readonly GetActivePollCount _getActivePollCount;
         private readonly GetUpcomingReserves _getUpcomingReserves;
         private readonly GetActiveReserveCount _getActiveReserveCount;
+        private readonly IPermissionService _permissionService;
+
 
         public DashboardController(
             //GetMonthlyExpenseTotal getMonthlyExpenseTotal,
@@ -28,7 +31,8 @@ namespace Foraria.Controllers
             //GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
             GetActivePollCount getActivePollCount,
             GetUpcomingReserves getUpcomingReserves,
-            GetActiveReserveCount getActiveReserveCount)
+            GetActiveReserveCount getActiveReserveCount,
+            IPermissionService permissionService)
         {
             //_getMonthlyExpenseTotal = getMonthlyExpenseTotal;
             //_getExpenseByCategory = getExpenseByCategory;
@@ -38,6 +42,7 @@ namespace Foraria.Controllers
             _getActivePollCount = getActivePollCount;
             _getUpcomingReserves = getUpcomingReserves;
             _getActiveReserveCount = getActiveReserveCount;
+            _permissionService = permissionService;
         }
         /*
         [HttpGet("expenses/total")]
@@ -152,6 +157,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetActivePolls([FromQuery] int consortiumId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewActivePolls");
+
             if (consortiumId < 0)
                 throw new ValidationException("Debe proporcionar un ID de consorcio válido.");
 
@@ -182,6 +189,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetActiveReservations([FromQuery] int consortiumId, [FromQuery] int limit = 5)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewActiveReservations");
+
             if (consortiumId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de consorcio válido.");
 
@@ -207,6 +216,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetActiveReservationsCount([FromQuery] int consortiumId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewReservationsCount");
+
             if (consortiumId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de consorcio válido.");
 

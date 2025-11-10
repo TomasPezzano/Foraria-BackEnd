@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -27,6 +28,7 @@ public class UserController : ControllerBase
     private readonly IGetUsersByConsortium _getUsersByConsortium;
     private readonly IResetPassword _resetPassword;
     private readonly IForgotPassword _forgotPassword;
+    private readonly IPermissionService _permissionService;
 
     public UserController(
         IRegisterUser registerUserService,
@@ -41,7 +43,8 @@ public class UserController : ControllerBase
         IGetTotalOwnerUsers getTotalOwnerUsers,
         IGetUsersByConsortium getUsersByConsortium,
         IResetPassword resetPassword,
-        IForgotPassword forgotPassword)
+        IForgotPassword forgotPassword,
+        IPermissionService permissionService)
     {
         _registerUserService = registerUserService;
         _loginUserService = loginUserService;
@@ -56,7 +59,9 @@ public class UserController : ControllerBase
         _getUsersByConsortium = getUsersByConsortium;
         _resetPassword = resetPassword;
         _forgotPassword = forgotPassword;
+        _permissionService = permissionService;
     }
+
 
     [HttpPost("register")]
     [SwaggerOperation(Summary = "Registra un nuevo usuario.", Description = "Crea un usuario con residencia asignada y genera una contraseña temporal.")]
@@ -64,6 +69,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterUserRequestDto request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.Register");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos del usuario no son válidos.");
 
@@ -123,6 +130,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateFirstTime([FromForm] UpdateUserFirstTimeRequestDto request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.UpdateFirstTime");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Datos inválidos para actualización inicial.");
 
@@ -176,6 +185,8 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Refresca el token JWT.", Description = "Devuelve un nuevo token JWT y de refresco si el actual es válido.")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.RefreshToken");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Solicitud de refresh token inválida.");
 
@@ -193,6 +204,8 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Cierra sesión del usuario.", Description = "Invalida el refresh token y cierra la sesión activa.")]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequestDto request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.Logout");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Solicitud inválida de logout.");
 
@@ -207,6 +220,8 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Obtiene la cantidad total de usuarios.", Description = "Devuelve el total de usuarios registrados en el sistema.")]
     public async Task<IActionResult> GetUsersCount()
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.ViewCount");
+
         var totalUsers = await _registerUserService.GetAllUsersInNumber();
         return Ok(new { totalUsers });
     }
@@ -216,6 +231,8 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Obtiene un usuario por su ID.", Description = "Devuelve los datos básicos del usuario solicitado.")]
     public async Task<IActionResult> GetUserById([FromQuery] int id)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.ViewById");
+
         var user = await _getUserById.Execute(id);
         if (user == null)
             throw new NotFoundException("Usuario no encontrado.");
@@ -237,6 +254,8 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Obtiene el total de inquilinos por consorcio.", Description = "Devuelve el número de usuarios con rol de inquilino en un consorcio.")]
     public async Task<IActionResult> GetTotalTenantsByConsortiumIdAsync([FromQuery] int consortiumId)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.ViewTotalTenants");
+
         var totalTenants = await _getTotalTenantUsers.ExecuteAsync(consortiumId);
         return Ok(new { totalTenants });
     }
@@ -246,6 +265,8 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Obtiene el total de propietarios por consorcio.", Description = "Devuelve el número de usuarios con rol de propietario en un consorcio.")]
     public async Task<IActionResult> GetTotalOwnersByConsortiumIdAsync([FromQuery] int consortiumId)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.ViewTotalOwners");
+
         var totalOwners = await _getTotalOwnerUsers.ExecuteAsync(consortiumId);
         return Ok(new { totalOwners });
     }
@@ -255,6 +276,8 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Obtiene los usuarios de un consorcio.", Description = "Devuelve la lista completa de usuarios y sus residencias asociadas.")]
     public async Task<IActionResult> GetUsersByConsortium(int consortiumId)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Users.ViewByConsortium");
+
         var users = await _getUsersByConsortium.ExecuteAsync(consortiumId);
 
         var usersDto = users.Select(u => new UserDetailDto

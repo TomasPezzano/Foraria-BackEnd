@@ -1,4 +1,5 @@
-﻿using Foraria.Controllers;
+﻿using Foraria.Application.Services;
+using Foraria.Controllers;
 using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
@@ -12,6 +13,7 @@ public class ClaimTests
     private readonly Mock<IGetClaims> _getClaimsMock;
     private readonly Mock<IRejectClaim> _rejectClaimMock;
     private readonly Mock<IFileProcessor> _fileProcessorMock;
+    private readonly Mock<IPermissionService> _permissionServiceMock;
     private readonly ClaimController _controller;
 
     public ClaimTests()
@@ -20,7 +22,8 @@ public class ClaimTests
         _getClaimsMock = new Mock<IGetClaims>();
         _rejectClaimMock = new Mock<IRejectClaim>();
         _fileProcessorMock = new Mock<IFileProcessor>();
-        _controller = new ClaimController(_createClaimMock.Object, _getClaimsMock.Object, _rejectClaimMock.Object, _fileProcessorMock.Object);
+        _permissionServiceMock = new Mock<IPermissionService>();
+        _controller = new ClaimController(_createClaimMock.Object, _getClaimsMock.Object, _rejectClaimMock.Object, _fileProcessorMock.Object, _permissionServiceMock.Object);
     }
 
     [Fact]
