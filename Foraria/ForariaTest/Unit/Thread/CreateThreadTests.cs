@@ -1,143 +1,153 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
 
-namespace ForariaTest.Unit.Thread
+namespace ForariaTest.Unit.Threads;
+
+public class CreateThreadTests
 {
-    public class CreateThreadTests
+    [Fact]
+    public async Task Execute_ShouldCreateThread_WhenForumAndUserExist_AndThemeIsUnique()
     {
-        [Fact]
-        public async Task Execute_ShouldCreateThread_WhenForumAndUserExist_AndThemeIsUnique()
+        // Arrange
+        var thread = new global::ForariaDomain.Thread
         {
-            // Arrange
-            var request = new CreateThreadRequest
-            {
-                Theme = "Nuevo tema",
-                Description = "Descripción del hilo",
-                ForumId = 1,
-                UserId = 1
-            };
+            Theme = "Nuevo tema",
+            Description = "Descripción del hilo",
+            ForumId = 1,
+            UserId = 1
+        };
 
-            var forum = new global::ForariaDomain.Forum
-            {
-                Id = 1,
-                Threads = new List<global::ForariaDomain.Thread>()
-            };
-
-            var user = new global::ForariaDomain.User
-            {
-                Id = 1,
-                Name = "TestUser"
-            };
-
-            var mockThreadRepo = new Mock<IThreadRepository>();
-            var mockForumRepo = new Mock<IForumRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
-
-            mockForumRepo.Setup(r => r.GetById(1)).ReturnsAsync(forum);
-            mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
-            mockThreadRepo.Setup(r => r.Add(It.IsAny<global::ForariaDomain.Thread>()))
-                          .Returns(Task.CompletedTask);
-
-            var useCase = new CreateThread(mockThreadRepo.Object, mockForumRepo.Object, mockUserRepo.Object);
-
-            // Act
-            var result = await useCase.Execute(request);
-
-            // Assert
-            result.Should().NotBeNull();
-            result.Theme.Should().Be("Nuevo tema");
-            result.Description.Should().Be("Descripción del hilo");
-            result.State.Should().Be("Active");
-            result.Forum_id.Should().Be(1);
-            result.User_id.Should().Be(1);
-
-            mockThreadRepo.Verify(r => r.Add(It.IsAny<global::ForariaDomain.Thread>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task Execute_ShouldThrow_WhenForumDoesNotExist()
+        var forum = new global::ForariaDomain.Forum
         {
-            var request = new CreateThreadRequest { ForumId = 10, UserId = 1, Theme = "Tema", Description = "Desc" };
+            Id = 1,
+            Threads = new List<global::ForariaDomain.Thread>()
+        };
 
-            var mockThreadRepo = new Mock<IThreadRepository>();
-            var mockForumRepo = new Mock<IForumRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
-
-            mockForumRepo.Setup(r => r.GetById(10)).ReturnsAsync((global::ForariaDomain.Forum?)null);
-
-            var useCase = new CreateThread(mockThreadRepo.Object, mockForumRepo.Object, mockUserRepo.Object);
-
-            Func<Task> act = async () => await useCase.Execute(request);
-
-            await act.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("El foro con ID 10 no existe.");
-        }
-
-        [Fact]
-        public async Task Execute_ShouldThrow_WhenUserDoesNotExist()
+        var user = new global::ForariaDomain.User
         {
-            var request = new CreateThreadRequest { ForumId = 1, UserId = 99, Theme = "Tema", Description = "Desc" };
+            Id = 1,
+            Name = "TestUser"
+        };
 
-            var forum = new global::ForariaDomain.Forum { Id = 1, Threads = new List<global::ForariaDomain.Thread>() };
+        var mockThreadRepo = new Mock<IThreadRepository>();
+        var mockForumRepo = new Mock<IForumRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
 
-            var mockThreadRepo = new Mock<IThreadRepository>();
-            var mockForumRepo = new Mock<IForumRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
+        mockForumRepo.Setup(r => r.GetById(1)).ReturnsAsync(forum);
+        mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
+        mockThreadRepo.Setup(r => r.Add(It.IsAny<global::ForariaDomain.Thread>()))
+                      .Returns(Task.CompletedTask);
 
-            mockForumRepo.Setup(r => r.GetById(1)).ReturnsAsync(forum);
-            mockUserRepo.Setup(r => r.GetById(99)).ReturnsAsync((global::ForariaDomain.User?)null);
+        var useCase = new CreateThread(mockThreadRepo.Object, mockForumRepo.Object, mockUserRepo.Object);
 
-            var useCase = new CreateThread(mockThreadRepo.Object, mockForumRepo.Object, mockUserRepo.Object);
+        // Act
+        var result = await useCase.Execute(thread);
 
-            Func<Task> act = async () => await useCase.Execute(request);
+        // Assert
+        result.Should().NotBeNull();
+        result.Theme.Should().Be("Nuevo tema");
+        result.Description.Should().Be("Descripción del hilo");
+        result.ForumId.Should().Be(1);
+        result.UserId.Should().Be(1);
 
-            await act.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("El usuario con ID 99 no existe.");
-        }
+        mockThreadRepo.Verify(r => r.Add(It.IsAny<global::ForariaDomain.Thread>()), Times.Once);
+    }
 
-        [Fact]
-        public async Task Execute_ShouldThrow_WhenThemeAlreadyExistsInForum()
+    [Fact]
+    public async Task Execute_ShouldThrow_WhenForumDoesNotExist()
+    {
+        var thread = new global::ForariaDomain.Thread
         {
-            var request = new CreateThreadRequest
-            {
-                ForumId = 1,
-                UserId = 1,
-                Theme = "Tema repetido",
-                Description = "Desc"
-            };
+            ForumId = 10,
+            UserId = 1,
+            Theme = "Tema",
+            Description = "Desc"
+        };
 
-            var existingThread = new global::ForariaDomain.Thread { Theme = "tema repetido" };
+        var mockThreadRepo = new Mock<IThreadRepository>();
+        var mockForumRepo = new Mock<IForumRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
 
-            var forum = new global::ForariaDomain.Forum
-            {
-                Id = 1,
-                Threads = new List<global::ForariaDomain.Thread> { existingThread }
-            };
+        mockForumRepo.Setup(r => r.GetById(10)).ReturnsAsync((global::ForariaDomain.Forum?)null);
 
-            var user = new global::ForariaDomain.User { Id = 1 };
+        var useCase = new CreateThread(mockThreadRepo.Object, mockForumRepo.Object, mockUserRepo.Object);
 
-            var mockThreadRepo = new Mock<IThreadRepository>();
-            var mockForumRepo = new Mock<IForumRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
+        Func<Task> act = async () => await useCase.Execute(thread);
 
-            mockForumRepo.Setup(r => r.GetById(1)).ReturnsAsync(forum);
-            mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("El foro con ID 10 no existe.");
+    }
 
-            var useCase = new CreateThread(mockThreadRepo.Object, mockForumRepo.Object, mockUserRepo.Object);
+    [Fact]
+    public async Task Execute_ShouldThrow_WhenUserDoesNotExist()
+    {
+        var thread = new global::ForariaDomain.Thread
+        {
+            ForumId = 1,
+            UserId = 99,
+            Theme = "Tema",
+            Description = "Desc"
+        };
 
-            Func<Task> act = async () => await useCase.Execute(request);
+        var forum = new global::ForariaDomain.Forum
+        {
+            Id = 1,
+            Threads = new List<global::ForariaDomain.Thread>()
+        };
 
-            await act.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("Ya existe un hilo con el título 'Tema repetido' en este foro.");
-        }
+        var mockThreadRepo = new Mock<IThreadRepository>();
+        var mockForumRepo = new Mock<IForumRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
+
+        mockForumRepo.Setup(r => r.GetById(1)).ReturnsAsync(forum);
+        mockUserRepo.Setup(r => r.GetById(99)).ReturnsAsync((global::ForariaDomain.User?)null);
+
+        var useCase = new CreateThread(mockThreadRepo.Object, mockForumRepo.Object, mockUserRepo.Object);
+
+        Func<Task> act = async () => await useCase.Execute(thread);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("El usuario con ID 99 no existe.");
+    }
+
+    [Fact]
+    public async Task Execute_ShouldThrow_WhenThemeAlreadyExistsInForum()
+    {
+        var thread = new global::ForariaDomain.Thread
+        {
+            ForumId = 1,
+            UserId = 1,
+            Theme = "Tema repetido",
+            Description = "Desc"
+        };
+
+        var existingThread = new global::ForariaDomain.Thread
+        {
+            Theme = "tema repetido"
+        };
+
+        var forum = new global::ForariaDomain.Forum
+        {
+            Id = 1,
+            Threads = new List<global::ForariaDomain.Thread> { existingThread }
+        };
+
+        var user = new global::ForariaDomain.User { Id = 1 };
+
+        var mockThreadRepo = new Mock<IThreadRepository>();
+        var mockForumRepo = new Mock<IForumRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
+
+        mockForumRepo.Setup(r => r.GetById(1)).ReturnsAsync(forum);
+        mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
+
+        var useCase = new CreateThread(mockThreadRepo.Object, mockForumRepo.Object, mockUserRepo.Object);
+
+        Func<Task> act = async () => await useCase.Execute(thread);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Ya existe un hilo con el título 'Tema repetido' en este foro.");
     }
 }

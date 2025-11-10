@@ -100,7 +100,8 @@ public class RegisterUser : IRegisterUser
             PhoneNumber = user.PhoneNumber,
             Role_id = savedUser.Role_id,
             Password = temporaryPassword,
-            Residences = residenceList
+            Residences = residenceList,
+            RequiresPasswordChange = true
         };
     }
 

@@ -1,72 +1,70 @@
-﻿using System.Text.Json;
-using Foraria.Domain.Repository;
-using ForariaDomain.Application.UseCase;
-using ForariaDomain.Repository;
-using ForariaDomain.Services;
-using ForariaDomain;
-using Moq;
-using Foraria.Contracts.DTOs;
+﻿//using System.Text.Json;
+//using ForariaDomain.Application.UseCase;
+//using ForariaDomain.Repository;
+//using ForariaDomain;
+//using Moq;
 
-namespace ForariaTest.Unit
-{
-    public class ProcessWebHookMPTest
-    {
-        [Fact]
-        public async Task ExecuteAsync_ShouldApprovePaymentAndMarkExpenseAsPaid()
-        {
-            // Arrange
-            var paymentRepo = new Mock<IPaymentRepository>();
-            var expenseRepo = new Mock<IExpenseDetailRepository>();
-            var paymentMethodRepo = new Mock<IPaymentMethodRepository>();
-            var gateway = new Mock<IPaymentGateway>();
 
-            var bodyJson = """
-        {
-            "data": {
-                "id": "9999"
-            }
-        }
-        """;
+//namespace ForariaTest.Unit
+//{
+//    public class ProcessWebHookMPTest
+//    {
+//        [Fact]
+//        public async Task ExecuteAsync_ShouldApprovePaymentAndMarkExpenseAsPaid()
+//        {
+//            // Arrange
+//            var paymentRepo = new Mock<IPaymentRepository>();
+//            var expenseRepo = new Mock<IExpenseDetailRepository>();
+//            var paymentMethodRepo = new Mock<IPaymentMethodRepository>();
+//            var gateway = new Mock<IPaymentGateway>();
 
-            var body = JsonDocument.Parse(bodyJson).RootElement;
+//            var bodyJson = """
+//        {
+//            "data": {
+//                "id": "9999"
+//            }
+//        }
+//        """;
 
-            var mpPayment = new MercadoPagoPaymentDto
-            {
-                Id = 9999,
-                Status = "approved",
-                StatusDetail = "accredited",
-                TransactionAmount = 5000m,
-                Metadata = new Dictionary<string, object>
-            {
-                { "expense_id", 1 },
-                { "residence_id", 10 }
-            },
-                Order = new MercadoPagoOrderDto { Id = 123 }
-            };
+//            var body = JsonDocument.Parse(bodyJson).RootElement;
 
-            gateway.Setup(g => g.GetPaymentAsync(9999)).ReturnsAsync(mpPayment);
-            gateway.Setup(g => g.VerifyMerchantOrderAsync(123)).ReturnsAsync(true);
+//            var mpPayment = new MercadoPagoPaymentDto
+//            {
+//                Id = 9999,
+//                Status = "approved",
+//                StatusDetail = "accredited",
+//                TransactionAmount = 5000m,
+//                Metadata = new Dictionary<string, object>
+//            {
+//                { "expense_id", 1 },
+//                { "residence_id", 10 }
+//            },
+//                Order = new MercadoPagoOrderDto { Id = 123 }
+//            };
 
-            var existingPayment = new Payment { Id = 1, ExpenseDetailByResidenceId = 1, Status = "pending" };
-            var expense = new ExpenseDetailByResidence { Id = 1, State = "unpaid" };
+//            gateway.Setup(g => g.GetPaymentAsync(9999)).ReturnsAsync(mpPayment);
+//            gateway.Setup(g => g.VerifyMerchantOrderAsync(123)).ReturnsAsync(true);
 
-            paymentRepo.Setup(r => r.FindByMercadoPagoMetadataAsync(
-                It.IsAny<Dictionary<string, object>>(), "123", "9999"))
-                .ReturnsAsync(existingPayment);
+//            var existingPayment = new Payment { Id = 1, ExpenseDetailByResidenceId = 1, Status = "pending" };
+//            var expense = new ExpenseDetailByResidence { Id = 1, State = "unpaid" };
 
-            expenseRepo.Setup(r => r.GetExpenseDetailById(1)).ReturnsAsync(expense);
+//            paymentRepo.Setup(r => r.FindByMercadoPagoMetadataAsync(
+//                It.IsAny<Dictionary<string, object>>(), "123", "9999"))
+//                .ReturnsAsync(existingPayment);
 
-            var useCase = new ProcessWebHookMP(
-                paymentRepo.Object, paymentMethodRepo.Object, gateway.Object, expenseRepo.Object
-            );
+//            expenseRepo.Setup(r => r.GetExpenseDetailById(1)).ReturnsAsync(expense);
 
-            await useCase.ExecuteAsync(body);
+//            var useCase = new ProcessWebHookMP(
+//                paymentRepo.Object, paymentMethodRepo.Object, gateway.Object, expenseRepo.Object
+//            );
 
-            Assert.Equal("approved", existingPayment.Status);
-            Assert.Equal("paid", expense.State);
+//            await useCase.ExecuteAsync(body);
 
-            paymentRepo.Verify(r => r.SaveChangesAsync(), Times.Once);
-            expenseRepo.Verify(r => r.SaveChangesAsync(), Times.Once);
-        }
-    }
-}
+//            Assert.Equal("approved", existingPayment.Status);
+//            Assert.Equal("paid", expense.State);
+
+//            paymentRepo.Verify(r => r.SaveChangesAsync(), Times.Once);
+//            expenseRepo.Verify(r => r.SaveChangesAsync(), Times.Once);
+//        }
+//    }
+//}

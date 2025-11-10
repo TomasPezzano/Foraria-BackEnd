@@ -44,50 +44,73 @@ public class ClaimResponseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Add([FromBody] ClaimResponseDto claimResponseDto)
+    [HttpPost]
+    public async Task<IActionResult> Add([FromBody] ClaimResponseDto dto)
     {
         if (!ModelState.IsValid)
-            throw new DomainValidationException("Los datos de la respuesta no son válidos.");
+            return BadRequest(ModelState);
 
-        var user = await _getUserById.Execute(claimResponseDto.User_id);
-        if (user == null)
-            throw new NotFoundException($"No se encontró el usuario con ID {claimResponseDto.User_id}.");
-
-        var claim = await _getClaimById.Execute(claimResponseDto.Claim_id);
-        if (claim == null)
-            throw new NotFoundException($"No se encontró el reclamo con ID {claimResponseDto.Claim_id}.");
-
-        var sector = await _getResponsibleSectorById.Execute(claimResponseDto.ResponsibleSector_id);
-        if (sector == null)
-            throw new NotFoundException($"No se encontró el sector responsable con ID {claimResponseDto.ResponsibleSector_id}.");
-
-        var claimResponse = new ClaimResponse
+        try
         {
-            Description = claimResponseDto.Description,
-            ResponseDate = claimResponseDto.ResponseDate,
-            User = user,
-            Claim = claim,
-            ResponsibleSector_id = sector.Id,
-            ResponsibleSector = sector
-        };
+            var user = await _getUserById.Execute(dto.User_id);
+            if (user == null)
+                return NotFound(new { error = "Usuario no encontrado" });
 
-        var responseResult = await _createClaimResponse.Execute(claimResponse);
-        if (responseResult == null)
-            throw new BusinessException("No se pudo registrar la respuesta del reclamo.");
+            var claim = await _getClaimById.Execute(dto.Claim_id);
+            if (claim == null)
+                return NotFound(new { error = "Reclamo no encontrado" });
 
-        var responseDto = new ClaimResponseResultDto
+            var sector = await _getResponsibleSectorById.Execute(dto.ResponsibleSector_id);
+            if (sector == null)
+                return NotFound(new { error = "Sector responsable no encontrado" });
+
+            var claimResponse = new ClaimResponse
+            {
+                Description = dto.Description,
+                ResponseDate = dto.ResponseDate,
+                ResponsibleSector_id = dto.ResponsibleSector_id,
+                User = user,
+                Claim = claim
+            };
+
+            var result = await _createClaimResponse.Execute(claimResponse);
+
+            // Enriquecemos el resultado con info adicional para devolver al front
+            var response = new
+            {
+                result.Id,
+                result.Description,
+                result.ResponseDate,
+                result.User_id,
+                UserName = user.Name,
+                result.Claim_id,
+                ClaimTitle = claim.Title,
+                result.ResponsibleSector_id,
+                ResponsibleSectorName = sector.Name
+            };
+
+            return CreatedAtAction(nameof(Add), new { id = result.Id }, response);
+        }
+        catch (ArgumentException ex)
         {
-            Id = claimResponse.Id,
-            Description = claimResponse.Description,
-            ResponseDate = claimResponse.ResponseDate,
-            User_id = claimResponse.User?.Id ?? claimResponseDto.User_id,
-            UserName = claimResponse.User?.Name,
-            Claim_id = claimResponse.Claim?.Id ?? claimResponseDto.Claim_id,
-            ClaimTitle = claimResponse.Claim?.Title,
-            ResponsibleSector_id = claimResponse.ResponsibleSector_id,
-            ResponsibleSectorName = claimResponse.ResponsibleSector?.Name
-        };
-
-        return CreatedAtAction(nameof(Add), new { id = responseDto.Id }, responseDto);
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (ForariaDomain.Exceptions.NotFoundException ex)
+        {
+            return NotFound(new { error = ex.Message });
+        }
+        catch (ForariaDomain.Exceptions.DomainValidationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                error = "Ocurrió un error interno",
+                details = ex.Message
+            });
+        }
     }
+
 }

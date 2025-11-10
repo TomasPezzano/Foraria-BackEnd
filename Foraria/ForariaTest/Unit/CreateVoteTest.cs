@@ -1,9 +1,9 @@
 ﻿using Foraria.Application.UseCase;
-using Foraria.Contracts.DTOs;
 using Foraria.Domain.Repository;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using ForariaDomain.Models;
 using Moq;
 
 namespace ForariaTest.Unit
@@ -34,6 +34,7 @@ namespace ForariaTest.Unit
         [Fact]
         public async Task ExecuteAsync_ShouldCreateVote_WhenUserExistsAndHasNotVoted()
         {
+            // Arrange
             var vote = new Vote
             {
                 User_id = 1,
@@ -55,19 +56,18 @@ namespace ForariaTest.Unit
             _unitOfWorkMock.Setup(uow => uow.SaveChangesAsync())
                            .ReturnsAsync(1);
 
+            var pollResults = new List<PollResult>();
             _voteRepoMock.Setup(repo => repo.GetPollResultsAsync(vote.Poll_id))
-               .ReturnsAsync(new List<PollResultDto>
-               {
-                 new() { PollOptionId = 100, VotesCount = 1 }
-               });
-
+                         .ReturnsAsync(pollResults);
 
             _signalRNotificationMock.Setup(n =>
-                    n.NotifyPollUpdatedAsync(It.IsAny<int>(), It.IsAny<IEnumerable<PollResultDto>>()))
+                    n.NotifyPollUpdatedAsync(It.IsAny<int>(), It.IsAny<IEnumerable<ForariaDomain.Models.PollResult>>()))
                 .Returns(Task.CompletedTask);
 
+            // Act
             await _createVote.ExecuteAsync(vote);
 
+            // Assert
             _voteRepoMock.Verify(repo => repo.AddAsync(It.Is<Vote>(v =>
                 v.User_id == vote.User_id &&
                 v.Poll_id == vote.Poll_id &&
@@ -76,13 +76,14 @@ namespace ForariaTest.Unit
             _unitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Once);
 
             _signalRNotificationMock.Verify(n =>
-                n.NotifyPollUpdatedAsync(vote.Poll_id, It.IsAny<IEnumerable<PollResultDto>>()),
+                n.NotifyPollUpdatedAsync(vote.Poll_id, It.IsAny<IEnumerable<ForariaDomain.Models.PollResult>>()),
                 Times.Once);
         }
 
         [Fact]
         public async Task ExecuteAsync_ShouldThrowNotFoundException_WhenUserDoesNotExist()
         {
+            // Arrange
             var vote = new Vote
             {
                 User_id = 2,
@@ -93,20 +94,23 @@ namespace ForariaTest.Unit
             _userRepoMock.Setup(repo => repo.GetById(vote.User_id))
                          .ReturnsAsync((User?)null);
 
+            // Act
             var ex = await Assert.ThrowsAsync<NotFoundException>(() =>
                 _createVote.ExecuteAsync(vote));
 
+            // Assert
             Assert.Equal($"El usuario con ID {vote.User_id} no existe.", ex.Message);
 
             _voteRepoMock.Verify(repo => repo.AddAsync(It.IsAny<Vote>()), Times.Never);
             _unitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
             _signalRNotificationMock.Verify(n =>
-                n.NotifyPollUpdatedAsync(It.IsAny<int>(), It.IsAny<IEnumerable<PollResultDto>>()), Times.Never);
+                n.NotifyPollUpdatedAsync(It.IsAny<int>(), It.IsAny<IEnumerable<ForariaDomain.Models.PollResult>>()), Times.Never);
         }
 
         [Fact]
         public async Task ExecuteAsync_ShouldThrowInvalidOperationException_WhenUserAlreadyVoted()
         {
+            // Arrange
             var vote = new Vote
             {
                 User_id = 3,
@@ -121,15 +125,17 @@ namespace ForariaTest.Unit
             _voteRepoMock.Setup(repo => repo.GetByUserAndPollAsync(vote.User_id, vote.Poll_id))
                          .ReturnsAsync(existingVote);
 
+            // Act
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _createVote.ExecuteAsync(vote));
 
+            // Assert
             Assert.Equal("El usuario ya votó en esta encuesta.", ex.Message);
 
             _voteRepoMock.Verify(repo => repo.AddAsync(It.IsAny<Vote>()), Times.Never);
             _unitOfWorkMock.Verify(uow => uow.SaveChangesAsync(), Times.Never);
             _signalRNotificationMock.Verify(n =>
-                n.NotifyPollUpdatedAsync(It.IsAny<int>(), It.IsAny<IEnumerable<PollResultDto>>()), Times.Never);
+                n.NotifyPollUpdatedAsync(It.IsAny<int>(), It.IsAny<IEnumerable<ForariaDomain.Models.PollResult>>()), Times.Never);
         }
     }
 }

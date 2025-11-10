@@ -1,12 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
+
 
 namespace ForariaTest.Unit.Thread
 {
@@ -65,8 +61,8 @@ namespace ForariaTest.Unit.Thread
             Func<Task> act = async () => await useCase.ExecuteAsync(threadId);
 
             // Assert
-            await act.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("No se encontró el thread con ID 999");
+            await act.Should().ThrowAsync<ForariaDomain.Exceptions.NotFoundException>()
+                .WithMessage($"No se encontró el hilo con ID {threadId}");
 
             mockRepo.Verify(r => r.UpdateAsync(It.IsAny<global::ForariaDomain.Thread>()), Times.Never);
         }
@@ -76,7 +72,6 @@ namespace ForariaTest.Unit.Thread
         {
             // Arrange
             int threadId = 2;
-
             var thread = new global::ForariaDomain.Thread
             {
                 Id = threadId,
@@ -93,8 +88,8 @@ namespace ForariaTest.Unit.Thread
             Func<Task> act = async () => await useCase.ExecuteAsync(threadId);
 
             // Assert
-            await act.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("El thread ya se encuentra cerrado.");
+            await act.Should().ThrowAsync<ForariaDomain.Exceptions.ThreadLockedException>()
+                .WithMessage("El hilo ya se encuentra cerrado.");
 
             mockRepo.Verify(r => r.UpdateAsync(It.IsAny<global::ForariaDomain.Thread>()), Times.Never);
         }

@@ -2,13 +2,9 @@
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using Moq;
-using System;
-using System.Threading.Tasks;
-using Xunit;
 
-namespace ForariaTest.Tests.Message
+namespace ForariaTest.Unit.Messages
 {
     public class CreateMessageTests
     {
@@ -31,29 +27,28 @@ namespace ForariaTest.Tests.Message
         }
 
         [Fact]
-        public async Task GivenValidMessageRequest_WhenExecutingCreateMessage_ThenReturnsMessage()
+        public async Task Execute_ShouldCreateMessage_WhenValidData()
         {
             // Arrange
-            var request = new CreateMessageWithFileRequest
+            var message = new global::ForariaDomain.Message
             {
                 Content = "mensaje de prueba",
                 Thread_id = 1,
-                User_id = 99,
-                File = null
+                User_id = 99
             };
 
             var thread = new global::ForariaDomain.Thread { Id = 1 };
             var user = new global::ForariaDomain.User { Id = 99 };
 
-            _mockThreadRepo.Setup(r => r.GetById(request.Thread_id)).ReturnsAsync(thread);
-            _mockUserRepo.Setup(r => r.GetById(request.User_id)).ReturnsAsync(user);
+            _mockThreadRepo.Setup(r => r.GetById(message.Thread_id)).ReturnsAsync(thread);
+            _mockUserRepo.Setup(r => r.GetById(message.User_id)).ReturnsAsync(user);
 
             var createdMessage = new global::ForariaDomain.Message
             {
                 Id = 1,
-                Content = request.Content,
-                Thread_id = request.Thread_id,
-                User_id = request.User_id,
+                Content = message.Content,
+                Thread_id = message.Thread_id,
+                User_id = message.User_id,
                 CreatedAt = DateTime.UtcNow,
                 State = "active"
             };
@@ -62,37 +57,37 @@ namespace ForariaTest.Tests.Message
                             .ReturnsAsync(createdMessage);
 
             // Act
-            var result = await _useCase.Execute(request);
+            var result = await _useCase.Execute(message);
 
             // Assert
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
-            result.Content.Should().Be(request.Content);
-            result.Thread_id.Should().Be(request.Thread_id);
-            result.User_id.Should().Be(request.User_id);
+            result.Content.Should().Be("mensaje de prueba");
+            result.Thread_id.Should().Be(1);
+            result.User_id.Should().Be(99);
             result.State.Should().Be("active");
 
-            _mockThreadRepo.Verify(r => r.GetById(request.Thread_id), Times.Once);
-            _mockUserRepo.Verify(r => r.GetById(request.User_id), Times.Once);
+            _mockThreadRepo.Verify(r => r.GetById(1), Times.Once);
+            _mockUserRepo.Verify(r => r.GetById(99), Times.Once);
             _mockMessageRepo.Verify(r => r.Add(It.IsAny<global::ForariaDomain.Message>()), Times.Once);
         }
 
         [Fact]
-        public async Task GivenNonexistentThread_WhenExecutingCreateMessage_ThenThrowsInvalidOperationException()
+        public async Task Execute_ShouldThrow_WhenThreadDoesNotExist()
         {
             // Arrange
-            var request = new CreateMessageWithFileRequest
+            var message = new global::ForariaDomain.Message
             {
                 Content = "mensaje",
                 Thread_id = 999,
                 User_id = 1
             };
 
-            _mockThreadRepo.Setup(r => r.GetById(request.Thread_id))
+            _mockThreadRepo.Setup(r => r.GetById(999))
                            .ReturnsAsync((global::ForariaDomain.Thread?)null);
 
             // Act
-            Func<Task> act = async () => await _useCase.Execute(request);
+            Func<Task> act = async () => await _useCase.Execute(message);
 
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>()
@@ -100,10 +95,10 @@ namespace ForariaTest.Tests.Message
         }
 
         [Fact]
-        public async Task GivenNonexistentUser_WhenExecutingCreateMessage_ThenThrowsInvalidOperationException()
+        public async Task Execute_ShouldThrow_WhenUserDoesNotExist()
         {
             // Arrange
-            var request = new CreateMessageWithFileRequest
+            var message = new global::ForariaDomain.Message
             {
                 Content = "mensaje",
                 Thread_id = 1,
@@ -112,12 +107,12 @@ namespace ForariaTest.Tests.Message
 
             var thread = new global::ForariaDomain.Thread { Id = 1 };
 
-            _mockThreadRepo.Setup(r => r.GetById(request.Thread_id)).ReturnsAsync(thread);
-            _mockUserRepo.Setup(r => r.GetById(request.User_id))
+            _mockThreadRepo.Setup(r => r.GetById(1)).ReturnsAsync(thread);
+            _mockUserRepo.Setup(r => r.GetById(999))
                          .ReturnsAsync((global::ForariaDomain.User?)null);
 
             // Act
-            Func<Task> act = async () => await _useCase.Execute(request);
+            Func<Task> act = async () => await _useCase.Execute(message);
 
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>()
@@ -125,10 +120,10 @@ namespace ForariaTest.Tests.Message
         }
 
         [Fact]
-        public async Task GivenEmptyContent_WhenExecutingCreateMessage_ThenThrowsInvalidOperationException()
+        public async Task Execute_ShouldThrow_WhenContentIsEmpty()
         {
             // Arrange
-            var request = new CreateMessageWithFileRequest
+            var message = new global::ForariaDomain.Message
             {
                 Content = "  ",
                 Thread_id = 1,
@@ -138,11 +133,11 @@ namespace ForariaTest.Tests.Message
             var thread = new global::ForariaDomain.Thread { Id = 1 };
             var user = new global::ForariaDomain.User { Id = 1 };
 
-            _mockThreadRepo.Setup(r => r.GetById(request.Thread_id)).ReturnsAsync(thread);
-            _mockUserRepo.Setup(r => r.GetById(request.User_id)).ReturnsAsync(user);
+            _mockThreadRepo.Setup(r => r.GetById(1)).ReturnsAsync(thread);
+            _mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
 
             // Act
-            Func<Task> act = async () => await _useCase.Execute(request);
+            Func<Task> act = async () => await _useCase.Execute(message);
 
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>()
