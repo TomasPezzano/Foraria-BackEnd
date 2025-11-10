@@ -1,12 +1,11 @@
 ﻿using Foraria.Domain.Repository;
-using ForariaDomain;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Exceptions;
 using ForariaDomain.Models;
 using Microsoft.Extensions.Options;
 
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface ILoginUser
 {

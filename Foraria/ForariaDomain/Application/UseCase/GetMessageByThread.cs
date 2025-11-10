@@ -1,20 +1,19 @@
 ﻿using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using ForariaDomain;
 
-namespace Foraria.Application.UseCase
+
+namespace ForariaDomain.Application.UseCase;
+
+public class GetMessagesByThread
 {
-    public class GetMessagesByThread
+    private readonly IMessageRepository _repository;
+
+    public GetMessagesByThread(IMessageRepository repository)
     {
-        private readonly IMessageRepository _repository;
+        _repository = repository;
+    }
 
-        public GetMessagesByThread(IMessageRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<IEnumerable<Message>> Execute(int threadId)
-        {
-            return await _repository.GetByThread(threadId);
-        }
+    public async Task<IEnumerable<Message>> Execute(int threadId)
+    {
+        return await _repository.GetByThread(threadId);
     }
 }

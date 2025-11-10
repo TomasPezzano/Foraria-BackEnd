@@ -1,19 +1,18 @@
 ﻿using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetPendingClaimsCount
 {
-    public class GetPendingClaimsCount
+    private readonly IClaimRepository _repository;
+
+    public GetPendingClaimsCount(IClaimRepository repository)
     {
-        private readonly IClaimRepository _repository;
+        _repository = repository;
+    }
 
-        public GetPendingClaimsCount(IClaimRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<int> ExecuteAsync(int? consortiumId = null)
-        {
-            return await _repository.GetPendingCountAsync(consortiumId);
-        }
+    public async Task<int> ExecuteAsync(int? consortiumId = null)
+    {
+        return await _repository.GetPendingCountAsync(consortiumId);
     }
 }

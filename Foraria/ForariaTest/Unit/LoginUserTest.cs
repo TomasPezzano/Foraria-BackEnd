@@ -1,10 +1,10 @@
 ﻿using Moq;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using ForariaDomain;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Exceptions;
 using Microsoft.Extensions.Options;
+using ForariaDomain.Application.UseCase;
 
 namespace ForariaTest.Unit;
 

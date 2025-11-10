@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
+using ForariaDomain.Application.UseCase;
 using Moq;
 
 namespace ForariaTest.Unit.Message

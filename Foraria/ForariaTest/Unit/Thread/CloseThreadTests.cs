@@ -1,7 +1,7 @@
 ﻿using Moq;
 using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
+using ForariaDomain.Application.UseCase;
 
 
 namespace ForariaTest.Unit.Thread

@@ -1,7 +1,6 @@
 ﻿using Foraria.Domain.Repository;
 
 namespace ForariaDomain.Application.UseCase;
-
 public interface ICreateReserve
 {
     Task<Reserve> Execute(Reserve reserve);

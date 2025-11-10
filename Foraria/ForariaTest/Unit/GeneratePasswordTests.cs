@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Foraria.Application.UseCase;
+﻿using ForariaDomain.Application.UseCase;
 
 namespace ForariaTest;
 

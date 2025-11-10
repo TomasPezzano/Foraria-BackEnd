@@ -1,8 +1,6 @@
-﻿using Foraria.Domain.Repository;
-using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Cryptography;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 public interface IGeneratePassword
 {
     Task<string> Generate();

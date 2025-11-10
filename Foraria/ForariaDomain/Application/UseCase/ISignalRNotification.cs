@@ -1,11 +1,8 @@
 ﻿using ForariaDomain.Models;
 
-namespace ForariaDomain.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public interface ISignalRNotification
 {
-
-    public interface ISignalRNotification
-    {
-        Task NotifyPollUpdatedAsync(int pollId, IEnumerable<PollResult> results);
-    }
-
+    Task NotifyPollUpdatedAsync(int pollId, IEnumerable<PollResult> results);
 }

@@ -1,8 +1,7 @@
 ﻿using Foraria.Domain.Repository;
-using ForariaDomain;
 using ForariaDomain.Exceptions;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public class CreateForum
 {

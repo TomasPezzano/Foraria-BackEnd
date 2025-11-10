@@ -1,5 +1,4 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Controllers;
+﻿using Foraria.Controllers;
 using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;

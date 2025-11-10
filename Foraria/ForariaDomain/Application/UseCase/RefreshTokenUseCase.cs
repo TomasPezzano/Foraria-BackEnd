@@ -1,7 +1,7 @@
 ﻿using Foraria.Domain.Repository;
 using ForariaDomain.Models;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface IRefreshTokenUseCase
 {

@@ -1,9 +1,9 @@
 ﻿using Moq;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using ForariaDomain;
 using Foraria.Domain.Service;
 using ForariaDomain.Exceptions;
+using ForariaDomain.Application.UseCase;
 
 namespace ForariaTest.Unit;
 

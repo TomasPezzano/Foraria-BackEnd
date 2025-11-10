@@ -1,4 +1,4 @@
-﻿using Foraria.Application.UseCase;
+﻿using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

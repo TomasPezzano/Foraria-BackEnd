@@ -3,7 +3,7 @@ using Foraria.Domain.Service;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface IRegisterUser
 {

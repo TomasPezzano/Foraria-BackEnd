@@ -1,7 +1,7 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 using Foraria.DTOs;
+using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

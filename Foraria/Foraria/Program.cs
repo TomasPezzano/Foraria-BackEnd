@@ -1,5 +1,4 @@
 ﻿using Foraria;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;

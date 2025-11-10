@@ -1,6 +1,8 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using ForariaDomain;
+
+
+namespace ForariaDomain.Application.UseCase;
 
 public class CreateMessage
 {

@@ -4,8 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using JwtClaim = System.Security.Claims.Claim;
 
-namespace Foraria.Application.UseCase;
+
+namespace ForariaDomain.Application.UseCase;
 
 public interface IJwtTokenGenerator
 {
@@ -29,13 +31,13 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
         var claims = new[]
         {
-        new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-        new Claim(JwtRegisteredClaimNames.Email, email),
-        new Claim(ClaimTypes.Role, roleName),
-        new Claim("roleId", roleId.ToString()),
-        new Claim("hasPermission", hasPermission.ToString()), 
-        new Claim("requiresPasswordChange", requiresPasswordChange.ToString()),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        new JwtClaim(JwtRegisteredClaimNames.Sub, userId.ToString()),
+        new JwtClaim(JwtRegisteredClaimNames.Email, email),
+        new JwtClaim(ClaimTypes.Role, roleName),
+        new JwtClaim("roleId", roleId.ToString()),
+        new JwtClaim("hasPermission", hasPermission.ToString()), 
+        new JwtClaim("requiresPasswordChange", requiresPasswordChange.ToString()),
+        new JwtClaim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
 
         var token = new JwtSecurityToken(

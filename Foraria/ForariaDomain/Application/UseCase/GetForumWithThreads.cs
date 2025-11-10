@@ -1,25 +1,23 @@
 ﻿using Foraria.Domain.Repository;
-using ForariaDomain;
 using ForariaDomain.Exceptions;
 
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetForumWithThreads
 {
-    public class GetForumWithThreads
+    private readonly IForumRepository _repository;
+
+    public GetForumWithThreads(IForumRepository repository)
     {
-        private readonly IForumRepository _repository;
+        _repository = repository;
+    }
 
-        public GetForumWithThreads(IForumRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task<Forum?> Execute(int id)
+    {
+        var forum = await _repository.GetByIdWithThreadsAsync(id)
+            ?? throw new NotFoundException($"No se encontró el foro con ID {id}.");
 
-        public async Task<Forum?> Execute(int id)
-        {
-            var forum = await _repository.GetByIdWithThreadsAsync(id)
-                ?? throw new NotFoundException($"No se encontró el foro con ID {id}.");
-
-            return forum;
-        }
+        return forum;
     }
 }

@@ -1,28 +1,24 @@
 ﻿using Foraria.Domain.Repository;
-using ForariaDomain;
 using ForariaDomain.Exceptions;
 
+namespace ForariaDomain.Application.UseCase;
 
-
-namespace Foraria.Application.UseCase
+public class GetAllForums
 {
-    public class GetAllForums
+    private readonly IForumRepository _repository;
+
+    public GetAllForums(IForumRepository repository)
     {
-        private readonly IForumRepository _repository;
+        _repository = repository;
+    }
 
-        public GetAllForums(IForumRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task<IEnumerable<Forum>> Execute()
+    {
+        var forums = await _repository.GetAll();
 
-        public async Task<IEnumerable<Forum>> Execute()
-        {
-            var forums = await _repository.GetAll();
+        if (forums == null || !forums.Any())
+            throw new NotFoundException("No se encontraron foros disponibles.");
 
-            if (forums == null || !forums.Any())
-                throw new NotFoundException("No se encontraron foros disponibles.");
-
-            return forums.Where(f => f.IsActive);
-        }
+        return forums.Where(f => f.IsActive);
     }
 }

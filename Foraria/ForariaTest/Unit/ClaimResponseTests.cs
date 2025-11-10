@@ -1,175 +1,118 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Controllers;
-using Foraria.DTOs;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Models;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace ForariaTest.Unit.ClaimResponseTests;
-
-public class ClaimResponseControllerTests
+namespace ForariaTest.Unit.ClaimResponseTests
 {
-    private readonly Mock<ICreateClaimResponse> _createClaimResponseMock;
-    private readonly Mock<IGetUserById> _getUserByIdMock;
-    private readonly Mock<IGetClaimById> _getClaimByIdMock;
-    private readonly Mock<IGetResponsibleSectorById> _getSectorByIdMock;
-    private readonly ClaimResponseController _controller;
-
-    public ClaimResponseControllerTests()
+    public class CreateClaimResponseTests
     {
-        _createClaimResponseMock = new Mock<ICreateClaimResponse>();
-        _getUserByIdMock = new Mock<IGetUserById>();
-        _getClaimByIdMock = new Mock<IGetClaimById>();
-        _getSectorByIdMock = new Mock<IGetResponsibleSectorById>();
+        private readonly Mock<IClaimResponseRepository> _claimResponseRepoMock;
+        private readonly Mock<IClaimRepository> _claimRepoMock;
+        private readonly CreateClaimResponse _useCase;
 
-        _controller = new ClaimResponseController(
-            _createClaimResponseMock.Object,
-            _getUserByIdMock.Object,
-            _getClaimByIdMock.Object,
-            _getSectorByIdMock.Object
-        );
-    }
-
-    [Fact]
-    public async Task Add_ValidData_ReturnsCreatedAtActionWithResult()
-    {
-        // Arrange
-        var dto = new ClaimResponseDto
+        public CreateClaimResponseTests()
         {
-            Description = "Respuesta al reclamo",
-            ResponseDate = DateTime.UtcNow,
-            User_id = 1,
-            Claim_id = 2,
-            ResponsibleSector_id = 3
-        };
-
-        var user = new User { Id = dto.User_id, Name = "Juan" };
-        var claim = new Claim { Id = dto.Claim_id, Title = "Reclamo A" };
-        var sector = new ResponsibleSector { Id = dto.ResponsibleSector_id, Name = "Atención al cliente" };
-
-        _getUserByIdMock.Setup(x => x.Execute(dto.User_id)).ReturnsAsync(user);
-        _getClaimByIdMock.Setup(x => x.Execute(dto.Claim_id)).ReturnsAsync(claim);
-        _getSectorByIdMock.Setup(x => x.Execute(dto.ResponsibleSector_id)).ReturnsAsync(sector);
-
-        var expectedResult = new ClaimResponsResult
-        {
-            Id = 10,
-            Description = dto.Description,
-            ResponseDate = dto.ResponseDate,
-            User_id = dto.User_id,
-            Claim_id = dto.Claim_id,
-            ResponsibleSector_id = dto.ResponsibleSector_id
-        };
-
-        _createClaimResponseMock
-            .Setup(x => x.Execute(It.IsAny<ClaimResponse>()))
-            .ReturnsAsync(expectedResult);
-
-        // Act
-        var result = await _controller.Add(dto);
-
-        // Assert
-        // Tolerar tanto CreatedAtActionResult como ObjectResult
-        if (result is CreatedAtActionResult created)
-        {
-            var returned = created.Value;
-            Assert.NotNull(returned);
+            _claimResponseRepoMock = new Mock<IClaimResponseRepository>();
+            _claimRepoMock = new Mock<IClaimRepository>();
+            _useCase = new CreateClaimResponse(_claimResponseRepoMock.Object, _claimRepoMock.Object);
         }
-        else if (result is ObjectResult obj)
+
+        [Fact]
+        public async Task Execute_ShouldCreateResponse_AndSetClaimStateToEnProceso()
         {
-            // Esto ayuda a ver qué pasó si no fue CreatedAtActionResult
-            throw new Exception($"Expected CreatedAtActionResult, but got ObjectResult with status {obj.StatusCode}");
+            // Arrange
+            var claim = new Claim { Id = 1, State = "Pendiente" };
+            var user = new User { Id = 1, Name = "Juan" };
+
+            var claimResponse = new ClaimResponse
+            {
+                Description = "Respuesta válida",
+                ResponsibleSector_id = 2,
+                Claim = claim,
+                User = user
+            };
+
+            _claimResponseRepoMock
+                .Setup(x => x.Add(It.IsAny<ClaimResponse>()))
+                .Returns(Task.CompletedTask);
+
+            _claimRepoMock
+                .Setup(x => x.Update(It.IsAny<Claim>()))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _useCase.Execute(claimResponse);
+
+            // Assert
+            _claimResponseRepoMock.Verify(x => x.Add(It.IsAny<ClaimResponse>()), Times.Once);
+            _claimRepoMock.Verify(x => x.Update(It.IsAny<Claim>()), Times.Once);
+
+            Assert.Equal("En Proceso", claim.State);
+            Assert.Same(claimResponse, claim.ClaimResponse);
+            Assert.NotNull(result);
         }
-        else
+
+        [Fact]
+        public async Task Execute_ShouldThrowArgumentException_WhenClaimOrUserIsNull()
         {
-            throw new Exception($"Unexpected result type: {result.GetType().Name}");
+            // Arrange
+            var claimResponse1 = new ClaimResponse
+            {
+                Claim = null,
+                User = new User(),
+                ResponsibleSector_id = 1
+            };
+
+            var claimResponse2 = new ClaimResponse
+            {
+                Claim = new Claim(),
+                User = null,
+                ResponsibleSector_id = 1
+            };
+
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(() => _useCase.Execute(claimResponse1));
+            await Assert.ThrowsAsync<ArgumentException>(() => _useCase.Execute(claimResponse2));
         }
-    }
 
+        [Fact]
+        public async Task Execute_ShouldThrowArgumentException_WhenSectorIsInvalid()
+        {
+            // Arrange
+            var claimResponse = new ClaimResponse
+            {
+                Claim = new Claim(),
+                User = new User(),
+                ResponsibleSector_id = 0
+            };
 
-    [Fact]
-    public async Task Add_InvalidModel_ReturnsBadRequest()
-    {
-        var dto = new ClaimResponseDto();
-        _controller.ModelState.AddModelError("Description", "Campo requerido");
+            // Act & Assert
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() => _useCase.Execute(claimResponse));
+            Assert.Equal("Sector responsable inválido", ex.Message);
+        }
 
-        var result = await _controller.Add(dto);
+        [Fact]
+        public async Task Execute_ShouldPropagateException_WhenRepositoryFails()
+        {
+            // Arrange
+            var claim = new Claim { Id = 1, State = "Pendiente" };
+            var user = new User { Id = 1 };
+            var claimResponse = new ClaimResponse
+            {
+                Claim = claim,
+                User = user,
+                ResponsibleSector_id = 2
+            };
 
-        Assert.IsType<BadRequestObjectResult>(result);
-    }
+            _claimResponseRepoMock
+                .Setup(x => x.Add(It.IsAny<ClaimResponse>()))
+                .ThrowsAsync(new Exception("Error al guardar ClaimResponse"));
 
-    [Fact]
-    public async Task Add_UserNotFound_ReturnsNotFound()
-    {
-        var dto = new ClaimResponseDto { User_id = 1, Claim_id = 2, ResponsibleSector_id = 3 };
-        _getUserByIdMock.Setup(x => x.Execute(dto.User_id)).ReturnsAsync((User)null);
-
-        var result = await _controller.Add(dto);
-
-        var notFound = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Equal("Usuario no encontrado", notFound.Value?.GetType().GetProperty("error")?.GetValue(notFound.Value));
-    }
-
-    [Fact]
-    public async Task Add_ClaimNotFound_ReturnsNotFound()
-    {
-        var dto = new ClaimResponseDto { User_id = 1, Claim_id = 2, ResponsibleSector_id = 3 };
-        _getUserByIdMock.Setup(x => x.Execute(dto.User_id)).ReturnsAsync(new User());
-        _getClaimByIdMock.Setup(x => x.Execute(dto.Claim_id)).ReturnsAsync((Claim)null);
-
-        var result = await _controller.Add(dto);
-
-        var notFound = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Equal("Reclamo no encontrado", notFound.Value?.GetType().GetProperty("error")?.GetValue(notFound.Value));
-    }
-
-    [Fact]
-    public async Task Add_SectorNotFound_ReturnsNotFound()
-    {
-        var dto = new ClaimResponseDto { User_id = 1, Claim_id = 2, ResponsibleSector_id = 3 };
-        _getUserByIdMock.Setup(x => x.Execute(dto.User_id)).ReturnsAsync(new User());
-        _getClaimByIdMock.Setup(x => x.Execute(dto.Claim_id)).ReturnsAsync(new Claim());
-        _getSectorByIdMock.Setup(x => x.Execute(dto.ResponsibleSector_id)).ReturnsAsync((ResponsibleSector)null);
-
-        var result = await _controller.Add(dto);
-
-        var notFound = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Equal("Sector responsable no encontrado", notFound.Value?.GetType().GetProperty("error")?.GetValue(notFound.Value));
-    }
-
-    [Fact]
-    public async Task Add_ThrowsArgumentException_ReturnsBadRequest()
-    {
-        var dto = new ClaimResponseDto { Description = "Inválido", User_id = 1, Claim_id = 2, ResponsibleSector_id = 3 };
-        _getUserByIdMock.Setup(x => x.Execute(dto.User_id)).ReturnsAsync(new User());
-        _getClaimByIdMock.Setup(x => x.Execute(dto.Claim_id)).ReturnsAsync(new Claim());
-        _getSectorByIdMock.Setup(x => x.Execute(dto.ResponsibleSector_id)).ReturnsAsync(new ResponsibleSector());
-        _createClaimResponseMock.Setup(x => x.Execute(It.IsAny<ClaimResponse>()))
-            .ThrowsAsync(new ArgumentException("Falta descripción"));
-
-        var result = await _controller.Add(dto);
-
-        var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal("Falta descripción", badRequest.Value?.GetType().GetProperty("error")?.GetValue(badRequest.Value));
-    }
-
-    [Fact]
-    public async Task Add_ThrowsException_ReturnsInternalServerError()
-    {
-        var dto = new ClaimResponseDto { Description = "Error", User_id = 1, Claim_id = 2, ResponsibleSector_id = 3 };
-        _getUserByIdMock.Setup(x => x.Execute(dto.User_id)).ReturnsAsync(new User());
-        _getClaimByIdMock.Setup(x => x.Execute(dto.Claim_id)).ReturnsAsync(new Claim());
-        _getSectorByIdMock.Setup(x => x.Execute(dto.ResponsibleSector_id)).ReturnsAsync(new ResponsibleSector());
-        _createClaimResponseMock.Setup(x => x.Execute(It.IsAny<ClaimResponse>()))
-            .ThrowsAsync(new Exception("Error inesperado"));
-
-        var result = await _controller.Add(dto);
-
-        var errorResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, errorResult.StatusCode);
-        Assert.Equal("Ocurrió un error interno", errorResult.Value?.GetType().GetProperty("error")?.GetValue(errorResult.Value));
-        Assert.Equal("Error inesperado", errorResult.Value?.GetType().GetProperty("details")?.GetValue(errorResult.Value));
+            // Act & Assert
+            var ex = await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(claimResponse));
+            Assert.Equal("Error al guardar ClaimResponse", ex.Message);
+        }
     }
 }

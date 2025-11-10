@@ -1,26 +1,25 @@
 ﻿using Foraria.Domain.Repository;
 using ForariaDomain.Exceptions;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetThreadById
 {
-    public class GetThreadById
+    private readonly IThreadRepository _repository;
+
+    public GetThreadById(IThreadRepository repository)
     {
-        private readonly IThreadRepository _repository;
+        _repository = repository;
+    }
 
-        public GetThreadById(IThreadRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task<ForariaDomain.Thread?> Execute(int id)
+    {
+        var thread = await _repository.GetById(id);
 
-        public async Task<ForariaDomain.Thread?> Execute(int id)
-        {
-            var thread = await _repository.GetById(id);
+        if (thread == null)
+            throw new NotFoundException($"No se encontró el hilo con ID {id}.");
 
-            if (thread == null)
-                throw new NotFoundException($"No se encontró el hilo con ID {id}.");
+        return thread;
 
-            return thread;
-
-        }
     }
 }

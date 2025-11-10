@@ -1,20 +1,19 @@
 ﻿using Foraria.Domain.Repository;
-using ForariaDomain;
 
-namespace Foraria.Application.UseCase
+
+namespace ForariaDomain.Application.UseCase;
+
+public class GetUserDocumentsByCategory
 {
-    public class GetUserDocumentsByCategory
+    private readonly IUserDocumentRepository _repository;
+
+    public GetUserDocumentsByCategory(IUserDocumentRepository repository)
     {
-        private readonly IUserDocumentRepository _repository;
+        _repository = repository;
+    }
 
-        public GetUserDocumentsByCategory(IUserDocumentRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<List<UserDocument>> ExecuteAsync(string category, int? userId = null)
-        {
-            return await _repository.GetByCategoryAsync(category, userId);
-        }
+    public async Task<List<UserDocument>> ExecuteAsync(string category, int? userId = null)
+    {
+        return await _repository.GetByCategoryAsync(category, userId);
     }
 }
