@@ -1,150 +1,228 @@
 ﻿using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Moq;
-using System;
-using System.Threading.Tasks;
-using Xunit;
 
-namespace ForariaTest.Unit.Message
+namespace ForariaTest.Unit.Messages;
+
+public class UpdateMessageTests
 {
-    public class UpdateMessageTests
+    [Fact]
+    public async Task ExecuteAsync_ShouldThrowNotFound_WhenUserDoesNotExist()
     {
-        [Fact]
-        public async Task ExecuteAsync_ShouldThrowNotFound_WhenUserDoesNotExist()
+        // Arrange
+        var mockMsgRepo = new Mock<IMessageRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
+
+        mockUserRepo.Setup(r => r.GetById(It.IsAny<int>()))
+                    .ReturnsAsync((User?)null);
+
+        var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
+        var editedMessage = new ForariaDomain.Message { Id = 1 };
+
+        // Act
+        Func<Task> act = async () => await useCase.ExecuteAsync(editedMessage, 1);
+
+        // Assert
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("No se encontró el usuario con id 1");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldThrowNotFound_WhenMessageDoesNotExist()
+    {
+        // Arrange
+        var mockMsgRepo = new Mock<IMessageRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
+
+        var user = new User { Id = 1, Role = new Role { Description = "admin" } };
+
+        mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
+        mockMsgRepo.Setup(r => r.GetById(1)).ReturnsAsync((ForariaDomain.Message?)null);
+
+        var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
+        var editedMessage = new ForariaDomain.Message { Id = 1 };
+
+        // Act
+        Func<Task> act = async () => await useCase.ExecuteAsync(editedMessage, 1);
+
+        // Assert
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("No se encontró el mensaje con id 1");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldThrowInvalidOperation_WhenMessageIsDeleted()
+    {
+        // Arrange
+        var mockMsgRepo = new Mock<IMessageRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
+
+        var user = new User { Id = 1, Role = new Role { Description = "admin" } };
+        var msg = new ForariaDomain.Message { Id = 1, IsDeleted = true };
+
+        mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
+        mockMsgRepo.Setup(r => r.GetById(1)).ReturnsAsync(msg);
+
+        var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
+        var editedMessage = new ForariaDomain.Message { Id = 1 };
+
+        // Act
+        Func<Task> act = async () => await useCase.ExecuteAsync(editedMessage, 1);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("No se puede editar un mensaje eliminado.");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldUpdateContent_WhenOwnerEditsWithin15Minutes()
+    {
+        // Arrange
+        var mockMsgRepo = new Mock<IMessageRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
+
+        var user = new User
         {
-            var mockMsgRepo = new Mock<IMessageRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
+            Id = 1,
+            Role = new Role { Description = "residente" }
+        };
 
-            mockUserRepo.Setup(r => r.GetById(It.IsAny<int>()))
-                        .ReturnsAsync((global::ForariaDomain.User?)null);
-
-            var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
-
-            var request = new UpdateMessageRequest { UserId = 1 };
-
-            Func<Task> act = async () => await useCase.ExecuteAsync(1, request);
-
-            await act.Should().ThrowAsync<NotFoundException>()
-                .WithMessage("No se encontró el usuario con id 1");
-        }
-
-        [Fact]
-        public async Task ExecuteAsync_ShouldThrowNotFound_WhenMessageDoesNotExist()
+        var msg = new ForariaDomain.Message
         {
-            var mockMsgRepo = new Mock<IMessageRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
+            Id = 10,
+            User_id = 1,
+            Content = "Viejo",
+            CreatedAt = DateTime.UtcNow.AddMinutes(-5),
+            IsDeleted = false
+        };
 
-            var user = new global::ForariaDomain.User { Id = 1, Role = new Role { Description = "admin" } };
+        mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
+        mockMsgRepo.Setup(r => r.GetById(10)).ReturnsAsync(msg);
 
-            mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
-            mockMsgRepo.Setup(r => r.GetById(1))
-                       .ReturnsAsync((global::ForariaDomain.Message?)null);
+        var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
+        var editedMessage = new ForariaDomain.Message { Id = 10, Content = "Nuevo contenido" };
 
-            var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
-            var request = new UpdateMessageRequest { UserId = 1 };
+        // Act
+        var result = await useCase.ExecuteAsync(editedMessage, 1);
 
-            Func<Task> act = async () => await useCase.ExecuteAsync(1, request);
+        // Assert
+        result.Content.Should().Be("Nuevo contenido");
+        result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
-            await act.Should().ThrowAsync<NotFoundException>()
-                .WithMessage("No se encontró el mensaje con id 1");
-        }
+        mockMsgRepo.Verify(r => r.Update(It.IsAny<ForariaDomain.Message>()), Times.Once);
+    }
 
-        [Fact]
-        public async Task ExecuteAsync_ShouldThrowInvalidOperation_WhenMessageIsDeleted()
+    [Fact]
+    public async Task ExecuteAsync_ShouldThrowForbidden_WhenOwnerEditsAfter15Minutes()
+    {
+        // Arrange
+        var mockMsgRepo = new Mock<IMessageRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
+
+        var user = new User
         {
-            var mockMsgRepo = new Mock<IMessageRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
+            Id = 1,
+            Role = new Role { Description = "residente" }
+        };
 
-            var user = new global::ForariaDomain.User { Id = 1, Role = new Role { Description = "admin" } };
-            var msg = new global::ForariaDomain.Message { Id = 1, IsDeleted = true };
-
-            mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
-            mockMsgRepo.Setup(r => r.GetById(1)).ReturnsAsync(msg);
-
-            var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
-            var request = new UpdateMessageRequest { UserId = 1 };
-
-            Func<Task> act = async () => await useCase.ExecuteAsync(1, request);
-
-            await act.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("No se puede editar un mensaje eliminado.");
-        }
-
-        [Fact]
-        public async Task ExecuteAsync_ShouldUpdateContent_WhenOwnerEditsWithin15Minutes()
+        var msg = new ForariaDomain.Message
         {
-            var mockMsgRepo = new Mock<IMessageRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
+            Id = 10,
+            User_id = 1,
+            Content = "Viejo",
+            CreatedAt = DateTime.UtcNow.AddMinutes(-30),
+            IsDeleted = false
+        };
 
-            var user = new global::ForariaDomain.User
-            {
-                Id = 1,
-                Role = new Role { Description = "residente" }
-            };
+        mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
+        mockMsgRepo.Setup(r => r.GetById(10)).ReturnsAsync(msg);
 
-            var msg = new global::ForariaDomain.Message
-            {
-                Id = 10,
-                User_id = 1,
-                Content = "Viejo",
-                CreatedAt = DateTime.UtcNow.AddMinutes(-5),
-                IsDeleted = false
-            };
+        var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
+        var editedMessage = new ForariaDomain.Message { Id = 10, Content = "Tarde" };
 
-            mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
-            mockMsgRepo.Setup(r => r.GetById(10)).ReturnsAsync(msg);
+        // Act
+        Func<Task> act = async () => await useCase.ExecuteAsync(editedMessage, 1);
 
-            var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
-            var request = new UpdateMessageRequest
-            {
-                UserId = 1,
-                Content = "Nuevo contenido"
-            };
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>()
+            .WithMessage("Solo puedes editar tu mensaje dentro de los primeros 15 minutos.");
+    }
 
-            var result = await useCase.ExecuteAsync(10, request);
+    [Fact]
+    public async Task ExecuteAsync_ShouldThrowForbidden_WhenUserIsNotOwnerOrAdmin()
+    {
+        // Arrange
+        var mockMsgRepo = new Mock<IMessageRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
 
-            result.Content.Should().Be("Nuevo contenido");
-            result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-
-            mockMsgRepo.Verify(r => r.Update(It.IsAny<global::ForariaDomain.Message>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task ExecuteAsync_ShouldThrowForbidden_WhenOwnerEditsAfter15Minutes()
+        var user = new User
         {
-            var mockMsgRepo = new Mock<IMessageRepository>();
-            var mockUserRepo = new Mock<IUserRepository>();
+            Id = 2,
+            Role = new Role { Description = "residente" }
+        };
 
-            var user = new global::ForariaDomain.User
-            {
-                Id = 1,
-                Role = new Role { Description = "residente" }
-            };
+        var msg = new ForariaDomain.Message
+        {
+            Id = 10,
+            User_id = 1,
+            Content = "Mensaje original",
+            CreatedAt = DateTime.UtcNow.AddMinutes(-5),
+            IsDeleted = false
+        };
 
-            var msg = new global::ForariaDomain.Message
-            {
-                Id = 10,
-                User_id = 1,
-                Content = "Viejo",
-                CreatedAt = DateTime.UtcNow.AddMinutes(-30),
-                IsDeleted = false
-            };
+        mockUserRepo.Setup(r => r.GetById(2)).ReturnsAsync(user);
+        mockMsgRepo.Setup(r => r.GetById(10)).ReturnsAsync(msg);
 
-            mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
-            mockMsgRepo.Setup(r => r.GetById(10)).ReturnsAsync(msg);
+        var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
+        var editedMessage = new ForariaDomain.Message { Id = 10, Content = "Intento no autorizado" };
 
-            var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
-            var request = new UpdateMessageRequest { UserId = 1, Content = "Tarde" };
+        // Act
+        Func<Task> act = async () => await useCase.ExecuteAsync(editedMessage, 2);
 
-            Func<Task> act = async () => await useCase.ExecuteAsync(10, request);
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenAccessException>()
+            .WithMessage("No tienes permisos para editar este mensaje.");
 
-            await act.Should().ThrowAsync<ForbiddenAccessException>()
-                .WithMessage("Solo puedes editar tu mensaje dentro de los primeros 15 minutos.");
-        }
+        mockMsgRepo.Verify(r => r.Update(It.IsAny<ForariaDomain.Message>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldAllowAdminToEditAnyMessage()
+    {
+        // Arrange
+        var mockMsgRepo = new Mock<IMessageRepository>();
+        var mockUserRepo = new Mock<IUserRepository>();
+
+        var user = new User
+        {
+            Id = 99,
+            Role = new Role { Description = "admin" }
+        };
+
+        var msg = new ForariaDomain.Message
+        {
+            Id = 10,
+            User_id = 1,
+            Content = "Original",
+            CreatedAt = DateTime.UtcNow.AddMinutes(-30),
+            IsDeleted = false
+        };
+
+        mockUserRepo.Setup(r => r.GetById(99)).ReturnsAsync(user);
+        mockMsgRepo.Setup(r => r.GetById(10)).ReturnsAsync(msg);
+
+        var useCase = new UpdateMessage(mockMsgRepo.Object, mockUserRepo.Object);
+        var editedMessage = new ForariaDomain.Message { Id = 10, Content = "Actualizado por admin" };
+
+        // Act
+        var result = await useCase.ExecuteAsync(editedMessage, 99);
+
+        // Assert
+        result.Content.Should().Be("Actualizado por admin");
+        mockMsgRepo.Verify(r => r.Update(It.IsAny<ForariaDomain.Message>()), Times.Once);
     }
 }

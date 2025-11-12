@@ -17,7 +17,7 @@ namespace Foraria.Infrastructure.Repository
         public async Task<Expense> AddExpenseAsync(Expense newExpense)
         {
             _context.Expenses.Add(newExpense);
-            await  _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return newExpense;
         }
 
@@ -38,14 +38,14 @@ namespace Foraria.Infrastructure.Repository
                             e.CreatedAt.Month == mesNumero)
                 .FirstOrDefaultAsync();
         }
-        
+
         public async Task<IEnumerable<Expense>> GetExpensesByDateRange(int consortiumId, DateTime startDate, DateTime endDate)
         {
-        return await _context.Expenses
-        .Where(e => e.ConsortiumId == consortiumId &&
-                 e.CreatedAt >= startDate &&
-                 e.CreatedAt < endDate)
-        .ToListAsync();
+            return await _context.Expenses
+            .Where(e => e.ConsortiumId == consortiumId &&
+                     e.CreatedAt >= startDate &&
+                     e.CreatedAt < endDate)
+            .ToListAsync();
         }
         public async Task<IEnumerable<Expense>> GetPendingExpenses(int consortiumId)
         {
@@ -67,7 +67,7 @@ namespace Foraria.Infrastructure.Repository
                             e.CreatedAt < monthEnd)
                 .ToListAsync();
 
-     
+
             var allDetails = expenses.SelectMany(e => e.ExpenseDetailsByResidence).ToList();
 
             var totalCount = allDetails.Count;
@@ -96,4 +96,4 @@ namespace Foraria.Infrastructure.Repository
         }
 
     }
- }
+}

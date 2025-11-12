@@ -1,15 +1,7 @@
 ﻿using FluentAssertions;
-using Foraria.Application.UseCase;
-using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace ForariaTest.Unit.Message
 {

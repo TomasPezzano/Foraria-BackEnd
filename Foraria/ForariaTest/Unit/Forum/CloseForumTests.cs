@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
+using ForariaDomain.Application.UseCase;
 
 namespace ForariaTest.Tests.Forum
 {

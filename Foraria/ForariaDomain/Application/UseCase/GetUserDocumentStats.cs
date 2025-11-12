@@ -1,20 +1,19 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain.Models;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetUserDocumentStats
 {
-    public class GetUserDocumentStats
+    private readonly IUserDocumentRepository _repository;
+
+    public GetUserDocumentStats(IUserDocumentRepository repository)
     {
-        private readonly IUserDocumentRepository _repository;
+        _repository = repository;
+    }
 
-        public GetUserDocumentStats(IUserDocumentRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<UserDocumentStatsDto> ExecuteAsync(int? userId = null)
-        {
-            return await _repository.GetStatsAsync(userId);
-        }
+    public async Task<UserDocumentStatsResult> ExecuteAsync(int? userId = null)
+    {
+        return await _repository.GetStatsAsync(userId);
     }
 }

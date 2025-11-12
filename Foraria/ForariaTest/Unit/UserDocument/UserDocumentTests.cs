@@ -1,14 +1,11 @@
 ﻿using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using ForariaDomain.Repository;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
+
 
 namespace ForariaTest.Tests.UserDocument
 {

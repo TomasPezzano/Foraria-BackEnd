@@ -1,84 +1,80 @@
-﻿using System;
-using System.Threading.Tasks;
-using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
-using Foraria.Domain.Model;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Application.UseCase;
 
-namespace ForariaTest.Unit.Forum
+namespace ForariaTest.Unit.Forum;
+
+public class GetForumByIdTests
 {
-    public class GetForumByIdTests
+    [Fact]
+    public async Task Execute_ShouldReturnForumResponse_WhenForumExists()
     {
-        [Fact]
-        public async Task Execute_ShouldReturnForumResponse_WhenForumExists()
+        // Arrange
+        int forumId = 1;
+
+        var mockRepo = new Mock<IForumRepository>();
+
+        var forum = new global::ForariaDomain.Forum
         {
-            // Arrange
-            int forumId = 1;
+            Id = forumId,
+            Category = ForumCategory.General
+        };
 
-            var mockRepo = new Mock<IForumRepository>();
+        mockRepo.Setup(r => r.GetById(forumId))
+                .ReturnsAsync(forum);
+        mockRepo.Setup(r => r.TotalThreads(forumId))
+                .ReturnsAsync(5);
+        mockRepo.Setup(r => r.TotalResponses(forumId))
+                .ReturnsAsync(20);
+        mockRepo.Setup(r => r.TotalUniqueParticipantsIncludingThreadCreators(forumId))
+                .ReturnsAsync(10);
 
-            var forum = new global::ForariaDomain.Forum
-            {
-                Id = forumId,
-                Category = ForumCategory.General
-            };
+        var useCase = new GetForumById(mockRepo.Object);
 
-            mockRepo.Setup(r => r.GetById(forumId))
-                    .ReturnsAsync(forum);
-            mockRepo.Setup(r => r.TotalThreads(forumId))
-                    .ReturnsAsync(5);
-            mockRepo.Setup(r => r.TotalResponses(forumId))
-                    .ReturnsAsync(20);
-            mockRepo.Setup(r => r.TotalUniqueParticipantsIncludingThreadCreators(forumId))
-                    .ReturnsAsync(10);
+        // Act
+        var result = await useCase.Execute(forumId);
 
-            var useCase = new GetForumById(mockRepo.Object);
+        // Assert
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(forumId);
+        result.Category.Should().Be(ForumCategory.General);
+        result.CountThreads.Should().Be(5);
+        result.CountResponses.Should().Be(20);
+        result.CountUserActives.Should().Be(10);
 
-            // Act
-            var result = await useCase.Execute(forumId);
+        mockRepo.Verify(r => r.GetById(forumId), Times.Once);
+        mockRepo.Verify(r => r.TotalThreads(forumId), Times.Once);
+        mockRepo.Verify(r => r.TotalResponses(forumId), Times.Once);
+        mockRepo.Verify(r => r.TotalUniqueParticipantsIncludingThreadCreators(forumId), Times.Once);
+    }
 
-            // Assert
-            result.Should().NotBeNull();
-            result!.Id.Should().Be(forumId);
-            result.Category.Should().Be(ForumCategory.General);
-            result.CategoryName.Should().Be("General");
-            result.CountThreads.Should().Be(5);
-            result.CountResponses.Should().Be(20);
-            result.CountUserActives.Should().Be(10);
+    [Fact]
+    public async Task Execute_ShouldThrowNotFoundException_WhenForumDoesNotExist()
+    {
+        // Arrange
+        int forumId = 999;
 
-            // Verify all repository calls
-            mockRepo.Verify(r => r.GetById(forumId), Times.Once);
-            mockRepo.Verify(r => r.TotalThreads(forumId), Times.Once);
-            mockRepo.Verify(r => r.TotalResponses(forumId), Times.Once);
-            mockRepo.Verify(r => r.TotalUniqueParticipantsIncludingThreadCreators(forumId), Times.Once);
-        }
+        var mockRepo = new Mock<IForumRepository>();
+        mockRepo.Setup(r => r.GetById(forumId))
+                .ReturnsAsync((global::ForariaDomain.Forum?)null);
 
-        [Fact]
-        public async Task Execute_ShouldReturnNull_WhenForumDoesNotExist()
-        {
-            // Arrange
-            int forumId = 999;
+        var useCase = new GetForumById(mockRepo.Object);
 
-            var mockRepo = new Mock<IForumRepository>();
-            mockRepo.Setup(r => r.GetById(forumId))
-                    .ReturnsAsync((global::ForariaDomain.Forum?)null);
+        // Act
+        var act = async () => await useCase.Execute(forumId);
 
-            var useCase = new GetForumById(mockRepo.Object);
+        // Assert
+        await act.Should()
+            .ThrowAsync<NotFoundException>()
+            .WithMessage($"No se encontró el foro con ID {forumId}.");
 
-            // Act
-            var result = await useCase.Execute(forumId);
-
-            // Assert
-            result.Should().BeNull();
-
-            mockRepo.Verify(r => r.GetById(forumId), Times.Once);
-            mockRepo.Verify(r => r.TotalThreads(forumId), Times.Once);
-            mockRepo.Verify(r => r.TotalResponses(forumId), Times.Once);
-            mockRepo.Verify(r => r.TotalUniqueParticipantsIncludingThreadCreators(forumId), Times.Once);
-        }
+        mockRepo.Verify(r => r.GetById(forumId), Times.Once);
+        // Como no encuentra el foro, nunca debería llamar a los demás:
+        mockRepo.Verify(r => r.TotalThreads(It.IsAny<int>()), Times.Never);
+        mockRepo.Verify(r => r.TotalResponses(It.IsAny<int>()), Times.Never);
+        mockRepo.Verify(r => r.TotalUniqueParticipantsIncludingThreadCreators(It.IsAny<int>()), Times.Never);
     }
 }

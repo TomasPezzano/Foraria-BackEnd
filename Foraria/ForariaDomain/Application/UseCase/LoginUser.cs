@@ -1,14 +1,15 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
 using ForariaDomain.Aplication.Configuration;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Models;
 using Microsoft.Extensions.Options;
 
-namespace Foraria.Application.UseCase;
+
+namespace ForariaDomain.Application.UseCase;
 
 public interface ILoginUser
 {
-    Task<LoginResponseDto> Login(User usuarioLogueado, string passRequest, string ipAddress);
+    Task<LoginResult> Login(User usuarioLogueado, string passRequest, string ipAddress);
 }
 
 public class LoginUser : ILoginUser
@@ -39,36 +40,20 @@ public class LoginUser : ILoginUser
         _roleRepository = roleRepository;
     }
 
-    public async Task<LoginResponseDto> Login(User usuarioLogueado, string passRequest, string ipAddress)
+    public async Task<LoginResult> Login(User usuarioLogueado, string passRequest, string ipAddress)
     {
         if (usuarioLogueado == null)
-        {
-            return new LoginResponseDto
-            {
-                Success = false,
-                Message = "Invalid email or password"
-            };
-        }
+            throw new BusinessException("Invalid email or password");
 
         var isPasswordValid = _passwordHash.VerifyPassword(passRequest, usuarioLogueado.Password);
         if (!isPasswordValid)
-        {
-            return new LoginResponseDto
-            {
-                Success = false,
-                Message = "Invalid email or password"
-            };
-        }
+            throw new BusinessException("Invalid email or password");
 
         Role? role = await _roleRepository.GetById(usuarioLogueado.Role_id);
         if (role == null)
-        {
-            return new LoginResponseDto
-            {
-                Success = false,
-                Message = "User role not found"
-            };
-        }
+            throw new NotFoundException("User role not found");
+
+
         usuarioLogueado.Role = role;
 
         var residence = usuarioLogueado.Residences.FirstOrDefault();
@@ -97,24 +82,7 @@ public class LoginUser : ILoginUser
 
         await _refreshTokenRepository.Add(refreshTokenEntity);
 
-        return new LoginResponseDto
-        {
-            Success = true,
-            Message = "Login successful",
-            Token = accessToken,
-            RefreshToken = refreshToken,
-            RequiresPasswordChange = usuarioLogueado.RequiresPasswordChange,
-            User = new UserInfoDto
-            {
-                Id = usuarioLogueado.Id,
-                Email = usuarioLogueado.Mail,
-                FirstName = usuarioLogueado.Name,
-                LastName = usuarioLogueado.LastName,
-                RoleId = usuarioLogueado.Role_id,
-                RoleName = usuarioLogueado.Role.Description,
-                ResidenceId = residenceId,
-                ConsortiumId = consortiumId
-            }
-        };
+        return LoginResult.SuccessResult(accessToken, refreshToken, usuarioLogueado);
+
     }
 }

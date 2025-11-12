@@ -1,10 +1,4 @@
-﻿using Foraria.Contracts.DTOs;
-using Foraria.Domain.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Foraria.Domain.Repository;
 
 namespace ForariaDomain.Application.UseCase;
 public interface IGetExpenseWithDto

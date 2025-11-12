@@ -1,11 +1,11 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain.Models;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface IRefreshTokenUseCase
 {
-    Task<RefreshTokenResponseDto> Refresh(string refreshToken, string ipAddress);
+    Task<RefreshTokenResult> Refresh(string refreshToken, string ipAddress);
 }
 public class RefreshTokenUseCase : IRefreshTokenUseCase
 {
@@ -23,26 +23,19 @@ public class RefreshTokenUseCase : IRefreshTokenUseCase
         _refreshTokenGenerator = refreshTokenGenerator;
     }
 
-    public async Task<RefreshTokenResponseDto> Refresh(string refreshToken, string ipAddress)
+    public async Task<RefreshTokenResult> Refresh(string refreshToken, string ipAddress)
     {
         var storedToken = await _refreshTokenRepository.GetByToken(refreshToken);
 
         if (storedToken == null)
         {
-            return new RefreshTokenResponseDto
-            {
-                Success = false,
-                Message = "Invalid refresh token"
-            };
+            return RefreshTokenResult.FailureResult("Invalid refresh token");
         }
 
         if (!storedToken.IsActive)
         {
-            return new RefreshTokenResponseDto
-            {
-                Success = false,
-                Message = storedToken.IsRevoked ? "Token has been revoked" : "Token has expired"
-            };
+            string message = storedToken.IsRevoked ? "Token has been revoked" : "Token has expired";
+            return RefreshTokenResult.FailureResult(message);
         }
 
         var newAccessToken = _jwtTokenGenerator.Generate(
@@ -73,12 +66,7 @@ public class RefreshTokenUseCase : IRefreshTokenUseCase
         await _refreshTokenRepository.Update(storedToken);
         await _refreshTokenRepository.Add(newRefreshTokenEntity);
 
-        return new RefreshTokenResponseDto
-        {
-            Success = true,
-            Message = "Token refreshed successfully",
-            AccessToken = newAccessToken,
-            RefreshToken = newRefreshToken
-        };
+        return RefreshTokenResult.SuccessResult(newAccessToken, newRefreshToken);
+
     }
 }

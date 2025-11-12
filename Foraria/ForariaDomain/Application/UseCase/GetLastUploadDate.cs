@@ -1,19 +1,18 @@
 ﻿using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetLastUploadDate
 {
-    public class GetLastUploadDate
+    private readonly IUserDocumentRepository _repository;
+
+    public GetLastUploadDate(IUserDocumentRepository repository)
     {
-        private readonly IUserDocumentRepository _repository;
+        _repository = repository;
+    }
 
-        public GetLastUploadDate(IUserDocumentRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<DateTime?> ExecuteAsync(int? userId = null)
-        {
-            return await _repository.GetLastUploadDateAsync(userId);
-        }
+    public async Task<DateTime?> ExecuteAsync(int? userId = null)
+    {
+        return await _repository.GetLastUploadDateAsync(userId);
     }
 }
