@@ -236,7 +236,9 @@ public class UserController : ControllerBase
             ResidenceId = residenceId,
             ConsortiumId = consortiumId,
             Success = true
-        });
+        };
+
+        return Ok(response);
     }
 
     [HttpGet("totalTenants")]

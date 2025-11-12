@@ -1,9 +1,9 @@
-﻿using ForariaDomain.Application.UseCase;
+﻿using foraria.application.usecase;
+using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Controllers
 {
