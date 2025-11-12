@@ -1,12 +1,11 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
+using ForariaDomain.Models;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface ICreateClaimResponse
 {
-    Task<ClaimResponseDto> Execute(ClaimResponse claimResponse);
+    Task<ClaimResponsResult> Execute(ClaimResponse claimResponse);
 }
 
 public class CreateClaimResponse : ICreateClaimResponse
@@ -21,7 +20,7 @@ public class CreateClaimResponse : ICreateClaimResponse
         _claimRepository = claimRepository;
     }
 
-    public async Task<ClaimResponseDto> Execute(ClaimResponse claimResponse)
+    public async Task<ClaimResponsResult> Execute(ClaimResponse claimResponse)
     {
         if (claimResponse.Claim == null || claimResponse.User == null)
             throw new ArgumentException("ClaimResponse incompleto");
@@ -35,7 +34,7 @@ public class CreateClaimResponse : ICreateClaimResponse
         claimResponse.Claim.ClaimResponse = claimResponse;
         await _claimRepository.Update(claimResponse.Claim);
 
-        var resultDto = new ClaimResponseDto
+        var resultDto = new ClaimResponsResult
         {
             Id = claimResponse.Id,
             Description = claimResponse.Description,

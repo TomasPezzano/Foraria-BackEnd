@@ -1,31 +1,30 @@
 ﻿using ForariaDomain.Exceptions;
 using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class DeleteForum
 {
-    public class DeleteForum
+    private readonly IForumRepository _repository;
+
+    public DeleteForum(IForumRepository repository)
     {
-        private readonly IForumRepository _repository;
+        _repository = repository;
+    }
 
-        public DeleteForum(IForumRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task Execute(int id)
+    {
+        var forum = await _repository.GetByIdWithThreadsAsync(id);
+        if (forum == null)
+            throw new NotFoundException($"No se encontró el foro con ID {id}.");
 
-        public async Task Execute(int id)
-        {
-            var forum = await _repository.GetByIdWithThreadsAsync(id);
-            if (forum == null)
-                throw new NotFoundException($"No se encontró el foro con ID {id}.");
+        if (!forum.IsActive)
+            throw new BusinessException("El foro ya está deshabilitado.");
 
-            if (!forum.IsActive)
-                throw new BusinessException("El foro ya está deshabilitado.");
+        if (forum.Threads.Any(t => t.State == "Active"))
+            throw new BusinessException("No se puede deshabilitar el foro porque contiene threads activos.");
 
-            if (forum.Threads.Any(t => t.State == "Active"))
-                throw new BusinessException("No se puede deshabilitar el foro porque contiene threads activos.");
-
-            forum.IsActive = false;
-            await _repository.UpdateAsync(forum);
-        }
+        forum.IsActive = false;
+        await _repository.UpdateAsync(forum);
     }
 }

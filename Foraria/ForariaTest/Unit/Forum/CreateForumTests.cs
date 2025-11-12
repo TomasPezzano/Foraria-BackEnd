@@ -1,13 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
-using Foraria.Domain.Model;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Application.UseCase;
 
 namespace ForariaTest.Unit.Forum
 {
@@ -17,12 +13,13 @@ namespace ForariaTest.Unit.Forum
         public async Task Execute_ShouldCreateForum_WhenCategoryDoesNotExist()
         {
             // Arrange
-            var request = new CreateForumRequest
+            var forum = new global::ForariaDomain.Forum
             {
+                Id = 0,
                 Category = ForumCategory.General
             };
 
-            var newForum = new global::ForariaDomain.Forum
+            var createdForum = new global::ForariaDomain.Forum
             {
                 Id = 1,
                 Category = ForumCategory.General
@@ -32,12 +29,12 @@ namespace ForariaTest.Unit.Forum
             mockRepo.Setup(r => r.GetByCategory(ForumCategory.General))
                     .ReturnsAsync((global::ForariaDomain.Forum?)null);
             mockRepo.Setup(r => r.Add(It.IsAny<global::ForariaDomain.Forum>()))
-                    .ReturnsAsync(newForum);
+                    .ReturnsAsync(createdForum);
 
             var useCase = new CreateForum(mockRepo.Object);
 
             // Act
-            var result = await useCase.Execute(request);
+            var result = await useCase.Execute(forum);
 
             // Assert
             result.Should().NotBeNull();
@@ -49,10 +46,10 @@ namespace ForariaTest.Unit.Forum
         }
 
         [Fact]
-        public async Task Execute_ShouldThrowInvalidOperationException_WhenCategoryAlreadyExists()
+        public async Task Execute_ShouldThrowBusinessException_WhenCategoryAlreadyExists()
         {
             // Arrange
-            var request = new CreateForumRequest
+            var forum = new global::ForariaDomain.Forum
             {
                 Category = ForumCategory.General
             };
@@ -70,10 +67,10 @@ namespace ForariaTest.Unit.Forum
             var useCase = new CreateForum(mockRepo.Object);
 
             // Act
-            Func<Task> act = async () => await useCase.Execute(request);
+            Func<Task> act = async () => await useCase.Execute(forum);
 
             // Assert
-            await act.Should().ThrowAsync<InvalidOperationException>()
+            await act.Should().ThrowAsync<BusinessException>()
                 .WithMessage("Ya existe un foro para la categoría 'General'.");
 
             mockRepo.Verify(r => r.Add(It.IsAny<global::ForariaDomain.Forum>()), Times.Never);

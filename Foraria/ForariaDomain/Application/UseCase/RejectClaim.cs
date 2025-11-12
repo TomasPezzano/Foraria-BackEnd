@@ -1,10 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
+﻿using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase;
-
+namespace ForariaDomain.Application.UseCase;
 public interface IRejectClaim
 {
     Task Execute(int claimId);

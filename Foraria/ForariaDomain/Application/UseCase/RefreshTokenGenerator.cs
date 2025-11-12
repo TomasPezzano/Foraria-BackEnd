@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface IRefreshTokenGenerator
 {

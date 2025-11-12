@@ -25,8 +25,5 @@ namespace ForariaDomain
         public int ResponsibleSector_id { get; set; }
 
         public ResponsibleSector ResponsibleSector { get; set; }
-
-
-
     }
 }

@@ -1,0 +1,81 @@
+﻿using Foraria.DTOs;
+using ForariaDomain.Application.UseCase;
+using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+
+namespace Foraria.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class OcrController : ControllerBase
+{
+    private readonly IProcessInvoiceOcr _processInvoiceOcr;
+    private const long MaxFileSizeInBytes = 10 * 1024 * 1024;
+    private static readonly string[] AllowedExtensions = { ".pdf", ".jpg", ".jpeg", ".png", ".tiff", ".bmp" };
+
+    public OcrController(IProcessInvoiceOcr processInvoiceOcr)
+    {
+        _processInvoiceOcr = processInvoiceOcr;
+    }
+
+    [HttpPost("process-invoice")]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    [Consumes("multipart/form-data")]
+    [SwaggerOperation(
+        Summary = "Procesa una factura mediante OCR.",
+        Description = "Analiza el archivo de la factura (PDF o imagen) para extraer automáticamente los datos principales y los ítems asociados."
+    )]
+    [ProducesResponseType(typeof(ProcessInvoiceResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ProcessInvoice([FromForm] ProcessInvoiceRequestDto request)
+    {
+        if (request?.File == null || request.File.Length == 0)
+            throw new DomainValidationException("No se proporcionó ningún archivo.");
+
+        if (request.File.Length > MaxFileSizeInBytes)
+            throw new DomainValidationException($"El archivo excede el tamaño máximo de {MaxFileSizeInBytes / (1024.0 * 1024.0):F2} MB.");
+
+        var fileExtension = Path.GetExtension(request.File.FileName).ToLowerInvariant();
+        if (!AllowedExtensions.Contains(fileExtension))
+            throw new DomainValidationException($"Formato no soportado. Use: {string.Join(", ", AllowedExtensions)}.");
+
+        var ocrResult = await _processInvoiceOcr.ExecuteAsync(request.File);
+
+        if (ocrResult == null)
+            throw new BusinessException("El procesamiento OCR no devolvió resultados.");
+
+        if (!ocrResult.Success)
+            throw new BusinessException(ocrResult.ErrorMessage ?? "Error en el procesamiento OCR.");
+
+        var response = new ProcessInvoiceResponseDto
+        {
+            Success = true,
+            SupplierName = ocrResult.SupplierName,
+            Cuit = ocrResult.Cuit,
+            InvoiceDate = ocrResult.InvoiceDate,
+            DueDate = ocrResult.DueDate,
+            InvoiceNumber = ocrResult.InvoiceNumber,
+            SubTotal = ocrResult.SubTotal,
+            TotalAmount = ocrResult.TotalAmount,
+            TotalTax = ocrResult.TotalTax,
+            SupplierAddress = ocrResult.SupplierAddress,
+            PurchaseOrder = ocrResult.PurchaseOrder,
+            Description = ocrResult.Description,
+            Items = ocrResult.Items.Select(item => new InvoiceItemDto
+            {
+                Description = item.Description,
+                Amount = item.Amount,
+                Quantity = item.Quantity,
+                UnitPrice = item.UnitPrice
+            }).ToList(),
+            ConfidenceScore = ocrResult.ConfidenceScore,
+            FilePath = ocrResult.FilePath,
+            ProcessedAt = ocrResult.ProcessedAt
+        };
+
+        return Ok(response);
+    }
+}

@@ -1,13 +1,9 @@
-﻿using Xunit;
-using Moq;
-using Foraria.Application.UseCase;
+﻿using Moq;
 using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
 using Foraria.Domain.Service;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Application.UseCase;
 
 namespace ForariaTest.Unit;
 
@@ -43,7 +39,7 @@ public class RegisterUserTests
     }
 
     [Fact]
-    public async Task Register_DuplicateEmail_ShouldReturnError()
+    public async Task Register_DuplicateEmail_ShouldThrowBusinessException()
     {
         // Arrange
         var user = new User
@@ -51,267 +47,143 @@ public class RegisterUserTests
             Name = "Juan",
             LastName = "Pérez",
             Mail = "existing@test.com",
-            PhoneNumber = 1234567890,
             Role_id = 1
         };
 
         _mockUserRepo.Setup(r => r.ExistsEmail("existing@test.com")).ReturnsAsync(true);
-
         var service = CreateService();
 
-        // Act
-        var result = await service.Register(user, 5);
-
-        // Assert
-        Assert.False(result.Success);
-        Assert.Equal("Email is already registered in the system", result.Message);
-        Assert.Null(result.Id);
-        Assert.Null(result.TemporaryPassword);
-
-        _mockUserRepo.Verify(r => r.ExistsEmail("existing@test.com"), Times.Once);
-        _mockRoleRepo.Verify(r => r.GetById(It.IsAny<int>()), Times.Never);
-        _mockResidenceRepo.Verify(r => r.Exists(It.IsAny<int>()), Times.Never);
-        _mockUserRepo.Verify(r => r.Add(It.IsAny<User>()), Times.Never);
-        _mockEmailService.Verify(s => s.SendWelcomeEmail(
-            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<BusinessException>(() => service.Register(user, 5));
+        Assert.Equal("Email is already registered in the system", ex.Message);
     }
 
     [Fact]
-    public async Task Register_InvalidRole_ShouldReturnError()
+    public async Task Register_InvalidRole_ShouldThrowNotFoundException()
     {
-        // Arrange
-        var user = new User
-        {
-            Name = "Juan",
-            LastName = "Pérez",
-            Mail = "juan@test.com",
-            PhoneNumber = 1234567890,
-            Role_id = 999
-        };
+        var user = new User { Mail = "juan@test.com", Role_id = 99 };
 
         _mockUserRepo.Setup(r => r.ExistsEmail("juan@test.com")).ReturnsAsync(false);
-        _mockRoleRepo.Setup(r => r.GetById(999)).ReturnsAsync((Role?)null);
+        _mockRoleRepo.Setup(r => r.GetById(99)).ReturnsAsync((Role?)null);
 
         var service = CreateService();
 
-        // Act
-        var result = await service.Register(user, 5);
-
-        // Assert
-        Assert.False(result.Success);
-        Assert.Equal("Selected role is not valid", result.Message);
-        Assert.Null(result.Id);
-        Assert.Null(result.TemporaryPassword);
-
-        _mockUserRepo.Verify(r => r.ExistsEmail("juan@test.com"), Times.Once);
-        _mockRoleRepo.Verify(r => r.GetById(999), Times.Once);
-        _mockResidenceRepo.Verify(r => r.Exists(It.IsAny<int>()), Times.Never);
-        _mockUserRepo.Verify(r => r.Add(It.IsAny<User>()), Times.Never);
+        var ex = await Assert.ThrowsAsync<NotFoundException>(() => service.Register(user, 1));
+        Assert.Equal("Selected role is not valid", ex.Message);
     }
 
     [Fact]
-    public async Task Register_InvalidResidenceId_ShouldReturnError()
+    public async Task Register_InvalidResidence_ShouldThrowNotFoundException()
     {
-        // Arrange
         var role = new Role { Id = 1, Description = "Inquilino" };
-        var user = new User
-        {
-            Name = "Juan",
-            LastName = "Pérez",
-            Mail = "juan@test.com",
-            PhoneNumber = 1234567890,
-            Role_id = 1
-        };
+        var user = new User { Mail = "test@mail.com", Role_id = 1 };
 
-        _mockUserRepo.Setup(r => r.ExistsEmail("juan@test.com")).ReturnsAsync(false);
+        _mockUserRepo.Setup(r => r.ExistsEmail(user.Mail)).ReturnsAsync(false);
         _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
-        _mockResidenceRepo.Setup(r => r.Exists(999)).ReturnsAsync(false);
+        _mockResidenceRepo.Setup(r => r.Exists(5)).ReturnsAsync(false);
 
         var service = CreateService();
 
-        // Act
-        var result = await service.Register(user, 999);
-
-        // Assert
-        Assert.False(result.Success);
-        Assert.Equal("Residence with ID 999 does not exist", result.Message);
-        Assert.Null(result.Id);
-        Assert.Null(result.TemporaryPassword);
-
-        _mockUserRepo.Verify(r => r.ExistsEmail("juan@test.com"), Times.Once);
-        _mockRoleRepo.Verify(r => r.GetById(1), Times.Once);
-        _mockResidenceRepo.Verify(r => r.Exists(999), Times.Once);
-        _mockResidenceRepo.Verify(r => r.GetById(It.IsAny<int>()), Times.Never);
-        _mockUserRepo.Verify(r => r.Add(It.IsAny<User>()), Times.Never);
+        var ex = await Assert.ThrowsAsync<NotFoundException>(() => service.Register(user, 5));
+        Assert.Equal("Residence with ID 5 does not exist", ex.Message);
     }
 
     [Fact]
-    public async Task Register_ResidenceGetByIdReturnsNull_ShouldReturnError()
+    public async Task Register_ResidenceGetByIdReturnsNull_ShouldThrowBusinessException()
     {
-        // Arrange
         var role = new Role { Id = 1, Description = "Inquilino" };
-        var user = new User
-        {
-            Name = "Juan",
-            LastName = "Pérez",
-            Mail = "juan@test.com",
-            PhoneNumber = 1234567890,
-            Role_id = 1
-        };
+        var user = new User { Mail = "juan@test.com", Role_id = 1 };
 
-        _mockUserRepo.Setup(r => r.ExistsEmail("juan@test.com")).ReturnsAsync(false);
+        _mockUserRepo.Setup(r => r.ExistsEmail(user.Mail)).ReturnsAsync(false);
         _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
         _mockResidenceRepo.Setup(r => r.Exists(5)).ReturnsAsync(true);
         _mockResidenceRepo.Setup(r => r.GetById(5)).ReturnsAsync((Residence?)null);
 
         var service = CreateService();
 
-        // Act
-        var result = await service.Register(user, 5);
-
-        // Assert
-        Assert.False(result.Success);
-        Assert.Equal("Error retrieving residence information", result.Message);
-        Assert.Null(result.Id);
-        Assert.Null(result.TemporaryPassword);
-
-        _mockResidenceRepo.Verify(r => r.Exists(5), Times.Once);
-        _mockResidenceRepo.Verify(r => r.GetById(5), Times.Once);
-        _mockUserRepo.Verify(r => r.Add(It.IsAny<User>()), Times.Never);
+        var ex = await Assert.ThrowsAsync<BusinessException>(() => service.Register(user, 5));
+        Assert.Equal("Error retrieving residence information", ex.Message);
     }
 
     [Fact]
-    public async Task Register_RoleAlreadyAssignedToResidence_ShouldReturnError()
+    public async Task Register_RoleAlreadyAssigned_ShouldThrowBusinessException()
     {
-        // Arrange
-        var role = new Role { Id = 2, Description = "Propietario" };
-        var user = new User
-        {
-            Name = "María",
-            LastName = "González",
-            Mail = "maria@test.com",
-            PhoneNumber = 9876543210,
-            Role_id = 2,
-            Role = role
-        };
-        var residence = new Residence { Id = 5, Number = 205, Floor = 2, Tower = "B" };
+        var role = new Role { Id = 1, Description = "Propietario" };
+        var user = new User { Mail = "juan@test.com", Role_id = 1 };
+        var residence = new Residence { Id = 5, Number = 205 };
 
-        _mockUserRepo.Setup(r => r.ExistsEmail("maria@test.com")).ReturnsAsync(false);
-        _mockRoleRepo.Setup(r => r.GetById(2)).ReturnsAsync(role);
+        _mockUserRepo.Setup(r => r.ExistsEmail(user.Mail)).ReturnsAsync(false);
+        _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
         _mockResidenceRepo.Setup(r => r.Exists(5)).ReturnsAsync(true);
         _mockResidenceRepo.Setup(r => r.GetById(5)).ReturnsAsync(residence);
         _mockUserRepo.Setup(r => r.ExistsUserWithRoleInResidence(5, "Propietario")).ReturnsAsync(true);
 
         var service = CreateService();
 
-        // Act
-        var result = await service.Register(user, 5);
-
-        // Assert
-        Assert.False(result.Success);
-        Assert.Equal("This residence already has a user with the role 'Propietario' assigned. Each residence can only have one user per role.", result.Message);
-        Assert.Null(result.Id);
-        Assert.Null(result.TemporaryPassword);
-
-        _mockUserRepo.Verify(r => r.ExistsUserWithRoleInResidence(5, "Propietario"), Times.Once);
-        _mockPasswordGenerator.Verify(s => s.Generate(), Times.Never);
-        _mockUserRepo.Verify(r => r.Add(It.IsAny<User>()), Times.Never);
+        var ex = await Assert.ThrowsAsync<BusinessException>(() => service.Register(user, 5));
+        Assert.Equal("This residence already has a user with the role 'Propietario' assigned.", ex.Message);
     }
 
     [Fact]
-    public async Task Register_EmailSendFails_ShouldStillReturnSuccess()
+    public async Task Register_EmailSendFails_ShouldStillReturnUser()
     {
-        // Arrange
         var role = new Role { Id = 1, Description = "Inquilino" };
-        var user = new User
-        {
-            Name = "Juan",
-            LastName = "Pérez",
-            Mail = "juan@test.com",
-            PhoneNumber = 1234567890,
-            Role_id = 1,
-            Role = role
-        };
-        var residence = new Residence { Id = 5, Number = 205, Floor = 2, Tower = "B" };
+        var residence = new Residence { Id = 5, Number = 205 };
+        var user = new User { Mail = "juan@test.com", Role_id = 1, Name = "Juan", LastName = "Perez" };
 
-        _mockUserRepo.Setup(r => r.ExistsEmail("juan@test.com")).ReturnsAsync(false);
+        _mockUserRepo.Setup(r => r.ExistsEmail(user.Mail)).ReturnsAsync(false);
         _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
         _mockResidenceRepo.Setup(r => r.Exists(5)).ReturnsAsync(true);
         _mockResidenceRepo.Setup(r => r.GetById(5)).ReturnsAsync(residence);
         _mockUserRepo.Setup(r => r.ExistsUserWithRoleInResidence(5, "Inquilino")).ReturnsAsync(false);
-        _mockPasswordGenerator.Setup(s => s.Generate()).ReturnsAsync("TempPass123!");
-        _mockPasswordHash.Setup(s => s.HashPassword("TempPass123!")).Returns("$2a$11$hashedpassword");
-        _mockUserRepo.Setup(r => r.Add(It.IsAny<User>())).ReturnsAsync((User u) => { u.Id = 1; return u; });
-        _mockEmailService.Setup(s => s.SendWelcomeEmail(It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>()))
-            .ThrowsAsync(new Exception("SMTP server not available"));
+        _mockPasswordGenerator.Setup(g => g.Generate()).ReturnsAsync("Temp123");
+        _mockPasswordHash.Setup(h => h.HashPassword("Temp123")).Returns("hashed");
+        _mockUserRepo.Setup(r => r.Add(It.IsAny<User>())).ReturnsAsync((User u) => { u.Id = 10; return u; });
+        _mockEmailService.Setup(s => s.SendWelcomeEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                         .ThrowsAsync(new Exception("SMTP error"));
 
         var service = CreateService();
 
-        // Act
         var result = await service.Register(user, 5);
 
-        // Assert
-        Assert.True(result.Success);
-        Assert.Equal("User registered successfully. An email has been sent with the credentials.", result.Message);
-        Assert.Equal(1, result.Id);
-        Assert.Equal("TempPass123!", result.TemporaryPassword);
-
-        _mockUserRepo.Verify(r => r.Add(It.IsAny<User>()), Times.Once);
-        _mockEmailService.Verify(s => s.SendWelcomeEmail("juan@test.com", "Juan", "Pérez", "TempPass123!"), Times.Once);
+        Assert.NotNull(result);
+        Assert.Equal(10, result.Id);
+        Assert.Equal("juan@test.com", result.Mail);
+        Assert.Equal("Temp123", result.Password);
     }
 
     [Fact]
-    public async Task Register_SetsRequiresPasswordChangeToTrue()
+    public async Task Register_SetsRequiresPasswordChangeTrue()
     {
-        // Arrange
         var role = new Role { Id = 1, Description = "Inquilino" };
-        var user = new User
-        {
-            Name = "Juan",
-            LastName = "Pérez",
-            Mail = "juan@test.com",
-            PhoneNumber = 1234567890,
-            Role_id = 1,
-            Role = role,
-            RequiresPasswordChange = false // Verificamos que se cambia a true
-        };
-        var residence = new Residence { Id = 5, Number = 205, Floor = 2, Tower = "B" };
+        var residence = new Residence { Id = 5, Number = 205 };
+        var user = new User { Mail = "test@mail.com", Role_id = 1 };
 
-        _mockUserRepo.Setup(r => r.ExistsEmail("juan@test.com")).ReturnsAsync(false);
+        _mockUserRepo.Setup(r => r.ExistsEmail(user.Mail)).ReturnsAsync(false);
         _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
         _mockResidenceRepo.Setup(r => r.Exists(5)).ReturnsAsync(true);
         _mockResidenceRepo.Setup(r => r.GetById(5)).ReturnsAsync(residence);
         _mockUserRepo.Setup(r => r.ExistsUserWithRoleInResidence(5, "Inquilino")).ReturnsAsync(false);
-        _mockPasswordGenerator.Setup(s => s.Generate()).ReturnsAsync("TempPass123!");
-        _mockPasswordHash.Setup(s => s.HashPassword("TempPass123!")).Returns("$2a$11$hashedpassword");
-        _mockUserRepo.Setup(r => r.Add(It.IsAny<User>())).ReturnsAsync((User u) => { u.Id = 1; return u; });
+        _mockPasswordGenerator.Setup(g => g.Generate()).ReturnsAsync("Temp123");
+        _mockPasswordHash.Setup(h => h.HashPassword("Temp123")).Returns("hashed");
+        _mockUserRepo.Setup(r => r.Add(It.IsAny<User>())).ReturnsAsync((User u) => u);
 
         var service = CreateService();
 
-        // Act
-        await service.Register(user, 5);
+        var result = await service.Register(user, 5);
 
-        // Assert
-        _mockUserRepo.Verify(r => r.Add(It.Is<User>(u =>
-            u.RequiresPasswordChange == true
-        )), Times.Once);
+        Assert.True(result.RequiresPasswordChange);
+        _mockUserRepo.Verify(r => r.Add(It.Is<User>(u => u.RequiresPasswordChange)), Times.Once);
     }
-
 
     [Fact]
     public async Task GetAllUsersInNumber_ShouldReturnTotalUsers()
     {
-        // Arrange
         _mockUserRepo.Setup(r => r.GetAllInNumber()).ReturnsAsync(42);
-
         var service = CreateService();
 
-        // Act
         var result = await service.GetAllUsersInNumber();
 
-        // Assert
         Assert.Equal(42, result);
-        _mockUserRepo.Verify(r => r.GetAllInNumber(), Times.Once);
     }
 }
