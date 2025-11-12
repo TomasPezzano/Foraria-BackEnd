@@ -1,10 +1,8 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using Moq;
-using Xunit;
-using System.Threading.Tasks;
-using System;
+
 
 namespace ForariaTest.Unit;
 

@@ -1,6 +1,6 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using Moq;
 
 namespace ForariaTest.Application;

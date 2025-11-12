@@ -1,14 +1,10 @@
 ﻿using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Model;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
-using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using Moq;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Xunit;
+
 
 namespace ForariaTest.Unit.Blockchain
 {

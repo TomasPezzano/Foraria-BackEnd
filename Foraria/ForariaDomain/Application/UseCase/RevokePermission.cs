@@ -1,11 +1,11 @@
-﻿using Foraria.Contracts.DTOs;
-using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
+using ForariaDomain.Exceptions;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface IRevokePermission
 {
-    Task<TransferPermissionResponseDto> Execute(int ownerId, int tenantId);
+    Task Execute(int ownerId, int tenantId);
 }
 
 public class RevokePermission : IRevokePermission
@@ -21,36 +21,29 @@ public class RevokePermission : IRevokePermission
         _refreshTokenRepository = refreshTokenRepository;
     }
 
-    public async Task<TransferPermissionResponseDto> Execute(int ownerId, int tenantId)
+    public async Task Execute(int ownerId, int tenantId)
     {
         var owner = await _userRepository.GetByIdWithRole(ownerId);
         var tenant = await _userRepository.GetByIdWithRole(tenantId);
 
         if (owner == null || tenant == null)
         {
-            return new TransferPermissionResponseDto
-            {
-                Success = false,
-                Message = "Usuario no encontrado"
-            };
+            throw new NotFoundException("Usuario no encontrado");
         }
 
-        if (owner.Role.Description != "Propietario" || tenant.Role.Description != "Inquilino")
+        if (owner.Role.Description != "Propietario")
         {
-            return new TransferPermissionResponseDto
-            {
-                Success = false,
-                Message = "Los roles no son válidos para esta operación"
-            };
+            throw new BusinessException("El usuario especificado no es un Propietario");
         }
 
-        if (!tenant.HasPermission)
+        if (tenant.Role.Description != "Inquilino")
         {
-            return new TransferPermissionResponseDto
-            {
-                Success = false,
-                Message = "El inquilino no tiene permisos activos para revocar"
-            };
+            throw new BusinessException("El usuario especificado no es un Inquilino");
+        }
+
+        if (tenant.HasPermission != null && tenant.HasPermission == true)
+        {
+            throw new BusinessException("El inquilino no tiene permisos activos para revocar");
         }
 
         owner.HasPermission = true;
@@ -61,14 +54,5 @@ public class RevokePermission : IRevokePermission
 
         await _refreshTokenRepository.RevokeAllByUserId(tenantId);
 
-        return new TransferPermissionResponseDto
-        {
-            Success = true,
-            Message = "Permisos revocados exitosamente. El inquilino debe iniciar sesión nuevamente.",
-            OwnerId = ownerId,
-            TenantId = tenantId,
-            OwnerHasPermission = true,
-            TenantHasPermission = false
-        };
     }
 }

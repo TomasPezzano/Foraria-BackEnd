@@ -1,8 +1,7 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 public interface IGetClaims
 {
     Task<List<Claim>> Execute();

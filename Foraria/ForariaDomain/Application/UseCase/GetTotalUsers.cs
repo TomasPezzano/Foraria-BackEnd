@@ -1,19 +1,18 @@
 ﻿using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetTotalUsers
 {
-    public class GetTotalUsers
+    private readonly IUserRepository _repository;
+
+    public GetTotalUsers(IUserRepository repository)
     {
-        private readonly IUserRepository _repository;
+        _repository = repository;
+    }
 
-        public GetTotalUsers(IUserRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<int> ExecuteAsync(int? consortiumId = null)
-        {
-            return await _repository.GetTotalUsersAsync(consortiumId);
-        }
+    public async Task<int> ExecuteAsync(int? consortiumId = null)
+    {
+        return await _repository.GetTotalUsersAsync(consortiumId);
     }
 }

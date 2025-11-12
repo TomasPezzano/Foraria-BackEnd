@@ -1,35 +1,34 @@
 ﻿using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetLatestPendingClaim
 {
-    public class GetLatestPendingClaim
+    private readonly IClaimRepository _repository;
+
+    public GetLatestPendingClaim(IClaimRepository repository)
     {
-        private readonly IClaimRepository _repository;
+        _repository = repository;
+    }
 
-        public GetLatestPendingClaim(IClaimRepository repository)
+    public async Task<object?> ExecuteAsync(int? consortiumId = null)
+    {
+        var claim = await _repository.GetLatestPendingAsync(consortiumId);
+
+        if (claim == null)
+            return null;
+
+        return new
         {
-            _repository = repository;
-        }
-
-        public async Task<object?> ExecuteAsync(int? consortiumId = null)
-        {
-            var claim = await _repository.GetLatestPendingAsync(consortiumId);
-
-            if (claim == null)
-                return null;
-
-            return new
-            {
-                id = claim.Id,
-                title = claim.Title,
-                description = claim.Description,
-                priority = claim.Priority,
-                category = claim.Category,
-                user = claim.User != null ? $"{claim.User.Name} {claim.User.LastName}" : null,
-                residence = claim.Residence?.Number,
-                consortium = claim.Residence?.Consortium?.Name,
-                createdAt = claim.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
-            };
-        }
+            id = claim.Id,
+            title = claim.Title,
+            description = claim.Description,
+            priority = claim.Priority,
+            category = claim.Category,
+            user = claim.User != null ? $"{claim.User.Name} {claim.User.LastName}" : null,
+            residence = claim.Residence?.Number,
+            consortium = claim.Residence?.Consortium?.Name,
+            createdAt = claim.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
+        };
     }
 }

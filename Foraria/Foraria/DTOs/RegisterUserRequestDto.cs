@@ -1,0 +1,27 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Foraria.DTOs;
+
+public class RegisterUserRequestDto
+{
+    [Required(ErrorMessage = "Nombre completo es requerido")]
+    public string FirstName { get; set; }
+
+    [Required(ErrorMessage = "Nombre completo es requerido")]
+    public string LastName { get; set; }
+
+    [Required(ErrorMessage = "Email es requerido")]
+    [EmailAddress(ErrorMessage = "Formato de email inválido")]
+    public string Email { get; set; }
+
+    [Required(ErrorMessage = "Numero es requerido")]
+    public long PhoneNumber { get; set; }
+
+    [Required(ErrorMessage = "Rol es requerido")]
+    public int RoleId { get; set; }
+
+    [Required(ErrorMessage = "Residencia es requerida")]
+    public int ResidenceId { get; set; }
+
+
+}

@@ -1,6 +1,4 @@
-﻿using BCrypt.Net;
-
-namespace Foraria.Application.UseCase;
+﻿namespace ForariaDomain.Application.UseCase;
 
 public interface IPasswordHash
 {

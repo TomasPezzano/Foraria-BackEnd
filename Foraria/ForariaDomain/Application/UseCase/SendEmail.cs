@@ -1,9 +1,6 @@
 ﻿using Foraria.Domain.Service;
-using Microsoft.Extensions.Options;
-using System.Net;
-using System.Net.Mail;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public class SendWelcomeEmailUseCase
 {

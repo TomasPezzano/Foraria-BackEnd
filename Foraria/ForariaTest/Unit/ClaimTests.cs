@@ -1,8 +1,8 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Interface.Controllers;
-using Foraria.Interface.DTOs;
+﻿using Foraria.Controllers;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
+using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -73,7 +73,7 @@ public class ClaimTests
     }
 
     [Fact]
-    public async Task Add_InvalidBase64_ReturnsBadRequest()
+    public async Task Add_InvalidBase64_ThrowsDomainValidationException()
     {
         // Arrange
         var dto = new ClaimDto
@@ -90,15 +90,9 @@ public class ClaimTests
         _fileProcessorMock.Setup(fp => fp.SaveBase64FileAsync(dto.Archive, "claims"))
             .ThrowsAsync(new FormatException());
 
-        // Act
-        var result = await _controller.Add(dto);
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<DomainValidationException>(() => _controller.Add(dto));
 
-        // Assert
-        var badRequest = Assert.IsType<BadRequestObjectResult>(result);
-        var value = badRequest.Value;
-        var messageProp = value.GetType().GetProperty("message");
-        var message = messageProp?.GetValue(value)?.ToString();
-
-        Assert.Equal("El formato del archivo Base64 no es válido.", message);
+        Assert.Equal("El formato del archivo Base64 no es válido.", ex.Message);
     }
 }

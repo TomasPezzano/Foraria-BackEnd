@@ -2,46 +2,45 @@
 using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class NotarizeFile
 {
-    public class NotarizeFile
+    private readonly IBlockchainService _blockchain;
+    private readonly IBlockchainProofRepository _proofRepo;
+
+    public NotarizeFile(IBlockchainService blockchain, IBlockchainProofRepository proofRepo)
     {
-        private readonly IBlockchainService _blockchain;
-        private readonly IBlockchainProofRepository _proofRepo;
+        _blockchain = blockchain;
+        _proofRepo = proofRepo;
+    }
 
-        public NotarizeFile(IBlockchainService blockchain, IBlockchainProofRepository proofRepo)
+    public async Task<BlockchainProof> ExecuteAsync(Guid documentId, string filePath)
+    {
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException("No se encontró el archivo a notarizar.", filePath);
+
+        var hashBytes = _blockchain.ComputeSha256FromFile(filePath);
+        var hashHex = _blockchain.BytesToHex(hashBytes);
+
+        var uri = $"app://document/{documentId}";
+        var (txHash, _) = await _blockchain.NotarizeAsync(hashHex, uri);
+
+        var proof = new BlockchainProof
         {
-            _blockchain = blockchain;
-            _proofRepo = proofRepo;
-        }
-
-        public async Task<BlockchainProof> ExecuteAsync(Guid documentId, string filePath)
-        {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException("No se encontró el archivo a notarizar.", filePath);
-
-            var hashBytes = _blockchain.ComputeSha256FromFile(filePath);
-            var hashHex = _blockchain.BytesToHex(hashBytes);
-
-            var uri = $"app://document/{documentId}";
-            var (txHash, _) = await _blockchain.NotarizeAsync(hashHex, uri);
-
-            var proof = new BlockchainProof
-            {
-                DocumentId = documentId,
-                HashHex = hashHex,
-                Uri = uri,
-                TxHash = txHash,
-                Contract = "0x1183232529d3973C31943739E5D76f32001eF03A",
-                Network = "polygon",
-                ChainId = 80002,
-                CreatedAtUtc = DateTime.UtcNow
-            };
+            DocumentId = documentId,
+            HashHex = hashHex,
+            Uri = uri,
+            TxHash = txHash,
+            Contract = "0x1183232529d3973C31943739E5D76f32001eF03A",
+            Network = "polygon",
+            ChainId = 80002,
+            CreatedAtUtc = DateTime.UtcNow
+        };
 
 
 
-            await _proofRepo.AddAsync(proof);
-            return proof;
-        }
+        await _proofRepo.AddAsync(proof);
+        return proof;
     }
 }

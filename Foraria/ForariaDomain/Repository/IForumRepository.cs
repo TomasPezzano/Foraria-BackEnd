@@ -1,7 +1,6 @@
 ﻿namespace Foraria.Domain.Repository
 {
     using ForariaDomain;
-    using global::Foraria.Domain.Model;
     using System.Threading.Tasks;
 
     public interface IForumRepository

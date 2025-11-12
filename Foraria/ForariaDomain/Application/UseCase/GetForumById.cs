@@ -1,35 +1,34 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain.Exceptions;
+using ForariaDomain.Models;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetForumById
 {
-    public class GetForumById
+    private readonly IForumRepository _repository;
+
+    public GetForumById(IForumRepository repository)
     {
-        private readonly IForumRepository _repository;
+        _repository = repository;
+    }
 
-        public GetForumById(IForumRepository repository)
+    public async Task<ForumWithStats?> Execute(int id)
+    {
+        var forum = await _repository.GetById(id)
+            ?? throw new NotFoundException($"No se encontró el foro con ID {id}.");
+
+        var countThreads = await _repository.TotalThreads(id);
+        var countResponses = await _repository.TotalResponses(id);
+        var countUserActives = await _repository.TotalUniqueParticipantsIncludingThreadCreators(id);
+
+        return new ForumWithStats
         {
-            _repository = repository;
-        }
-
-        public async Task<ForumResponse?> Execute(int id)
-        {
-            var countThreads = await _repository.TotalThreads(id);
-            var countResponses = await _repository.TotalResponses(id);
-            var countUserActives = await _repository.TotalUniqueParticipantsIncludingThreadCreators(id);
-            var forum = await _repository.GetById(id);
-
-            if (forum == null) return null;
-
-            return new ForumResponse
-            {
-                Id = forum.Id,
-                Category = forum.Category,
-                CategoryName = forum.Category.ToString(),
-                CountThreads = countThreads,
-                CountResponses = countResponses,
-                CountUserActives = countUserActives
-            };
-        }
+            Id = forum.Id,
+            Category = forum.Category,
+            CountThreads = countThreads,
+            CountResponses = countResponses,
+            CountUserActives = countUserActives
+        };
     }
 }

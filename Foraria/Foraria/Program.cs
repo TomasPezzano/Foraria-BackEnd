@@ -144,7 +144,7 @@ builder.Services.AddScoped<IGetConsortiumById, GetConsortiumById>();
 builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IPaymentGateway, MercadoPagoService>();
+builder.Services.AddScoped<IPaymentService, MercadoPagoService>();
 builder.Services.AddScoped<CreatePreferenceMP>();
 builder.Services.AddScoped<ProcessWebHookMP>();
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();

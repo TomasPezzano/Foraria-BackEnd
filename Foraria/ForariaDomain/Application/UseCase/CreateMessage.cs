@@ -1,7 +1,8 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
+
+
+namespace ForariaDomain.Application.UseCase;
 
 public class CreateMessage
 {
@@ -19,26 +20,16 @@ public class CreateMessage
         _userRepository = userRepository;
     }
 
-    public async Task<Message> Execute(CreateMessageWithFileRequest request)
+    public async Task<Message> Execute(Message message)
     {
-        var thread = await _threadRepository.GetById(request.Thread_id)
-            ?? throw new InvalidOperationException($"El hilo con ID {request.Thread_id} no existe.");
+        var thread = await _threadRepository.GetById(message.Thread_id)
+            ?? throw new InvalidOperationException($"El hilo con ID {message.Thread_id} no existe.");
 
-        var user = await _userRepository.GetById(request.User_id)
-            ?? throw new InvalidOperationException($"El usuario con ID {request.User_id} no existe.");
+        var user = await _userRepository.GetById(message.User_id)
+            ?? throw new InvalidOperationException($"El usuario con ID {message.User_id} no existe.");
 
-        if (string.IsNullOrWhiteSpace(request.Content))
+        if (string.IsNullOrWhiteSpace(message.Content))
             throw new InvalidOperationException("El contenido del mensaje no puede estar vacío.");
-
-        var message = new Message
-        {
-            Content = request.Content.Trim(),
-            Thread_id = request.Thread_id,
-            User_id = request.User_id,
-            CreatedAt = DateTime.UtcNow,
-            State = "active",
-            optionalFile = request.FilePath
-        };
 
         return await _messageRepository.Add(message);
     }

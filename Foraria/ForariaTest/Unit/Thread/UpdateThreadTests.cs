@@ -1,15 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
-using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
+using ForariaDomain.Application.UseCase;
 
-namespace ForariaTest.Unit.Thread
+namespace ForariaTest.Unit.Threads
 {
     public class UpdateThreadTests
     {
@@ -21,14 +17,14 @@ namespace ForariaTest.Unit.Thread
             var mockUserRepo = new Mock<IUserRepository>();
 
             mockUserRepo.Setup(r => r.GetById(It.IsAny<int>()))
-                        .ReturnsAsync((global::ForariaDomain.User?)null);
+                        .ReturnsAsync((User?)null);
 
             var useCase = new UpdateThread(mockThreadRepo.Object, mockUserRepo.Object);
 
-            var request = new UpdateThreadRequest { UserId = 1 };
+            var thread = new ForariaDomain.Thread { UserId = 1 };
 
             // Act
-            Func<Task> act = async () => await useCase.ExecuteAsync(10, request);
+            Func<Task> act = async () => await useCase.ExecuteAsync(10, thread);
 
             // Assert
             await act.Should().ThrowAsync<NotFoundException>()
@@ -42,17 +38,18 @@ namespace ForariaTest.Unit.Thread
             var mockThreadRepo = new Mock<IThreadRepository>();
             var mockUserRepo = new Mock<IUserRepository>();
 
-            var user = new global::ForariaDomain.User { Id = 1, Role = new Role { Description = "Administrador" } };
+            var user = new User { Id = 1, Role = new Role { Description = "Administrador" } };
+
             mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
             mockThreadRepo.Setup(r => r.GetById(It.IsAny<int>()))
-                          .ReturnsAsync((global::ForariaDomain.Thread?)null);
+                          .ReturnsAsync((ForariaDomain.Thread?)null);
 
             var useCase = new UpdateThread(mockThreadRepo.Object, mockUserRepo.Object);
 
-            var request = new UpdateThreadRequest { UserId = 1 };
+            var thread = new ForariaDomain.Thread { UserId = 1 };
 
             // Act
-            Func<Task> act = async () => await useCase.ExecuteAsync(50, request);
+            Func<Task> act = async () => await useCase.ExecuteAsync(50, thread);
 
             // Assert
             await act.Should().ThrowAsync<NotFoundException>()
@@ -66,13 +63,13 @@ namespace ForariaTest.Unit.Thread
             var mockThreadRepo = new Mock<IThreadRepository>();
             var mockUserRepo = new Mock<IUserRepository>();
 
-            var user = new global::ForariaDomain.User
+            var user = new User
             {
                 Id = 2,
                 Role = new Role { Description = "Residente" }
             };
 
-            var thread = new global::ForariaDomain.Thread
+            var threadDb = new ForariaDomain.Thread
             {
                 Id = 1,
                 UserId = 99,
@@ -80,11 +77,11 @@ namespace ForariaTest.Unit.Thread
             };
 
             mockUserRepo.Setup(r => r.GetById(2)).ReturnsAsync(user);
-            mockThreadRepo.Setup(r => r.GetById(1)).ReturnsAsync(thread);
+            mockThreadRepo.Setup(r => r.GetById(1)).ReturnsAsync(threadDb);
 
             var useCase = new UpdateThread(mockThreadRepo.Object, mockUserRepo.Object);
 
-            var request = new UpdateThreadRequest
+            var update = new ForariaDomain.Thread
             {
                 UserId = 2,
                 Theme = "Nuevo título",
@@ -92,13 +89,13 @@ namespace ForariaTest.Unit.Thread
             };
 
             // Act
-            Func<Task> act = async () => await useCase.ExecuteAsync(1, request);
+            Func<Task> act = async () => await useCase.ExecuteAsync(1, update);
 
             // Assert
             await act.Should().ThrowAsync<ForbiddenAccessException>()
                 .WithMessage("No tienes permisos para editar este hilo.");
 
-            mockThreadRepo.Verify(r => r.UpdateAsync(It.IsAny<global::ForariaDomain.Thread>()), Times.Never);
+            mockThreadRepo.Verify(r => r.UpdateAsync(It.IsAny<ForariaDomain.Thread>()), Times.Never);
         }
 
         [Fact]
@@ -108,13 +105,13 @@ namespace ForariaTest.Unit.Thread
             var mockThreadRepo = new Mock<IThreadRepository>();
             var mockUserRepo = new Mock<IUserRepository>();
 
-            var user = new global::ForariaDomain.User
+            var user = new User
             {
                 Id = 1,
                 Role = new Role { Description = "Residente" }
             };
 
-            var thread = new global::ForariaDomain.Thread
+            var threadDb = new ForariaDomain.Thread
             {
                 Id = 10,
                 UserId = 1,
@@ -124,11 +121,11 @@ namespace ForariaTest.Unit.Thread
             };
 
             mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
-            mockThreadRepo.Setup(r => r.GetById(10)).ReturnsAsync(thread);
+            mockThreadRepo.Setup(r => r.GetById(10)).ReturnsAsync(threadDb);
 
             var useCase = new UpdateThread(mockThreadRepo.Object, mockUserRepo.Object);
 
-            var request = new UpdateThreadRequest
+            var update = new ForariaDomain.Thread
             {
                 UserId = 1,
                 Theme = "Nuevo título",
@@ -136,14 +133,14 @@ namespace ForariaTest.Unit.Thread
             };
 
             // Act
-            var result = await useCase.ExecuteAsync(10, request);
+            var result = await useCase.ExecuteAsync(10, update);
 
             // Assert
             result.Theme.Should().Be("Nuevo título");
             result.Description.Should().Be("Nueva descripción");
             result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
-            mockThreadRepo.Verify(r => r.UpdateAsync(It.IsAny<global::ForariaDomain.Thread>()), Times.Once);
+            mockThreadRepo.Verify(r => r.UpdateAsync(It.IsAny<ForariaDomain.Thread>()), Times.Once);
         }
 
         [Fact]
@@ -153,13 +150,13 @@ namespace ForariaTest.Unit.Thread
             var mockThreadRepo = new Mock<IThreadRepository>();
             var mockUserRepo = new Mock<IUserRepository>();
 
-            var user = new global::ForariaDomain.User
+            var user = new User
             {
                 Id = 1,
                 Role = new Role { Description = "Administrador" }
             };
 
-            var thread = new global::ForariaDomain.Thread
+            var threadDb = new ForariaDomain.Thread
             {
                 Id = 100,
                 UserId = 99,
@@ -167,22 +164,63 @@ namespace ForariaTest.Unit.Thread
             };
 
             mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
-            mockThreadRepo.Setup(r => r.GetById(100)).ReturnsAsync(thread);
+            mockThreadRepo.Setup(r => r.GetById(100)).ReturnsAsync(threadDb);
 
             var useCase = new UpdateThread(mockThreadRepo.Object, mockUserRepo.Object);
 
-            var request = new UpdateThreadRequest
+            var update = new ForariaDomain.Thread
             {
                 UserId = 1,
                 State = "Closed"
             };
 
             // Act
-            var result = await useCase.ExecuteAsync(100, request);
+            var result = await useCase.ExecuteAsync(100, update);
 
             // Assert
             result.State.Should().Be("Closed");
-            mockThreadRepo.Verify(r => r.UpdateAsync(It.IsAny<global::ForariaDomain.Thread>()), Times.Once);
+            mockThreadRepo.Verify(r => r.UpdateAsync(It.IsAny<ForariaDomain.Thread>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ExecuteAsync_ShouldThrowForbidden_WhenNonAdminTriesToChangeState()
+        {
+            // Arrange
+            var mockThreadRepo = new Mock<IThreadRepository>();
+            var mockUserRepo = new Mock<IUserRepository>();
+
+            var user = new User
+            {
+                Id = 1,
+                Role = new Role { Description = "Residente" }
+            };
+
+            var threadDb = new ForariaDomain.Thread
+            {
+                Id = 100,
+                UserId = 1,
+                State = "Active"
+            };
+
+            mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
+            mockThreadRepo.Setup(r => r.GetById(100)).ReturnsAsync(threadDb);
+
+            var useCase = new UpdateThread(mockThreadRepo.Object, mockUserRepo.Object);
+
+            var update = new ForariaDomain.Thread
+            {
+                UserId = 1,
+                State = "Closed"
+            };
+
+            // Act
+            Func<Task> act = async () => await useCase.ExecuteAsync(100, update);
+
+            // Assert
+            await act.Should().ThrowAsync<ForbiddenAccessException>()
+                .WithMessage("No tienes permisos para cambiar el estado del hilo.");
+
+            mockThreadRepo.Verify(r => r.UpdateAsync(It.IsAny<ForariaDomain.Thread>()), Times.Never);
         }
     }
 }

@@ -1,29 +1,37 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
+using ForariaDomain.Exceptions;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class VerifyFileProof
 {
-    public class VerifyFileProof
+    private readonly IBlockchainService _blockchain;
+    private readonly IBlockchainProofRepository _proofRepo;
+
+    public VerifyFileProof(IBlockchainService blockchain, IBlockchainProofRepository proofRepo)
     {
-        private readonly IBlockchainService _blockchain;
-        private readonly IBlockchainProofRepository _proofRepo;
+        _blockchain = blockchain;
+        _proofRepo = proofRepo;
+    }
 
-        public VerifyFileProof(IBlockchainService blockchain, IBlockchainProofRepository proofRepo)
+    public async Task<bool> ExecuteAsync(Guid documentId, string filePath)
+    {
+        if (!File.Exists(filePath))
+            throw new NotFoundException("El archivo especificado no fue encontrado.");
+
+        var proof = await _proofRepo.GetByDocumentIdAsync(documentId);
+        if (proof == null)
+            throw new NotFoundException($"No se encontró una prueba registrada para el documento {documentId}.");
+
+        try
         {
-            _blockchain = blockchain;
-            _proofRepo = proofRepo;
+            var isValid = await _blockchain.VerifyFileAsync(filePath, proof.HashHex);
+            return isValid;
         }
-
-        public async Task<bool> ExecuteAsync(Guid documentId, string filePath)
+        catch (Exception ex)
         {
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException("No se encontró el archivo a verificar.", filePath);
-
-            var proof = await _proofRepo.GetByDocumentIdAsync(documentId);
-            if (proof == null)
-                throw new InvalidOperationException($"No se encontró una prueba registrada para el documento {documentId}.");
-
-            return await _blockchain.VerifyFileAsync(filePath, proof.HashHex);
+            throw new BlockchainException($"Error al verificar la prueba de blockchain: {ex.Message}");
         }
     }
 }
