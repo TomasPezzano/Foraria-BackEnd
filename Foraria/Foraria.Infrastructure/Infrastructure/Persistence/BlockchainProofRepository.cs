@@ -14,10 +14,9 @@ namespace Foraria.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<BlockchainProof> AddAsync(BlockchainProof proof)
+        public BlockchainProof Add(BlockchainProof proof)
         {
             _context.BlockchainProofs.Add(proof);
-            await _context.SaveChangesAsync();
             return proof;
         }
 
@@ -40,6 +39,13 @@ namespace Foraria.Infrastructure.Repository
             return await _context.BlockchainProofs
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.HashHex == hashHex);
+        }
+
+        public async Task<BlockchainProof?> GetByCallTranscriptIdAsync(int callTranscriptId)
+        {
+            return await _context.BlockchainProofs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.CallTranscriptId == callTranscriptId);
         }
     }
 }

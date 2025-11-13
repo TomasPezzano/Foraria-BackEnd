@@ -173,7 +173,6 @@ builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepo
 builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
 builder.Services.AddScoped<IResetPassword, ResetPassword>();
 
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
@@ -352,6 +351,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.MapHub<PollHub>("/pollHub");
+app.MapHub<CallHub>("/callHub");
 
 app.UseHttpsRedirection();
 

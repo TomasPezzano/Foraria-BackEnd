@@ -15,8 +15,8 @@ namespace Foraria.Domain.Model
         //  public int? PaymentId { get; set; }
         //  public Payment? Payment { get; set; }
 
-        // public int? TranscriptId { get; set; }
-        // public Transcript? Transcript { get; set; }
+        public int? CallTranscriptId { get; set; } 
+        public CallTranscript? CallTranscript { get; set; }
 
         public Guid? DocumentId { get; set; }
         public string HashHex { get; set; } = null!;

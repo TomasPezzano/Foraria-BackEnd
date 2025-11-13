@@ -17,11 +17,11 @@ namespace Foraria.Controllers
         private readonly VerifyFileProof _verifyFileProof;
 
         public BlockchainController(
-            IBlockchainService blockchainService,
-            IBlockchainProofRepository proofRepository)
+            NotarizeFile notarizeFile,
+            VerifyFileProof verifyFileProof)
         {
-            _notarizeFile = new NotarizeFile(blockchainService, proofRepository);
-            _verifyFileProof = new VerifyFileProof(blockchainService, proofRepository);
+            _notarizeFile = notarizeFile;
+            _verifyFileProof = verifyFileProof;
         }
 
         [HttpPost("notarize-file")]

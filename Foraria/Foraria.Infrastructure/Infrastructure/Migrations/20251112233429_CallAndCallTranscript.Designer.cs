@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251112233429_CallAndCallTranscript")]
+    partial class CallAndCallTranscript
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,7 +103,7 @@ namespace Foraria.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Calls", (string)null);
+                    b.ToTable("Calls");
                 });
 
             modelBuilder.Entity("ForariaDomain.CallParticipant", b =>
@@ -127,7 +130,7 @@ namespace Foraria.Migrations
 
                     b.HasIndex("CallId");
 
-                    b.ToTable("CallParticipants", (string)null);
+                    b.ToTable("CallParticipants");
                 });
 
             modelBuilder.Entity("ForariaDomain.CallTranscript", b =>
@@ -169,7 +172,7 @@ namespace Foraria.Migrations
                     b.HasIndex("CallId")
                         .IsUnique();
 
-                    b.ToTable("CallTranscripts", (string)null);
+                    b.ToTable("CallTranscripts");
                 });
 
             modelBuilder.Entity("ForariaDomain.CategoryPoll", b =>
@@ -368,7 +371,7 @@ namespace Foraria.Migrations
 
                     b.HasIndex("ConsortiumId");
 
-                    b.ToTable("Expenses", (string)null);
+                    b.ToTable("Expenses");
                 });
 
             modelBuilder.Entity("ForariaDomain.ExpenseDetailByResidence", b =>
@@ -1312,7 +1315,7 @@ namespace Foraria.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserEvent", (string)null);
+                    b.ToTable("UserEvent");
                 });
 
             modelBuilder.Entity("UserResidence", b =>
@@ -1327,7 +1330,7 @@ namespace Foraria.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserResidence", (string)null);
+                    b.ToTable("UserResidence");
                 });
 
             modelBuilder.Entity("Foraria.Domain.Model.BlockchainProof", b =>

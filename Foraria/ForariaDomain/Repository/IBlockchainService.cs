@@ -8,6 +8,7 @@
         byte[] ComputeSha256FromFile(string filePath);
         string BytesToHex(byte[] bytes);
         byte[] ComputeSha256(string input);
+        string ContractAddress { get; }
 
     }
 }

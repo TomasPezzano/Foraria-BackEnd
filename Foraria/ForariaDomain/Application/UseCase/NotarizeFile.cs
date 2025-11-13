@@ -2,17 +2,20 @@
 using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 
-namespace ForariaDomain.Application.UseCase;
-
 public class NotarizeFile
 {
     private readonly IBlockchainService _blockchain;
     private readonly IBlockchainProofRepository _proofRepo;
+    private readonly IUnitOfWork _uow;
 
-    public NotarizeFile(IBlockchainService blockchain, IBlockchainProofRepository proofRepo)
+    public NotarizeFile(
+        IBlockchainService blockchain,
+        IBlockchainProofRepository proofRepo,
+        IUnitOfWork uow)
     {
         _blockchain = blockchain;
         _proofRepo = proofRepo;
+        _uow = uow;
     }
 
     public async Task<BlockchainProof> ExecuteAsync(Guid documentId, string filePath)
@@ -32,15 +35,15 @@ public class NotarizeFile
             HashHex = hashHex,
             Uri = uri,
             TxHash = txHash,
-            Contract = "0x1183232529d3973C31943739E5D76f32001eF03A",
+            Contract = _blockchain.ContractAddress,
             Network = "polygon",
             ChainId = 80002,
             CreatedAtUtc = DateTime.UtcNow
         };
 
+        _proofRepo.Add(proof);
+        await _uow.SaveChangesAsync();
 
-
-        await _proofRepo.AddAsync(proof);
         return proof;
     }
 }
