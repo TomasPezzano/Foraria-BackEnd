@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Foraria.Domain.Repository;
-using ForariaDomain.Repository;
+﻿using Foraria.Domain.Repository;
+
 
 namespace ForariaDomain.Application.UseCase;
 

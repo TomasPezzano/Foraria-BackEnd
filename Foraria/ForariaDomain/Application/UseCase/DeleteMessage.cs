@@ -1,8 +1,7 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using ForariaDomain;
 using ForariaDomain.Exceptions;
-using ForariaDomain.Repository;
+
 
 namespace ForariaDomain.Application.UseCase;
 
@@ -30,7 +29,9 @@ public class DeleteMessage
         var isOwner = message.User_id == user.Id;
         var roleName = user.Role.Description.ToLower();
 
-        var isAdminOrConsortium = roleName == "Administrador" || roleName == "Consorcio";
+        var isAdminOrConsortium =
+        string.Equals(user.Role.Description, "Administrador", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(user.Role.Description, "Consorcio", StringComparison.OrdinalIgnoreCase);
 
         if (!isOwner && !isAdminOrConsortium)
             throw new ForbiddenAccessException("No tienes permisos para eliminar este mensaje.");
