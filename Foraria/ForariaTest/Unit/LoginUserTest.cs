@@ -48,45 +48,51 @@ public class LoginUserTests
         );
     }
 
-    //[Fact]
-    //public async Task Login_ValidCredentials_ShouldReturnSuccess()
-    //{
-    //    // Arrange
-    //    var role = new Role { Id = 1, Description = "Inquilino" };
-    //    var user = new User
-    //    {
-    //        Id = 1,
-    //        Mail = "juan@test.com",
-    //        Password = "hashed",
-    //        Role_id = 1,
-    //        RequiresPasswordChange = true,
-    //        HasPermission = false
-    //    };
+    [Fact]
+    public async Task Login_ValidCredentials_ShouldReturnSuccess()
+    {
+        // Arrange
+        var role = new Role { Id = 1, Description = "Inquilino" };
+        var user = new User
+        {
+            Id = 1,
+            Mail = "juan@test.com",
+            Password = "hashed",
+            Role_id = 1,
+            RequiresPasswordChange = true,
+            HasPermission = false,
+            Residences = new List<Residence>
+        {
+            new Residence { Id = 10, Number = 101, Floor = 1, Tower = "A", ConsortiumId = 5 }
+        }
+        };
 
-    //    _mockPasswordHash.Setup(p => p.VerifyPassword("TempPass123!", user.Password)).Returns(true);
-    //    _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
-    //    _mockJwtGenerator.Setup(j => j.Generate(1, "juan@test.com", 1, "Inquilino", true, false))
-    //                     .Returns("mock.access.token");
-    //    _mockRefreshTokenGenerator.Setup(r => r.Generate()).Returns("mock.refresh.token");
-    //    _mockRefreshTokenRepo.Setup(r => r.Add(It.IsAny<RefreshToken>()))
-    //                         .ReturnsAsync((RefreshToken rt) => rt);
+        _mockPasswordHash.Setup(p => p.VerifyPassword("TempPass123!", user.Password)).Returns(true);
+        _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
+        _mockJwtGenerator.Setup(j => j.Generate(1, "juan@test.com", 1, "Inquilino", true, false))
+                         .Returns("mock.access.token");
+        _mockRefreshTokenGenerator.Setup(r => r.Generate()).Returns("mock.refresh.token");
+        _mockRefreshTokenRepo.Setup(r => r.Add(It.IsAny<RefreshToken>()))
+                             .ReturnsAsync((RefreshToken rt) => rt);
 
-    //    var service = CreateService();
+        var service = CreateService();
 
-    //    // Act
-    //    var result = await service.Login(user, "TempPass123!", "192.168.1.1");
+        // Act
+        var result = await service.Login(user, "TempPass123!", "192.168.1.1");
 
-    //    // Assert
-    //    Assert.NotNull(result);
-    //    Assert.Equal("mock.refresh.token", result.RefreshToken);
-    //    Assert.NotNull(result.User);
-    //    Assert.Equal(1, result.User.Id);
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("mock.access.token", result.AccessToken);
+        Assert.Equal("mock.refresh.token", result.RefreshToken);
+        Assert.NotNull(result.User);
+        Assert.Equal(1, result.User.Id);
 
-    //    _mockPasswordHash.Verify(p => p.VerifyPassword("TempPass123!", user.Password), Times.Once);
-    //    _mockRoleRepo.Verify(r => r.GetById(1), Times.Once);
-    //    _mockJwtGenerator.Verify(j => j.Generate(1, "juan@test.com", 1, "Inquilino", true, false), Times.Once);
-    //    _mockRefreshTokenRepo.Verify(r => r.Add(It.IsAny<RefreshToken>()), Times.Once);
-    //}
+        _mockPasswordHash.Verify(p => p.VerifyPassword("TempPass123!", user.Password), Times.Once);
+        _mockRoleRepo.Verify(r => r.GetById(1), Times.Once);
+        _mockJwtGenerator.Verify(j => j.Generate(1, "juan@test.com", 1, "Inquilino", true, false), Times.Once);
+        _mockRefreshTokenRepo.Verify(r => r.Add(It.IsAny<RefreshToken>()), Times.Once);
+    }
+
 
     [Fact]
     public async Task Login_ShouldThrow_WhenUserIsNull()
@@ -149,38 +155,44 @@ public class LoginUserTests
         Assert.Equal("User role not found", ex.Message);
     }
 
-    //[Fact]
-    //public async Task Login_ShouldSetCorrectRefreshTokenFields()
-    //{
-    //    // Arrange
-    //    var role = new Role { Id = 1, Description = "Inquilino" };
-    //    var user = new User
-    //    {
-    //        Id = 1,
-    //        Mail = "juan@test.com",
-    //        Password = "hashed",
-    //        Role_id = 1
-    //    };
+    [Fact]
+    public async Task Login_ShouldSetCorrectRefreshTokenFields()
+    {
+        // Arrange
+        var role = new Role { Id = 1, Description = "Inquilino" };
+        var user = new User
+        {
+            Id = 1,
+            Mail = "juan@test.com",
+            Password = "hashed",
+            Role_id = 1,
+            Residences = new List<Residence> // ✅ simulamos un usuario real con residencia
+        {
+            new Residence { Id = 10, Number = 101, Floor = 1, Tower = "A", ConsortiumId = 5 }
+        }
+        };
 
-    //    _mockPasswordHash.Setup(p => p.VerifyPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-    //    _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
-    //    _mockJwtGenerator.Setup(j => j.Generate(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(),
-    //                                           It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
-    //                     .Returns("token");
-    //    _mockRefreshTokenGenerator.Setup(r => r.Generate()).Returns("refresh");
+        _mockPasswordHash.Setup(p => p.VerifyPassword(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        _mockRoleRepo.Setup(r => r.GetById(1)).ReturnsAsync(role);
+        _mockJwtGenerator.Setup(j => j.Generate(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(),
+                                               It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                         .Returns("token");
+        _mockRefreshTokenGenerator.Setup(r => r.Generate()).Returns("refresh");
+        _mockRefreshTokenRepo.Setup(r => r.Add(It.IsAny<RefreshToken>()))
+                             .ReturnsAsync((RefreshToken rt) => rt);
 
-    //    var service = CreateService();
+        var service = CreateService();
 
-    //    // Act
-    //    await service.Login(user, "pass", "127.0.0.1");
+        // Act
+        await service.Login(user, "pass", "127.0.0.1");
 
-    //    // Assert
-    //    _mockRefreshTokenRepo.Verify(r => r.Add(It.Is<RefreshToken>(
-    //        rt => rt.UserId == 1 &&
-    //              rt.Token == "refresh" &&
-    //              rt.CreatedByIp == "127.0.0.1" &&
-    //              rt.IsRevoked == false &&
-    //              rt.ExpiresAt > DateTime.UtcNow
-    //    )), Times.Once);
-    //}
+        // Assert
+        _mockRefreshTokenRepo.Verify(r => r.Add(It.Is<RefreshToken>(
+            rt => rt.UserId == 1 &&
+                  rt.Token == "refresh" &&
+                  rt.CreatedByIp == "127.0.0.1" &&
+                  rt.IsRevoked == false &&
+                  rt.ExpiresAt > DateTime.UtcNow
+        )), Times.Once);
+    }
 }
