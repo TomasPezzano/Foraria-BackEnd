@@ -31,7 +31,7 @@ public class ReserveController : ControllerBase
         _getPlaceById = getPlaceById;
     }
 
-    [HttpGet]
+    [HttpGet("{idConsortium}")]
     [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Obtiene todas las reservas registradas.",
@@ -40,12 +40,12 @@ public class ReserveController : ControllerBase
     [ProducesResponseType(typeof(List<ReserveDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(int idConsortium)
     {
-        var reserves = await _getAllReserve.Execute();
+        var reserves = await _getAllReserve.Execute(idConsortium);
 
         if (reserves == null || !reserves.Any())
-            throw new NotFoundException("No se encontraron reservas registradas.");
+            throw new NotFoundException($"No se encontraron reservas para el consorcio con ID {idConsortium}.");
 
         return Ok(reserves);
     }
@@ -68,6 +68,9 @@ public class ReserveController : ControllerBase
         if (reserveDto.Place_id <= 0)
             throw new DomainValidationException("Debe especificar un ID de lugar válido.");
 
+        if (reserveDto.Consortium_id <= 0)
+            throw new DomainValidationException("Debe especificar un ID de consorcio válido.");
+
         var place = await _getPlaceById.Execute(reserveDto.Place_id);
         if (place == null)
             throw new NotFoundException("Lugar no encontrado.");
@@ -79,6 +82,7 @@ public class ReserveController : ControllerBase
             CreatedAt = reserveDto.CreatedAt,
             Place_id = reserveDto.Place_id,
             Residence_id = reserveDto.Residence_id,
+            ConsortiumId = reserveDto.Consortium_id,
             User_id = reserveDto.User_id
         };
 

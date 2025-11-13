@@ -39,7 +39,16 @@ namespace Foraria.Infrastructure.Repository
 
         public async Task<List<Reserve>> GetAll()
         {
-            return await _context.Reserves.ToListAsync();
+            return await _context.Reserves
+                .ToListAsync();
+        }
+
+        public async Task<List<Reserve>> GetAllInConsortium(int idConsortium)
+        {
+            return await _context.Reserves
+                .Include(r => r.Place)
+                .Where(r => r.ConsortiumId == idConsortium)
+                .ToListAsync();
         }
 
         public async Task UpdateRange(List<Reserve> reserves)

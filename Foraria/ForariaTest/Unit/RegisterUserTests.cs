@@ -137,7 +137,7 @@ public class RegisterUserTests
         _mockResidenceRepo.Setup(r => r.GetById(5)).ReturnsAsync(residence);
         _mockUserRepo.Setup(r => r.ExistsUserWithRoleInResidence(5, "Inquilino")).ReturnsAsync(false);
         _mockPasswordGenerator.Setup(g => g.Generate()).ReturnsAsync("Temp123");
-        _mockPasswordHash.Setup(h => h.HashPassword("Temp123")).Returns("hashed");
+        _mockPasswordHash.Setup(h => h.Execute("Temp123")).Returns("hashed");
         _mockUserRepo.Setup(r => r.Add(It.IsAny<User>())).ReturnsAsync((User u) => { u.Id = 10; return u; });
         _mockEmailService.Setup(s => s.SendWelcomeEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                          .ThrowsAsync(new Exception("SMTP error"));
@@ -165,7 +165,7 @@ public class RegisterUserTests
         _mockResidenceRepo.Setup(r => r.GetById(5)).ReturnsAsync(residence);
         _mockUserRepo.Setup(r => r.ExistsUserWithRoleInResidence(5, "Inquilino")).ReturnsAsync(false);
         _mockPasswordGenerator.Setup(g => g.Generate()).ReturnsAsync("Temp123");
-        _mockPasswordHash.Setup(h => h.HashPassword("Temp123")).Returns("hashed");
+        _mockPasswordHash.Setup(h => h.Execute("Temp123")).Returns("hashed");
         _mockUserRepo.Setup(r => r.Add(It.IsAny<User>())).ReturnsAsync((User u) => u);
 
         var service = CreateService();

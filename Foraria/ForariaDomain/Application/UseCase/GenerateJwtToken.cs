@@ -15,11 +15,11 @@ public interface IJwtTokenGenerator
 }
 
 
-public class JwtTokenGenerator : IJwtTokenGenerator
+public class GenerateJwtToken : IJwtTokenGenerator
 {
     private readonly JwtSettings _jwtSettings;
 
-    public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings)
+    public GenerateJwtToken(IOptions<JwtSettings> jwtSettings)
     {
         _jwtSettings = jwtSettings.Value;
     }

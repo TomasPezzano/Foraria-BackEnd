@@ -31,4 +31,11 @@ public class UserDto
 
     public int? ConsortiumId { get; set; }
 
+    public long? Dni { get; set; }
+
+    public int? Floor { get; set; }
+
+    public int? NumberFloor { get; set; }
+
+    public string? RoleDescription { get; set; }
 }

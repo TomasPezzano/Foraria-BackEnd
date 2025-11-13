@@ -78,7 +78,7 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
         }
 
 
-        user.Password = _passwordHash.HashPassword(newPassword);
+        user.Password = _passwordHash.Execute(newPassword);
         user.RequiresPasswordChange = false;
 
         await _userRepository.Update(user);

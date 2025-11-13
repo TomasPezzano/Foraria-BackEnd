@@ -4,7 +4,7 @@ public interface IFileProcessor
 {
     Task<string?> SaveBase64FileAsync(string base64String, string folderName);
 }
-public class FileProcessor : IFileProcessor
+public class ProcessFile : IFileProcessor
 {
     public async Task<string?> SaveBase64FileAsync(string base64String, string folderName)
     {

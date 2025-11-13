@@ -9,7 +9,7 @@ namespace ForariaTest.Unit;
 
 public class JwtTokenGeneratorTests
 {
-    private readonly JwtTokenGenerator _jwtGenerator;
+    private readonly GenerateJwtToken _jwtGenerator;
 
     public JwtTokenGeneratorTests()
     {
@@ -24,7 +24,7 @@ public class JwtTokenGeneratorTests
         var optionsMock = new Mock<IOptions<JwtSettings>>();
         optionsMock.Setup(o => o.Value).Returns(jwtSettings);
 
-        _jwtGenerator = new JwtTokenGenerator(optionsMock.Object);
+        _jwtGenerator = new GenerateJwtToken(optionsMock.Object);
     }
 
     [Fact]

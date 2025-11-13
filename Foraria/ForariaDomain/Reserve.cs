@@ -29,5 +29,8 @@ namespace ForariaDomain
 
         public User User { get; set; }
         public DateTime Date { get; set; }
+
+        public int ConsortiumId { get; set; }
+        public Consortium Consortium { get; set; }
     }
 }
