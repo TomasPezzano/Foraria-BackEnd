@@ -27,5 +27,7 @@ public class Consortium
 
     public ICollection<Invoice> Invoices { get; set; }
 
+    public ICollection<Reserve> Reserves { get; set; }
+
 
 }

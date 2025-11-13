@@ -33,7 +33,7 @@ public class SupplierController : ControllerBase
     }
 
     [HttpPost]
-    //[Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     [SwaggerOperation(
         Summary = "Crea un nuevo proveedor.",
         Description = "Registra un proveedor asociado a un consorcio existente con sus datos de contacto y categoría."
@@ -173,5 +173,26 @@ public class SupplierController : ControllerBase
         }).ToList();
 
         return Ok(response);
+    }
+
+    [HttpGet("category-count")]
+    [Authorize(Policy = "All")]
+    [SwaggerOperation(
+        Summary = "Obtiene la cantidad de categoria de los proveedores.",
+        Description = "Devuelve el total de categorias de proveedores registrados en el sistema."
+    )]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult GetSupplierCategoriesCount()
+    {
+        var suppliers = _getAllSupplier.Execute();
+        if (suppliers == null || !suppliers.Any())
+            throw new NotFoundException("No se encontraron proveedores registrados.");
+        var distinctCategoryCount = suppliers
+            .Select(s => s.SupplierCategory)
+            .Distinct()
+            .Count();
+
+        return Ok(distinctCategoryCount);
     }
 }

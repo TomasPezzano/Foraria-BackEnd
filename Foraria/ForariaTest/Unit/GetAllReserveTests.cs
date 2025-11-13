@@ -20,6 +20,7 @@ public class GetAllReserveTests
     public async Task Execute_ShouldReturnReserves_WhenRepositoryReturnsData()
     {
         // Arrange
+        int consortiumId = 1;
         var expectedReserves = new List<Reserve>
         {
             new Reserve { Id = 1, Description = "Reserva 1" },
@@ -27,11 +28,11 @@ public class GetAllReserveTests
         };
 
         _reserveRepositoryMock
-            .Setup(r => r.GetAll())
+            .Setup(r => r.GetAllInConsortium(consortiumId))
             .ReturnsAsync(expectedReserves);
 
         // Act
-        var result = await _useCase.Execute();
+        var result = await _useCase.Execute(consortiumId);
 
         // Assert
         Assert.NotNull(result);
@@ -39,38 +40,42 @@ public class GetAllReserveTests
         Assert.Contains(result, r => r.Id == 1);
         Assert.Contains(result, r => r.Id == 2);
 
-        _reserveRepositoryMock.Verify(r => r.GetAll(), Times.Once);
+        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(consortiumId), Times.Once);
     }
 
     [Fact]
     public async Task Execute_ShouldReturnEmptyList_WhenRepositoryReturnsEmpty()
     {
         // Arrange
+        int consortiumId = 1;
+
         _reserveRepositoryMock
-            .Setup(r => r.GetAll())
+            .Setup(r => r.GetAllInConsortium(consortiumId))
             .ReturnsAsync(new List<Reserve>());
 
         // Act
-        var result = await _useCase.Execute();
+        var result = await _useCase.Execute(consortiumId);
 
         // Assert
         Assert.NotNull(result);
         Assert.Empty(result);
 
-        _reserveRepositoryMock.Verify(r => r.GetAll(), Times.Once);
+        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(consortiumId), Times.Once);
     }
 
     [Fact]
     public async Task Execute_ShouldPropagateException_WhenRepositoryThrows()
     {
         // Arrange
+        int consortiumId = 1;
+
         _reserveRepositoryMock
-            .Setup(r => r.GetAll())
+            .Setup(r => r.GetAllInConsortium(consortiumId))
             .ThrowsAsync(new Exception("DB Error"));
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _useCase.Execute());
+        await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(consortiumId));
 
-        _reserveRepositoryMock.Verify(r => r.GetAll(), Times.Once);
+        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(consortiumId), Times.Once);
     }
 }
