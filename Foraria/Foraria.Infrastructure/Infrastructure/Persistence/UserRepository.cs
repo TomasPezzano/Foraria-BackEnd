@@ -36,7 +36,7 @@ public class UserRepository : IUserRepository
 
     public Task<User?> GetById(int id)
     {
-        return _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        return _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == id);
     }
 
 
