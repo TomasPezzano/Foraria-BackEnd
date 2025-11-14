@@ -18,6 +18,7 @@ public class SupplierContractController : ControllerBase
     private readonly ILocalFileStorageService _localFileStorageService;
     private readonly GetSupplierContractById _getSupplierContractById;
     private readonly GetSupplierContractsById _getContractsBySupplierId;
+    private readonly IGetActiveContractsSupplierCount _getActiveContractsSupplierCountUseCase;
     private static readonly string[] AllowedFileExtensions = { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
     private const long MaxFileSizeInBytes = 10 * 1024 * 1024;
 
@@ -26,13 +27,15 @@ public class SupplierContractController : ControllerBase
         GetSupplierById getSupplierById,
         ILocalFileStorageService localFileStorageService,
         GetSupplierContractById getSupplierContractById,
-        GetSupplierContractsById getSupplierContractsBySupplierId)
+        GetSupplierContractsById getSupplierContractsBySupplierId,
+        IGetActiveContractsSupplierCount getActiveContractsSupplierCountUseCase)
     {
         _createSupplierContract = createSupplierContract;
         _getSupplierById = getSupplierById;
         _localFileStorageService = localFileStorageService;
         _getSupplierContractById = getSupplierContractById;
         _getContractsBySupplierId = getSupplierContractsBySupplierId;
+        _getActiveContractsSupplierCountUseCase = getActiveContractsSupplierCountUseCase;
     }
 
     [HttpPost]
@@ -190,5 +193,24 @@ public class SupplierContractController : ControllerBase
         }
 
         return Ok(response);
+    }
+
+    [HttpGet("/active-contracts")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
+    [SwaggerOperation(
+        Summary = "Obtiene la cantidad de contratos de proveedores activos.",
+        Description = "Devuelve el número total de contratos activos del consorcio especificado."
+    )]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetActiveContractsSupplierCount([FromQuery] int ConsortiumId)
+    {
+        if (ConsortiumId <= 0)
+            return BadRequest("ConsortiumId inválido.");
+
+        var count = await _getActiveContractsSupplierCountUseCase.ExecuteAsync(ConsortiumId);
+
+        return Ok(count);
     }
 }

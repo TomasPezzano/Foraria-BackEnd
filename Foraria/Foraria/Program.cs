@@ -196,6 +196,7 @@ builder.Services.AddScoped<SaveCallRecording>();
 builder.Services.AddScoped<GetCallRecordings>();
 builder.Services.AddScoped<ICallMessageRepository, CallMessageRepository>();
 builder.Services.AddScoped<ICallRecordingRepository, CallRecordingRepository>();
+builder.Services.AddScoped<IGetActiveContractsSupplierCount, GetActiveContractsSupplierCount>();
 
 builder.Services.AddCors(options =>
 {
