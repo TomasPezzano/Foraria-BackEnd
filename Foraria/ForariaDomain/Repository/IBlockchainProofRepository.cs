@@ -7,4 +7,5 @@ public interface IBlockchainProofRepository
     Task<BlockchainProof?> GetByDocumentIdAsync(Guid documentId);
     Task<BlockchainProof?> GetByHashAsync(string hashHex);
     Task<BlockchainProof?> GetByCallTranscriptIdAsync(int callTranscriptId);
+
 }

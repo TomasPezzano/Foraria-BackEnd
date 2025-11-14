@@ -172,6 +172,15 @@ builder.Services.AddScoped<IPasswordResetTokenGenerator, PasswordResetTokenGener
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
 builder.Services.AddScoped<IResetPassword, ResetPassword>();
+builder.Services.AddScoped<ICallRepository, CallRepository>();
+builder.Services.AddScoped<ICallParticipantRepository, CallParticipantRepository>();
+builder.Services.AddScoped<ICallTranscriptRepository, CallTranscriptRepository>();
+builder.Services.AddScoped<CreateCall>();
+builder.Services.AddScoped<EndCall>();
+builder.Services.AddScoped<JoinCall>();
+builder.Services.AddScoped<FinalizeCallTranscriptionAndNotarize>();
+builder.Services.AddScoped<RegisterTranscriptionResult>();
+builder.Services.AddScoped<VerifyTranscriptIntegrity>();
 
 builder.Services.AddCors(options =>
 {

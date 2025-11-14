@@ -29,12 +29,17 @@ public class FinalizeCallTranscriptionAndNotarize
         var transcript = _transcriptRepo.GetById(callTranscriptId)
             ?? throw new NotFoundException("Transcripción no encontrada.");
 
+        if (string.IsNullOrWhiteSpace(transcript.TranscriptHash))
+            throw new DomainValidationException("La transcripción no tiene hash asociado.");
 
-        var hashBytes = _blockchain.ComputeSha256FromFile(transcript.TranscriptPath);
-        var hashHex = _blockchain.BytesToHex(hashBytes);
+        var existingProof = await _proofRepo.GetByCallTranscriptIdAsync(callTranscriptId);
+        if (existingProof != null)
+            throw new BlockchainException("Esta transcripción ya está notarizada");
 
+        var hashHex = transcript.TranscriptHash;
 
-        var uri = $"file://{transcript.TranscriptPath}";
+        var uri = $"call-transcript:{transcript.CallId}";
+
 
 
         var (txHash, finalHashHex) = await _blockchain.NotarizeAsync(hashHex, uri);
@@ -45,12 +50,16 @@ public class FinalizeCallTranscriptionAndNotarize
             HashHex = finalHashHex,
             Uri = uri,
             TxHash = txHash,
-            Contract = _blockchain.ContractAddress, 
+            Contract = _blockchain.ContractAddress,
             Network = "polygon",
             ChainId = 80002
         };
 
+        transcript.BlockchainTxHash = txHash;
+
         _proofRepo.Add(proof);
+        _transcriptRepo.Update(transcript);
+
         await _uow.SaveChangesAsync();
     }
 }

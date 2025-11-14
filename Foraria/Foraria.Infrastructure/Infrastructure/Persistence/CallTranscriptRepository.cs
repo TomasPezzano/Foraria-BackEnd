@@ -28,4 +28,16 @@ public class CallTranscriptRepository : ICallTranscriptRepository
         return _context.CallTranscripts
             .FirstOrDefault(t => t.Id == id);
     }
+    public void Update(CallTranscript transcript)
+    {
+        _context.CallTranscripts.Update(transcript);
+    }
+    public IEnumerable<CallTranscript> GetAll()
+    {
+        return _context.CallTranscripts.ToList();
+    }
+    public CallTranscript? GetByCallIdTranscript(int callId)
+    {
+        return _context.CallTranscripts.FirstOrDefault(t => t.CallId == callId);
+    }
 }
