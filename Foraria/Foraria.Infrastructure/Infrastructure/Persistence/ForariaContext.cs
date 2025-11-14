@@ -73,6 +73,10 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
+        public DbSet<NotificationPreference> NotificationPreferences { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -106,7 +110,8 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<InvoiceItem>().ToTable("invoiceItem");
             modelBuilder.Entity<ExpenseDetailByResidence>().ToTable("ExpenseDetailByResidences");
             modelBuilder.Entity<PasswordResetToken>().ToTable("passwordResetToken");
-
+            modelBuilder.Entity<NotificationPreference>().ToTable("notificationPreference");
+            modelBuilder.Entity<Notification>().ToTable("notification");
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
@@ -378,6 +383,35 @@ namespace Foraria.Infrastructure.Persistence
                .WithMany(i => i.PasswordResetTokens)
                .HasForeignKey(u => u.UserId)
                .OnDelete(DeleteBehavior.Cascade);
+
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany(u => u.Notifications)
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<NotificationPreference>()
+                .HasOne(np => np.User)
+                .WithOne(u => u.NotificationPreference)
+                .HasForeignKey<NotificationPreference>(np => np.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => n.UserId);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => n.Status);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => n.CreatedAt);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => new { n.UserId, n.Status });
+
+            modelBuilder.Entity<NotificationPreference>()
+                .HasIndex(np => np.UserId)
+                .IsUnique();
 
 
 

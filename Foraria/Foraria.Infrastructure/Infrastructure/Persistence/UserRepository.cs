@@ -111,4 +111,11 @@ public class UserRepository : IUserRepository
                 u.Residences.Any(r => r.Id == residenceId));
     }
 
+    public async Task<IEnumerable<User>> GetAllAsync()
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .ToListAsync();
+    }
+
 }

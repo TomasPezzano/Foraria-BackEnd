@@ -81,7 +81,16 @@ namespace Foraria.Infrastructure.Repository
             return (totalCount, paidCount, totalPaidAmount, totalUnpaidAmount);
         }
 
-
+        public async Task<IEnumerable<Expense>> GetExpensesExpiringBetweenAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.Expenses
+                .Include(e => e.Consortium)
+                .Where(e =>
+                    e.ExpirationDate >= startDate &&
+                    e.ExpirationDate <= endDate)
+                .OrderBy(e => e.ExpirationDate)
+                .ToListAsync();
+        }
 
 
         public async Task<Expense?> GetByIdAsync(int id)

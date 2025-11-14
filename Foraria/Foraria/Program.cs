@@ -9,6 +9,7 @@ using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Infrastructure.Persistence;
 using Foraria.Infrastructure.Infrastructure.Services;
+using Foraria.Infrastructure.Notifications;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using Foraria.SignalRImplementation;
@@ -36,6 +37,7 @@ builder.Services.Configure<EmailSettings>(
 
 // Add services to the container.
 
+builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
@@ -172,6 +174,15 @@ builder.Services.AddScoped<IPasswordResetTokenGenerator, PasswordResetTokenGener
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
 builder.Services.AddScoped<IResetPassword, ResetPassword>();
+
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationPreferenceRepository, NotificationPreferenceRepository>();
+builder.Services.AddScoped<IFcmPushNotificationService, FcmPushNotificationService>();
+builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+builder.Services.AddScoped<ISendExpenseReminderNotification, SendExpenseReminderNotification>();
+builder.Services.AddScoped<ISendVotingNotification, SendVotingNotification>();
+builder.Services.AddScoped<IConfigureNotificationPreferences, ConfigureNotificationPreferences>();
+
 
 
 builder.Services.AddCors(options =>

@@ -13,13 +13,17 @@ public class CreateExpense : ICreateExpense
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IGetAllInvoicesByMonthAndConsortium _getAllInvoicesByMonthAndConsortium;
     private readonly IGetConsortiumById _getConsortiumById;
+    private readonly INotificationDispatcher _notificationDispatcher;
+    private readonly IUserRepository _userRepository;
 
-    public CreateExpense(IExpenseRepository expenseRepository, IGetAllInvoicesByMonthAndConsortium getAllInvoicesByMonthAndConsortium, IGetConsortiumById getConsortiumById, IInvoiceRepository invoiceRepository)
+    public CreateExpense(IExpenseRepository expenseRepository, IGetAllInvoicesByMonthAndConsortium getAllInvoicesByMonthAndConsortium, IGetConsortiumById getConsortiumById, IInvoiceRepository invoiceRepository, INotificationDispatcher notificationDispatcher, IUserRepository userRepository)
     {
         _expenseRepository = expenseRepository;
         _getAllInvoicesByMonthAndConsortium = getAllInvoicesByMonthAndConsortium;
         _getConsortiumById = getConsortiumById;
         _invoiceRepository = invoiceRepository;
+        _notificationDispatcher = notificationDispatcher;
+        _userRepository = userRepository;
     }
     public async Task<Expense> ExecuteAsync(int consortiumId, string date)
     {
@@ -58,7 +62,7 @@ public class CreateExpense : ICreateExpense
         {
             Description = $"Gastos del mes {inicio.ToString("MMMM yyyy")}",
             CreatedAt = inicio.AddMonths(1),
-            ExpirationDate = inicio.AddDays(15),
+            ExpirationDate = inicio.AddMonths(1).AddDays(15),
             TotalAmount = totalAmount,
             ConsortiumId = consortiumId,
             Consortium = consortium,
@@ -71,6 +75,43 @@ public class CreateExpense : ICreateExpense
         {
             invoice.ExpenseId = expense.Id;
             await _invoiceRepository.UpdateInvoiceAsync(invoice);
+        }
+
+        try
+        {
+            // Obtener usuarios del consorcio
+            var users = await _userRepository.GetUsersByConsortiumIdAsync(consortiumId);
+
+            // Filtrar solo Propietarios e Inquilinos con permiso
+            var usersToNotify = users.Where(u =>
+                u.Role.Description == "Propietario" ||
+                (u.Role.Description == "Inquilino" && u.HasPermission)
+            ).ToList();
+
+            if (usersToNotify.Any())
+            {
+                var userIds = usersToNotify.Select(u => u.Id).ToList();
+
+                await _notificationDispatcher.SendBatchNotificationAsync(
+                    userIds: userIds,
+                    type: NotificationType.ExpenseCreated,
+                    title: "📋 Nueva Expensa Creada",
+                    body: $"Se creó la expensa de {inicio:MMMM yyyy}. Vence el {expense.ExpirationDate:dd/MM/yyyy}. Monto: ${expense.TotalAmount:N2}",
+                    relatedEntityId: expense.Id,
+                    relatedEntityType: "Expense",
+                    metadata: new Dictionary<string, string>
+                    {
+                        { "expenseId", expense.Id.ToString() },
+                        { "amount", expense.TotalAmount.ToString() },
+                        { "expirationDate", expense.ExpirationDate.ToString("yyyy-MM-dd") },
+                        { "consortiumId", consortiumId.ToString() }
+                    }
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al enviar notificaciones: {ex.Message}");
         }
 
         return expense;

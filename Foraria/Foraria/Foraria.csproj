@@ -33,4 +33,10 @@
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Firebase-configuration\foraria-ar-firebase-adminsdk-fbsvc-015467b177.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
