@@ -230,6 +230,7 @@ public class UserController : ControllerBase
             Id = user.Id,
             FirstName = user.Name,
             LastName = user.LastName,
+            Photo = user.Photo,
             Email = user.Mail,
             PhoneNumber = user.PhoneNumber,
             Dni = user.Dni,

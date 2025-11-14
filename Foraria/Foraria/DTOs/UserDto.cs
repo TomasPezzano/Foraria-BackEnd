@@ -21,6 +21,7 @@ public class UserDto
 
     [Required(ErrorMessage = "Rol es requerido")]
     public int RoleId { get; set; }
+    public string? Photo { get; set; }
 
     public string TemporaryPassword { get; set; }
     public string Message { get; set; }
