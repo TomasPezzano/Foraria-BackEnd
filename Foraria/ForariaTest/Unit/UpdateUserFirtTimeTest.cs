@@ -104,7 +104,7 @@ public class UpdateUserFirstTimeTest
         Assert.Null(result.RefreshToken);
 
         _passwordHashMock.Verify(x => x.VerifyPassword("wrongPassword", user.Password), Times.Once);
-        _passwordHashMock.Verify(x => x.HashPassword(It.IsAny<string>()), Times.Never);
+        _passwordHashMock.Verify(x => x.Execute(It.IsAny<string>()), Times.Never);
         _userRepositoryMock.Verify(x => x.Update(It.IsAny<User>()), Times.Never);
     }
 
@@ -142,7 +142,7 @@ public class UpdateUserFirstTimeTest
         Assert.Null(result.RefreshToken);
 
         _passwordHashMock.Verify(x => x.VerifyPassword("OldPass123!", user.Password), Times.Once);
-        _passwordHashMock.Verify(x => x.HashPassword(It.IsAny<string>()), Times.Never);
+        _passwordHashMock.Verify(x => x.Execute(It.IsAny<string>()), Times.Never);
         _userRepositoryMock.Verify(x => x.Update(It.IsAny<User>()), Times.Never);
     }
 
@@ -173,7 +173,7 @@ public class UpdateUserFirstTimeTest
             .Returns(true);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword("NewPass123!"))
+            .Setup(x => x.Execute("NewPass123!"))
             .Returns(newHashedPassword);
 
         _userRepositoryMock
@@ -210,7 +210,7 @@ public class UpdateUserFirstTimeTest
         Assert.Equal(newRefreshToken, result.RefreshToken);
 
         _passwordHashMock.Verify(x => x.VerifyPassword("OldPass123!", "hashedOldPassword"), Times.Once);
-        _passwordHashMock.Verify(x => x.HashPassword("NewPass123!"), Times.Once);
+        _passwordHashMock.Verify(x => x.Execute("NewPass123!"), Times.Once);
 
         _userRepositoryMock.Verify(x => x.Update(It.Is<User>(u =>
             u.Password == newHashedPassword &&
@@ -254,7 +254,7 @@ public class UpdateUserFirstTimeTest
             .Returns(true);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword("NewPass123!"))
+            .Setup(x => x.Execute("NewPass123!"))
             .Returns("newHashedPassword");
 
         _userRepositoryMock
@@ -276,7 +276,7 @@ public class UpdateUserFirstTimeTest
 
         // CORRECCIÓN: Verificamos con el password original, no el nuevo
         _passwordHashMock.Verify(x => x.VerifyPassword("OldPass123!", "hashedOldPassword"), Times.Once);
-        _passwordHashMock.Verify(x => x.HashPassword("NewPass123!"), Times.Once);
+        _passwordHashMock.Verify(x => x.Execute("NewPass123!"), Times.Once);
         _userRepositoryMock.Verify(x => x.Update(It.IsAny<User>()), Times.Once);
         _roleRepositoryMock.Verify(x => x.GetById(999), Times.Once);
         _jwtTokenGeneratorMock.Verify(x => x.Generate(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(),
@@ -309,7 +309,7 @@ public class UpdateUserFirstTimeTest
             .Returns(true);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(validPassword))
+            .Setup(x => x.Execute(validPassword))
             .Returns($"hashed_{validPassword}");
 
         _userRepositoryMock
@@ -338,7 +338,7 @@ public class UpdateUserFirstTimeTest
 
         // Assert
         Assert.True(result.Success);
-        _passwordHashMock.Verify(x => x.HashPassword(validPassword), Times.Once);
+        _passwordHashMock.Verify(x => x.Execute(validPassword), Times.Once);
     }
 
     [Fact]
@@ -362,7 +362,7 @@ public class UpdateUserFirstTimeTest
             .Returns(true);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword("NewPass123!"))
+            .Setup(x => x.Execute("NewPass123!"))
             .Returns("newHashedPassword");
 
         _userRepositoryMock
@@ -415,7 +415,7 @@ public class UpdateUserFirstTimeTest
             .Returns(true);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(It.IsAny<string>()))
+            .Setup(x => x.Execute(It.IsAny<string>()))
             .Returns("newHashedPassword");
 
         _userRepositoryMock
@@ -468,7 +468,7 @@ public class UpdateUserFirstTimeTest
             .Returns(true);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword("NewPass123!"))
+            .Setup(x => x.Execute("NewPass123!"))
             .Returns("newHashedPassword");
 
         _userRepositoryMock

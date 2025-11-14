@@ -212,7 +212,7 @@ public class ResetPasswordUseCaseTests
             .ReturnsAsync(resetToken);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(validPassword))
+            .Setup(x => x.Execute(validPassword))
             .Returns(hashedPassword);
 
         // Act
@@ -260,7 +260,7 @@ public class ResetPasswordUseCaseTests
             .ReturnsAsync(resetToken);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(newPassword))
+            .Setup(x => x.Execute(newPassword))
             .Returns("hashed-password");
 
         // Act
@@ -311,7 +311,7 @@ public class ResetPasswordUseCaseTests
             .ReturnsAsync(resetToken);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(newPassword))
+            .Setup(x => x.Execute(newPassword))
             .Returns("hashed-password");
 
         // Act
@@ -356,7 +356,7 @@ public class ResetPasswordUseCaseTests
             .ReturnsAsync(resetToken);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(newPassword))
+            .Setup(x => x.Execute(newPassword))
             .Returns("hashed-password");
 
         _userRepositoryMock

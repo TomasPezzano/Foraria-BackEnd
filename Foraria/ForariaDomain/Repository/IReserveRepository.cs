@@ -6,10 +6,12 @@ namespace Foraria.Domain.Repository
     {
         Task<IEnumerable<Reserve>> GetUpcomingReservationsAsync(int consortiumId, DateTime fromDate, int limit = 5);
         Task Add(Reserve reserve);
+        Task<List<Reserve>> GetAllInConsortium(int idConsortium);
         Task<List<Reserve>> GetAll();
         Task UpdateRange(List<Reserve> reserves);
         Task<IEnumerable<Reserve>> GetActiveReservationsAsync(int consortiumId, DateTime now);
 
+        Task<Reserve> getReserveByPlaceAndCreatedAt(int consortiumId,DateTime createdAt, int place_id);
 
     }
 }

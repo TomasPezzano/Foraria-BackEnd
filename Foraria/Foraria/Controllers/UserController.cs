@@ -212,7 +212,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "All")]
     [SwaggerOperation(Summary = "Obtiene un usuario por su ID.", Description = "Devuelve los datos básicos del usuario solicitado.")]
     public async Task<IActionResult> GetUserById([FromQuery] int id)
     {
@@ -230,10 +230,15 @@ public class UserController : ControllerBase
             Id = user.Id,
             FirstName = user.Name,
             LastName = user.LastName,
+            Photo = user.Photo,
             Email = user.Mail,
             PhoneNumber = user.PhoneNumber,
+            Dni = user.Dni,
             RoleId = user.Role_id,
+            RoleDescription = user.Role.Description,
             ResidenceId = residenceId,
+            Floor = residence?.Floor,
+            NumberFloor = residence?.Number,
             ConsortiumId = consortiumId,
             Success = true
         };

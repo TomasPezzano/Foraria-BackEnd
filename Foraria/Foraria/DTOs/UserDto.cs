@@ -21,6 +21,7 @@ public class UserDto
 
     [Required(ErrorMessage = "Rol es requerido")]
     public int RoleId { get; set; }
+    public string? Photo { get; set; }
 
     public string TemporaryPassword { get; set; }
     public string Message { get; set; }
@@ -31,4 +32,11 @@ public class UserDto
 
     public int? ConsortiumId { get; set; }
 
+    public long? Dni { get; set; }
+
+    public int? Floor { get; set; }
+
+    public int? NumberFloor { get; set; }
+
+    public string? RoleDescription { get; set; }
 }

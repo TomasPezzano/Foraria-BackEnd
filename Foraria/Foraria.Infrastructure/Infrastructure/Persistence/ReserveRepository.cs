@@ -39,7 +39,16 @@ namespace Foraria.Infrastructure.Repository
 
         public async Task<List<Reserve>> GetAll()
         {
-            return await _context.Reserves.ToListAsync();
+            return await _context.Reserves
+                .ToListAsync();
+        }
+
+        public async Task<List<Reserve>> GetAllInConsortium(int idConsortium)
+        {
+            return await _context.Reserves
+                .Include(r => r.Place)
+                .Where(r => r.ConsortiumId == idConsortium)
+                .ToListAsync();
         }
 
         public async Task UpdateRange(List<Reserve> reserves)
@@ -60,6 +69,11 @@ namespace Foraria.Infrastructure.Repository
                     r.DeletedAt == null &&
                     r.Date >= now)
                 .ToListAsync();
+        }
+
+        public async Task<Reserve> getReserveByPlaceAndCreatedAt(int consortiumId,DateTime createdAt, int place_id)
+        {
+            return await _context.Reserves.Where(r=> r.ConsortiumId == consortiumId && r.CreatedAt == createdAt && r.Place_id == place_id ).FirstOrDefaultAsync();
         }
     }
 }

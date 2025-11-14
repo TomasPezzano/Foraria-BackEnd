@@ -21,7 +21,7 @@ namespace Foraria.Application.UseCase
             var invoices = await _repository.GetAllInvoicesByMonthAndConsortium(startOfMonth, consortiumId);
 
             var total = invoices
-                .Where(i => i.DateOfIssue >= startOfMonth && i.DateOfIssue <= endOfMonth)
+                .Where(i => i.ProcessedAt >= startOfMonth && i.ProcessedAt <= endOfMonth)
                 .Sum(i => (double)i.Amount);
 
             return total;
