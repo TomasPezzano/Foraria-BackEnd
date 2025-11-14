@@ -43,7 +43,6 @@ namespace Foraria.Migrations
                 principalColumn: "Id");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
@@ -59,10 +58,6 @@ namespace Foraria.Migrations
                 table: "userDocument");
 
             migrationBuilder.DropColumn(
-                name: "HasPermission",
-                table: "user");
-
-            migrationBuilder.DropColumn(
                 name: "ApprovedAt",
                 table: "poll");
 
@@ -70,5 +65,6 @@ namespace Foraria.Migrations
                 name: "ApprovedByUserId",
                 table: "poll");
         }
+
     }
 }

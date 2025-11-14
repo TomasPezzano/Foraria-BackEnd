@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251112233429_CallAndCallTranscript")]
+    partial class CallAndCallTranscript
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,32 +106,6 @@ namespace Foraria.Migrations
                     b.ToTable("Calls");
                 });
 
-            modelBuilder.Entity("ForariaDomain.CallMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CallId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CallMessages");
-                });
-
             modelBuilder.Entity("ForariaDomain.CallParticipant", b =>
                 {
                     b.Property<int>("Id")
@@ -139,15 +116,6 @@ namespace Foraria.Migrations
 
                     b.Property<int>("CallId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsCameraOn")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsConnected")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsMuted")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("JoinedAt")
                         .HasColumnType("datetime2");
@@ -163,33 +131,6 @@ namespace Foraria.Migrations
                     b.HasIndex("CallId");
 
                     b.ToTable("CallParticipants");
-                });
-
-            modelBuilder.Entity("ForariaDomain.CallRecording", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CallId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CallRecordings");
                 });
 
             modelBuilder.Entity("ForariaDomain.CallTranscript", b =>
@@ -965,9 +906,6 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ConsortiumId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -995,8 +933,6 @@ namespace Foraria.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
 
                     b.HasIndex("Place_id");
 
@@ -1670,12 +1606,6 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
                 {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("Reserves")
-                        .HasForeignKey("ConsortiumId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("ForariaDomain.Place", "Place")
                         .WithMany("Reserves")
                         .HasForeignKey("Place_id")
@@ -1693,8 +1623,6 @@ namespace Foraria.Migrations
                         .HasForeignKey("User_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Consortium");
 
                     b.Navigation("Place");
 
@@ -1858,8 +1786,6 @@ namespace Foraria.Migrations
                     b.Navigation("Expenses");
 
                     b.Navigation("Invoices");
-
-                    b.Navigation("Reserves");
 
                     b.Navigation("Residences");
 

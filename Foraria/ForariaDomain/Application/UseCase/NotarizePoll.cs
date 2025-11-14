@@ -1,19 +1,21 @@
 ﻿using Foraria.Domain.Model;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
-using System;
-
-namespace ForariaDomain.Application.UseCase;
 
 public class NotarizePoll
 {
     private readonly IBlockchainService _blockchain;
     private readonly IBlockchainProofRepository _proofRepo;
+    private readonly IUnitOfWork _uow;
 
-    public NotarizePoll(IBlockchainService blockchain, IBlockchainProofRepository proofRepo)
+    public NotarizePoll(
+        IBlockchainService blockchain,
+        IBlockchainProofRepository proofRepo,
+        IUnitOfWork uow)
     {
         _blockchain = blockchain;
         _proofRepo = proofRepo;
+        _uow = uow;
     }
 
     public async Task<BlockchainProof> ExecuteAsync(int pollId, string text)
@@ -26,7 +28,7 @@ public class NotarizePoll
         var hashBytes = _blockchain.ComputeSha256(text.Trim());
         var hashHex = _blockchain.BytesToHex(hashBytes);
 
-        if (!hashHex.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+        if (!hashHex.StartsWith("0x"))
             hashHex = "0x" + hashHex;
 
         var (txHash, _) = await _blockchain.NotarizeAsync(hashHex, uri);
@@ -37,13 +39,15 @@ public class NotarizePoll
             HashHex = hashHex,
             Uri = uri,
             TxHash = txHash,
-            Contract = "0xA8a7BcAb69C858929e03f5f93986F65195aE935C",
+            Contract = _blockchain.ContractAddress,
             Network = "polygon",
             ChainId = 80002,
             CreatedAtUtc = DateTime.UtcNow
         };
 
-        await _proofRepo.AddAsync(proof);
+        _proofRepo.Add(proof);
+        await _uow.SaveChangesAsync();
+
         return proof;
     }
 }

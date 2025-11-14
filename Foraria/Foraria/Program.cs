@@ -8,13 +8,16 @@ using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Infrastructure.Persistence;
+using Foraria.Infrastructure.Infrastructure.Persistence.Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Infrastructure.Services;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using Foraria.SignalRImplementation;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
+using ForariaDomain.Application.UseCase.Foraria.Application.UseCase;
 using ForariaDomain.Repository;
+using ForariaDomain.Repository.ForariaDomain.Repository;
 using ForariaDomain.Services;
 using MercadoPago.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -172,7 +175,27 @@ builder.Services.AddScoped<IPasswordResetTokenGenerator, ResetTokenGeneratorPass
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
 builder.Services.AddScoped<IResetPassword, ResetPassword>();
-
+builder.Services.AddScoped<ICallRepository, CallRepository>();
+builder.Services.AddScoped<ICallParticipantRepository, CallParticipantRepository>();
+builder.Services.AddScoped<ICallTranscriptRepository, CallTranscriptRepository>();
+builder.Services.AddScoped<CreateCall>();
+builder.Services.AddScoped<EndCall>();
+builder.Services.AddScoped<JoinCall>();
+builder.Services.AddScoped<FinalizeCallTranscriptionAndNotarize>();
+builder.Services.AddScoped<RegisterTranscriptionResult>();
+builder.Services.AddScoped<VerifyTranscriptIntegrity>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<GetCallDetails>();
+builder.Services.AddScoped<GetCallParticipants>();
+builder.Services.AddScoped<GetCallMessages>();
+builder.Services.AddScoped<ToggleMute>();
+builder.Services.AddScoped<ToggleCamera>();
+builder.Services.AddScoped<LeaveCall>();
+builder.Services.AddScoped<SaveCallMessage>();
+builder.Services.AddScoped<SaveCallRecording>();
+builder.Services.AddScoped<GetCallRecordings>();
+builder.Services.AddScoped<ICallMessageRepository, CallMessageRepository>();
+builder.Services.AddScoped<ICallRecordingRepository, CallRecordingRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -267,6 +290,11 @@ builder.Services.AddAuthorization(options =>
         }));
 });
 
+builder.Services.AddHttpClient("TranscriptionService", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["TranscriptionService:BaseUrl"]);
+});
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -352,6 +380,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.MapHub<PollHub>("/pollHub");
+app.MapHub<CallHub>("/callHub");
 
 app.UseHttpsRedirection();
 

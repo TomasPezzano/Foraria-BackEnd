@@ -27,6 +27,7 @@ namespace Foraria.Infrastructure.Blockchain
         private readonly string _abi;
         private readonly Web3 _web3;
         private readonly Account _account;
+        public string ContractAddress => _contractAddress;
 
 
 
