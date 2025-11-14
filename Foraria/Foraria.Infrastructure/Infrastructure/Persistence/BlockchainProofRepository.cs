@@ -47,5 +47,8 @@ namespace Foraria.Infrastructure.Repository
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.CallTranscriptId == callTranscriptId);
         }
+        public Task<BlockchainProof?> GetByHashHexAsync(string hashHex)
+            => _context.BlockchainProofs
+                .FirstOrDefaultAsync(x => x.HashHex.ToLower() == hashHex.ToLower());
     }
 }

@@ -38,6 +38,12 @@ public class FinalizeCallTranscriptionAndNotarize
 
         var hashHex = transcript.TranscriptHash;
 
+        var existing = await _proofRepo.GetByHashHexAsync(hashHex);
+        if (existing != null)
+            throw new InvalidOperationException(
+                "El archivo ya fue notarizado previamente. Si querés volver a registrarlo, modificá el contenido para generar un hash diferente."
+            );
+
         var uri = $"call-transcript:{transcript.CallId}";
 
 

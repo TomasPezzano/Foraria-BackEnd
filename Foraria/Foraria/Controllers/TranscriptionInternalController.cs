@@ -47,6 +47,12 @@ public class TranscriptionInternalController : ControllerBase
     [AllowAnonymous] // microservicio
     public async Task<IActionResult> Complete(int callId, [FromBody] CallTranscriptCompleteDto request)
     {
+        var existingByHash = await _proofRepo.GetByHashHexAsync(request.TranscriptHash);
+        if (existingByHash != null)
+            throw new InvalidOperationException(
+                "El archivo ya fue notarizado previamente. No se puede registrar nuevamente."
+            );
+
         var transcript = _register.Execute(
             callId,
             request.TranscriptPath,
@@ -77,16 +83,15 @@ public class TranscriptionInternalController : ControllerBase
 
         var proof = await _proofRepo.GetByCallTranscriptIdAsync(transcript.Id);
 
-        var transcriptionServiceBase =
-            _config["TranscriptionService:BaseUrl"]?.TrimEnd('/')
+        var baseUrl = _config["TranscriptionService:BaseUrl"]
             ?? throw new InvalidOperationException("TranscriptionService:BaseUrl no configurado.");
 
-        var transcriptUrl = $"{transcriptionServiceBase}/api/transcriptions/{callId}/transcript-file";
-        var audioUrl = $"{transcriptionServiceBase}/api/transcriptions/{callId}/audio-file";
+        var transcriptUrl = $"{baseUrl}/api/transcriptions/{callId}/transcript-file";
+        var audioUrl = $"{baseUrl}/api/transcriptions/{callId}/audio-file";
 
-        string? explorerUrl = proof?.TxHash == null
-            ? null
-            : $"https://amoy.polygonscan.com/tx/{proof.TxHash}";
+        var explorerUrl = proof?.TxHash != null
+            ? $"https://amoy.polygonscan.com/tx/{proof.TxHash}"
+            : null;
 
         return Ok(new
         {
@@ -121,7 +126,9 @@ public class TranscriptionInternalController : ControllerBase
         var (transcript, proof, hashMatches, isValidOnChain) =
             await _verifyTranscriptIntegrity.ExecuteAsync(callId);
 
-        var explorerUrl = $"https://amoy.polygonscan.com/tx/{proof.TxHash}";
+        var explorerUrl = proof.TxHash != null
+            ? $"https://amoy.polygonscan.com/tx/{proof.TxHash}"
+            : null;
 
         return Ok(new
         {

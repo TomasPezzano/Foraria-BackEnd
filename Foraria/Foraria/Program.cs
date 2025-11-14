@@ -181,6 +181,7 @@ builder.Services.AddScoped<JoinCall>();
 builder.Services.AddScoped<FinalizeCallTranscriptionAndNotarize>();
 builder.Services.AddScoped<RegisterTranscriptionResult>();
 builder.Services.AddScoped<VerifyTranscriptIntegrity>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
@@ -273,6 +274,11 @@ builder.Services.AddAuthorization(options =>
 
             return false;
         }));
+});
+
+builder.Services.AddHttpClient("TranscriptionService", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["TranscriptionService:BaseUrl"]);
 });
 
 
