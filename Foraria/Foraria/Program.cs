@@ -8,13 +8,16 @@ using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Infrastructure.Persistence;
+using Foraria.Infrastructure.Infrastructure.Persistence.Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Infrastructure.Services;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using Foraria.SignalRImplementation;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
+using ForariaDomain.Application.UseCase.Foraria.Application.UseCase;
 using ForariaDomain.Repository;
+using ForariaDomain.Repository.ForariaDomain.Repository;
 using ForariaDomain.Services;
 using MercadoPago.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -182,6 +185,17 @@ builder.Services.AddScoped<FinalizeCallTranscriptionAndNotarize>();
 builder.Services.AddScoped<RegisterTranscriptionResult>();
 builder.Services.AddScoped<VerifyTranscriptIntegrity>();
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<GetCallDetails>();
+builder.Services.AddScoped<GetCallParticipants>();
+builder.Services.AddScoped<GetCallMessages>();
+builder.Services.AddScoped<ToggleMute>();
+builder.Services.AddScoped<ToggleCamera>();
+builder.Services.AddScoped<LeaveCall>();
+builder.Services.AddScoped<SaveCallMessage>();
+builder.Services.AddScoped<SaveCallRecording>();
+builder.Services.AddScoped<GetCallRecordings>();
+builder.Services.AddScoped<ICallMessageRepository, CallMessageRepository>();
+builder.Services.AddScoped<ICallRecordingRepository, CallRecordingRepository>();
 
 builder.Services.AddCors(options =>
 {

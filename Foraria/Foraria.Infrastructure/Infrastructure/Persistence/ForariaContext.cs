@@ -75,6 +75,8 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<Call> Calls { get; set; }
         public DbSet<CallParticipant> CallParticipants { get; set; }
         public DbSet<CallTranscript> CallTranscripts { get; set; }
+        public DbSet<CallMessage> CallMessages { get; set; }
+        public DbSet<CallRecording> CallRecordings { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

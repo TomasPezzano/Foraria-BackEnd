@@ -119,7 +119,7 @@ public class TranscriptionInternalController : ControllerBase
     [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Verifica integridad de la transcripción y su validez en blockchain.",
-        Description = "Recalcula hash, compara con DB y verifica contra la prueba en blockchain."
+        Description = "Recalcula hash, compara con DB y verifica contra la prueba en blockchain. Requiere de Microservicio Foraria.Calltranscript"
     )]
     public async Task<IActionResult> Verify(int callId)
     {
