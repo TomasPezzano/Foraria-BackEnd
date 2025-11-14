@@ -70,5 +70,10 @@ namespace Foraria.Infrastructure.Repository
                     r.Date >= now)
                 .ToListAsync();
         }
+
+        public async Task<Reserve> getReserveByPlaceAndCreatedAt(int consortiumId,DateTime createdAt, int place_id)
+        {
+            return await _context.Reserves.Where(r=> r.ConsortiumId == consortiumId && r.CreatedAt == createdAt && r.Place_id == place_id ).FirstOrDefaultAsync();
+        }
     }
 }

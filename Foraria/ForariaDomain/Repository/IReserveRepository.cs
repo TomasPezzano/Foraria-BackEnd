@@ -11,6 +11,7 @@ namespace Foraria.Domain.Repository
         Task UpdateRange(List<Reserve> reserves);
         Task<IEnumerable<Reserve>> GetActiveReservationsAsync(int consortiumId, DateTime now);
 
+        Task<Reserve> getReserveByPlaceAndCreatedAt(int consortiumId,DateTime createdAt, int place_id);
 
     }
 }

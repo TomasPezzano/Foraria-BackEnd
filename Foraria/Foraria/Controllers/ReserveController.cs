@@ -1,8 +1,9 @@
-﻿using Foraria.DTOs;
+﻿    using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -32,7 +33,7 @@ public class ReserveController : ControllerBase
     }
 
     [HttpGet("{idConsortium}")]
-    [Authorize(Policy = "All")]
+    //[Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Obtiene todas las reservas registradas.",
         Description = "Devuelve una lista completa de reservas activas y pasadas del sistema."
@@ -44,14 +45,36 @@ public class ReserveController : ControllerBase
     {
         var reserves = await _getAllReserve.Execute(idConsortium);
 
+        var reservesDto = new List<ReserveResponseDto>();
+
+        foreach (var reserve in reserves)
+        {
+            var reserveDto = new ReserveResponseDto
+            {
+                Id = reserve.Id,
+                Description = reserve.Description,
+                State = reserve.State,
+                CreatedAt = reserve.Date,
+                DeletedAt = reserve.DeletedAt,
+                Place_id = reserve.Place_id,
+                PlaceName = reserve.Place?.Name,
+                Residence_id = reserve.Residence_id,
+                User_id = reserve.User_id,
+                UserName = reserve.User?.Name,
+                DateReserve = reserve.CreatedAt
+            };
+
+            reservesDto.Add(reserveDto);
+        }
+
         if (reserves == null || !reserves.Any())
             throw new NotFoundException($"No se encontraron reservas para el consorcio con ID {idConsortium}.");
 
-        return Ok(reserves);
+        return Ok(reservesDto);
     }
 
     [HttpPost]
-    [Authorize(Policy = "All")]
+    //[Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Crea una nueva reserva.",
         Description = "Registra una reserva asociada a un lugar, usuario y residencia."
@@ -105,7 +128,7 @@ public class ReserveController : ControllerBase
             DateReserve = created.CreatedAt
         };
 
-        return CreatedAtAction(nameof(GetAll), new { id = response.Id }, response);
+        return Ok(response);
     }
 
     [HttpPost("update-old")]
