@@ -33,7 +33,7 @@ public class ReserveController : ControllerBase
     }
 
     [HttpGet("{idConsortium}")]
-    //[Authorize(Policy = "All")]
+    [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Obtiene todas las reservas registradas.",
         Description = "Devuelve una lista completa de reservas activas y pasadas del sistema."
@@ -74,7 +74,7 @@ public class ReserveController : ControllerBase
     }
 
     [HttpPost]
-    //[Authorize(Policy = "All")]
+    [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Crea una nueva reserva.",
         Description = "Registra una reserva asociada a un lugar, usuario y residencia."
