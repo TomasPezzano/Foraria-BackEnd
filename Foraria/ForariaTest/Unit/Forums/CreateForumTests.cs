@@ -5,7 +5,7 @@ using ForariaDomain;
 using ForariaDomain.Exceptions;
 using ForariaDomain.Application.UseCase;
 
-namespace ForariaTest.Unit.Forum
+namespace ForariaTest.Unit.Forums
 {
     public class CreateForumTests
     {

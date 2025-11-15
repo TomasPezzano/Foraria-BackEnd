@@ -5,7 +5,7 @@ using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Moq;
 
-namespace ForariaTest.Unit.Message;
+namespace ForariaTest.Unit.Messages;
 
 public class DeleteMessageTests
 {

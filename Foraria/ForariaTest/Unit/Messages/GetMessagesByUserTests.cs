@@ -3,7 +3,7 @@ using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using ForariaDomain.Application.UseCase;
 using Moq;
 
-namespace ForariaTest.Unit.Message
+namespace ForariaTest.Unit.Messages
 {
     public class GetMessagesByUserTests
     {

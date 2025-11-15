@@ -7,7 +7,7 @@ using ForariaDomain.Repository;
 using Moq;
 
 
-namespace ForariaTest.Tests.UserDocument
+namespace ForariaTest.Tests.UserDocuments
 {
     public class UserDocumentTests
     {

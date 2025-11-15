@@ -4,7 +4,7 @@ using Foraria.Domain.Repository;
 using ForariaDomain.Application.UseCase;
 
 
-namespace ForariaTest.Unit.Thread
+namespace ForariaTest.Unit.Threads
 {
     public class CloseThreadTests
     {

@@ -29,7 +29,6 @@ namespace ForariaTest.Unit.Messages
         [Fact]
         public async Task Execute_ShouldCreateMessage_WhenValidData()
         {
-            // Arrange
             var message = new global::ForariaDomain.Message
             {
                 Content = "mensaje de prueba",
@@ -56,10 +55,8 @@ namespace ForariaTest.Unit.Messages
             _mockMessageRepo.Setup(r => r.Add(It.IsAny<global::ForariaDomain.Message>()))
                             .ReturnsAsync(createdMessage);
 
-            // Act
             var result = await _useCase.Execute(message);
 
-            // Assert
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
             result.Content.Should().Be("mensaje de prueba");
@@ -75,7 +72,6 @@ namespace ForariaTest.Unit.Messages
         [Fact]
         public async Task Execute_ShouldThrow_WhenThreadDoesNotExist()
         {
-            // Arrange
             var message = new global::ForariaDomain.Message
             {
                 Content = "mensaje",
@@ -86,10 +82,8 @@ namespace ForariaTest.Unit.Messages
             _mockThreadRepo.Setup(r => r.GetById(999))
                            .ReturnsAsync((global::ForariaDomain.Thread?)null);
 
-            // Act
             Func<Task> act = async () => await _useCase.Execute(message);
 
-            // Assert
             await act.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("El hilo con ID 999 no existe.");
         }
@@ -97,7 +91,6 @@ namespace ForariaTest.Unit.Messages
         [Fact]
         public async Task Execute_ShouldThrow_WhenUserDoesNotExist()
         {
-            // Arrange
             var message = new global::ForariaDomain.Message
             {
                 Content = "mensaje",
@@ -111,10 +104,8 @@ namespace ForariaTest.Unit.Messages
             _mockUserRepo.Setup(r => r.GetById(999))
                          .ReturnsAsync((global::ForariaDomain.User?)null);
 
-            // Act
             Func<Task> act = async () => await _useCase.Execute(message);
 
-            // Assert
             await act.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("El usuario con ID 999 no existe.");
         }
@@ -122,7 +113,6 @@ namespace ForariaTest.Unit.Messages
         [Fact]
         public async Task Execute_ShouldThrow_WhenContentIsEmpty()
         {
-            // Arrange
             var message = new global::ForariaDomain.Message
             {
                 Content = "  ",
@@ -136,10 +126,8 @@ namespace ForariaTest.Unit.Messages
             _mockThreadRepo.Setup(r => r.GetById(1)).ReturnsAsync(thread);
             _mockUserRepo.Setup(r => r.GetById(1)).ReturnsAsync(user);
 
-            // Act
             Func<Task> act = async () => await _useCase.Execute(message);
 
-            // Assert
             await act.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("El contenido del mensaje no puede estar vacío.");
         }
