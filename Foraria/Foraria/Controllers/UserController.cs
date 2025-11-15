@@ -69,7 +69,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterUserRequestDto request)
     {
-        await _permissionService.EnsurePermissionAsync(User, "Users.Register");
+        //await _permissionService.EnsurePermissionAsync(User, "Users.Register");
 
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos del usuario no son válidos.");
