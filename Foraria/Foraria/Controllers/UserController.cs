@@ -279,6 +279,7 @@ public class UserController : ControllerBase
             Mail = u.Mail,
             PhoneNumber = u.PhoneNumber,
             Role = u.Role.Description,
+            ConsortiumId = consortiumId,
             Residences = u.Residences.Select(r => new ResidenceDto
             {
                 Id = r.Id,
