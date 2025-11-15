@@ -12,6 +12,8 @@ public class CreateExpenseTests
     private readonly Mock<IInvoiceRepository> _invoiceRepositoryMock = new();
     private readonly Mock<IGetAllInvoicesByMonthAndConsortium> _getAllInvoicesMock = new();
     private readonly Mock<IGetConsortiumById> _getConsortiumMock = new();
+    private readonly Mock<IGetAllResidencesByConsortiumWithOwner> _getResidencesMock = new();
+    private readonly Mock<IResidenceRepository> _residenceRepositoryMock = new();
 
     private CreateExpense CreateUseCase()
     {
@@ -19,7 +21,9 @@ public class CreateExpenseTests
             _expenseRepositoryMock.Object,
             _getAllInvoicesMock.Object,
             _getConsortiumMock.Object,
-            _invoiceRepositoryMock.Object
+            _invoiceRepositoryMock.Object,
+            _getResidencesMock.Object,
+            _residenceRepositoryMock.Object
         );
     }
 
@@ -41,7 +45,6 @@ public class CreateExpenseTests
         Assert.StartsWith("El formato de la fecha es inválido", exception.Message);
     }
 
-
     [Fact]
     public async Task ExecuteAsync_ShouldThrowKeyNotFoundException_WhenConsortiumDoesNotExist()
     {
@@ -57,7 +60,6 @@ public class CreateExpenseTests
         Assert.Contains("99", exception.Message);
     }
 
-
     [Fact]
     public async Task ExecuteAsync_ShouldThrowInvalidOperationException_WhenNoInvoicesFound()
     {
@@ -69,20 +71,20 @@ public class CreateExpenseTests
 
         var useCase = CreateUseCase();
 
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             useCase.ExecuteAsync(1, "2025-10")
         );
 
-        Assert.StartsWith("No existen facturas registradas", exception.Message);
+        Assert.StartsWith("No existen facturas registradas", ex.Message);
     }
 
     [Fact]
     public async Task ExecuteAsync_ShouldThrowInvalidOperationException_WhenTotalAmountIsZeroOrNegative()
     {
         var invoices = new List<Invoice>
-        {
-            new Invoice { Id = 1, Amount = 0 }
-        };
+    {
+        new Invoice { Id = 1, Amount = 0 }
+    };
 
         _getConsortiumMock.Setup(x => x.Execute(1))
             .ReturnsAsync(new Consortium { Id = 1 });
@@ -90,14 +92,21 @@ public class CreateExpenseTests
         _getAllInvoicesMock.Setup(x => x.Execute(It.IsAny<DateTime>(), 1))
             .ReturnsAsync(invoices);
 
+        _getResidencesMock.Setup(x => x.ExecuteAsync(1))
+            .ReturnsAsync(new List<Residence>
+            {
+            new Residence { Id = 1, Expenses = new List<Expense>() }
+            });
+
         var useCase = CreateUseCase();
 
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
             useCase.ExecuteAsync(1, "2025-10")
         );
 
-        Assert.Equal("El total de las facturas no puede ser cero o negativo.", exception.Message);
+        Assert.Equal("El total de las facturas no puede ser cero o negativo.", ex.Message);
     }
+
 
     [Fact]
     public async Task ExecuteAsync_ShouldCreateExpenseSuccessfully()
@@ -110,11 +119,13 @@ public class CreateExpenseTests
             new Invoice { Id = 11, Amount = 250 }
         };
 
-        var expectedExpense = new Expense
+        var residences = new List<Residence>
         {
-            Id = 123,
-            TotalAmount = 750
+            new Residence { Id = 1, Expenses = new List<Expense>() },
+            new Residence { Id = 2, Expenses = new List<Expense>() }
         };
+
+        var expectedExpenseId = 123;
 
         _getConsortiumMock.Setup(x => x.Execute(1))
             .ReturnsAsync(consortium);
@@ -122,29 +133,42 @@ public class CreateExpenseTests
         _getAllInvoicesMock.Setup(x => x.Execute(It.IsAny<DateTime>(), 1))
             .ReturnsAsync(invoices);
 
-        _expenseRepositoryMock.Setup(
-            x => x.AddExpenseAsync(It.IsAny<Expense>())
-        )
-        .ReturnsAsync((Expense e) =>
-        {
-            e.Id = expectedExpense.Id;
-            return e;
-        });
+        _getResidencesMock.Setup(x => x.ExecuteAsync(1))
+            .ReturnsAsync(residences);
+
+        _expenseRepositoryMock
+            .Setup(x => x.AddExpenseAsync(It.IsAny<Expense>()))
+            .ReturnsAsync((Expense e) =>
+            {
+                e.Id = expectedExpenseId;
+                return e;
+            });
 
         var useCase = CreateUseCase();
-
         var result = await useCase.ExecuteAsync(1, "2025-10");
 
+
         Assert.NotNull(result);
-        Assert.Equal(123, result.Id);
+        Assert.Equal(expectedExpenseId, result.Id);
         Assert.Equal(750, result.TotalAmount);
         Assert.Equal(2, result.Invoices.Count);
 
+
         _invoiceRepositoryMock.Verify(
-            x => x.UpdateInvoiceAsync(It.Is<Invoice>(i => i.ExpenseId == 123)),
+            x => x.UpdateInvoiceAsync(It.Is<Invoice>(i => i.ExpenseId == expectedExpenseId)),
             Times.Exactly(2)
         );
 
+
+        _residenceRepositoryMock.Verify(
+            x => x.UpdateExpense(It.IsAny<Residence>()),
+            Times.Exactly(2)
+        );
+
+
+        Assert.All(residences, r =>
+            Assert.Contains(result, r.Expenses)
+        );
 
         _expenseRepositoryMock.Verify(
             x => x.AddExpenseAsync(It.IsAny<Expense>()),

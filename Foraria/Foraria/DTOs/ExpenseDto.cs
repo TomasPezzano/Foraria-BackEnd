@@ -9,7 +9,7 @@ namespace Foraria.DTOs;
 public class ExpenseDto
 {
     public int ConsortiumId { get; set; }
-    public string month { get; set;}
+    public string month { get; set; }
 }
 
 public class ExpenseResponseDto
@@ -25,4 +25,6 @@ public class ExpenseResponseDto
     public int ConsortiumId { get; set; }
 
     public ICollection<InvoiceResponseDto> Invoices { get; set; }
+
+    public ICollection<ResidenceResponseDto> Residences { get; set; }
 }
