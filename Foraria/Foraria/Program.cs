@@ -206,6 +206,7 @@ builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
 builder.Services.AddScoped<ISendExpenseReminderNotification, SendExpenseReminderNotification>();
 builder.Services.AddScoped<IConfigureNotificationPreferences, ConfigureNotificationPreferences>();
 builder.Services.AddHostedService<ExpenseReminderBackgroundService>();
+builder.Services.AddScoped<IGetActiveContractsSupplierCount, GetActiveContractsSupplierCount>();
 
 builder.Services.AddCors(options =>
 {
