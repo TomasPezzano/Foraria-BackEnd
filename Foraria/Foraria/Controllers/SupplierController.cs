@@ -110,7 +110,7 @@ public class SupplierController : ControllerBase
         if (id <= 0)
             throw new DomainValidationException("Debe especificar un ID de proveedor válido.");
 
-        _deleteSupplier.Execute(id);
+        _deleteSupplier.ExecuteAsync(id);
         return NoContent();
     }
 
@@ -122,14 +122,14 @@ public class SupplierController : ControllerBase
     )]
     [ProducesResponseType(typeof(SupplierResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetSupplierById(int id)
+    public async Task<IActionResult> GetSupplierById(int id)
     {
-        _permissionService.EnsurePermissionAsync(User, "Suppliers.View");
+        await _permissionService.EnsurePermissionAsync(User, "Suppliers.View");
 
         if (id <= 0)
             throw new DomainValidationException("Debe especificar un ID de proveedor válido.");
 
-        var supplier = _getSupplierById.Execute(id);
+        var supplier = await _getSupplierById.Execute(id);
         if (supplier == null)
             throw new NotFoundException($"Proveedor con ID {id} no encontrado.");
 
@@ -160,11 +160,12 @@ public class SupplierController : ControllerBase
     )]
     [ProducesResponseType(typeof(IEnumerable<SupplierResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetAllSuppliers()
+    public async Task<IActionResult> GetAllSuppliersAsync(int consortiumId)
     {
-        _permissionService.EnsurePermissionAsync(User, "Suppliers.ViewAll");
+        await _permissionService.EnsurePermissionAsync(User, "Suppliers.ViewAll");
 
-        var suppliers = _getAllSupplier.Execute();
+        var suppliers = await _getAllSupplier.Execute(consortiumId);
+
         if (suppliers == null || !suppliers.Any())
             throw new NotFoundException("No se encontraron proveedores registrados.");
 
@@ -195,9 +196,9 @@ public class SupplierController : ControllerBase
     )]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetSupplierCategoriesCount()
+    public async Task<IActionResult> GetSupplierCategoriesCount(int consortiumId)
     {
-        var suppliers = _getAllSupplier.Execute();
+        var suppliers = await _getAllSupplier.Execute(consortiumId);
         if (suppliers == null || !suppliers.Any())
             throw new NotFoundException("No se encontraron proveedores registrados.");
         var distinctCategoryCount = suppliers

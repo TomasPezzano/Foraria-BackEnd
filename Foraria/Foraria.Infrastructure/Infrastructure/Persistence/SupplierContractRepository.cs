@@ -26,14 +26,14 @@ public class SupplierContractRepository : ISupplierContractRepository
         return contract;
     }
 
-    public SupplierContract? GetById(int id)
+    public async Task<SupplierContract?> GetById(int id)
     {
-        return _context.SupplierContracts
+        return await _context.SupplierContracts
             .Include(c => c.Supplier)
-            .FirstOrDefault(c => c.Id == id);
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public List<SupplierContract> GetBySupplierId(int supplierId)
+    public async Task<List<SupplierContract>> GetBySupplierId(int supplierId)
     {
         return _context.SupplierContracts
             .Include(c => c.Supplier)

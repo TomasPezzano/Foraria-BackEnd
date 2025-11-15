@@ -5,7 +5,7 @@ namespace ForariaDomain.Application.UseCase;
 
 public interface ICreateSupplierContract
 {
-    SupplierContract Execute(SupplierContract contract);
+    Task<SupplierContract> Execute(SupplierContract contract);
 }
 public class CreateSupplierContract : ICreateSupplierContract
 {
@@ -20,9 +20,9 @@ public class CreateSupplierContract : ICreateSupplierContract
         _supplierRepository = supplierRepository;
     }
 
-    public SupplierContract Execute(SupplierContract contract)
+    public async Task<SupplierContract> Execute(SupplierContract contract)
     {
-        var supplier = _supplierRepository.GetById(contract.SupplierId);
+        var supplier = await _supplierRepository.GetById(contract.SupplierId);
         if (supplier == null)
         {
             throw new ArgumentException($"El proveedor con ID {contract.SupplierId} no existe.");
@@ -53,7 +53,7 @@ public class CreateSupplierContract : ICreateSupplierContract
             throw new ArgumentException("El monto mensual debe ser mayor a 0.");
         }
 
-        var existingContracts = _contractRepository.GetBySupplierId(contract.SupplierId);
+        var existingContracts = await _contractRepository.GetBySupplierId(contract.SupplierId);
         if (existingContracts.Any(c => c.Name.Equals(contract.Name, StringComparison.OrdinalIgnoreCase) && c.Active))
         {
             throw new InvalidOperationException($"Ya existe un contrato activo con el nombre '{contract.Name}' para este proveedor.");

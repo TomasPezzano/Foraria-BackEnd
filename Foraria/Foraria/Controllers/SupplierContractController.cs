@@ -81,11 +81,11 @@ public class SupplierContractController : ControllerBase
             FilePath = filePath
         };
 
-        var createdContract = _createSupplierContract.Execute(contract);
+        var createdContract = await _createSupplierContract.Execute(contract);
         if (createdContract == null)
             throw new BusinessException("No se pudo crear el contrato del proveedor.");
 
-        var supplier = _getSupplierById.Execute(createdContract.SupplierId);
+        var supplier = await _getSupplierById.Execute(createdContract.SupplierId);
         if (supplier == null)
             throw new NotFoundException($"Proveedor con ID {createdContract.SupplierId} no encontrado.");
 
@@ -126,11 +126,11 @@ public class SupplierContractController : ControllerBase
         if (id <= 0)
             throw new DomainValidationException("Debe proporcionar un ID de contrato válido.");
 
-        var contract = _getSupplierContractById.Execute(id);
+        var contract = await _getSupplierContractById.Execute(id);
         if (contract == null)
             throw new NotFoundException($"Contrato con ID {id} no encontrado.");
 
-        var supplier = _getSupplierById.Execute(contract.SupplierId);
+        var supplier = await _getSupplierById.Execute(contract.SupplierId);
         if (supplier == null)
             throw new NotFoundException($"Proveedor con ID {contract.SupplierId} no encontrado.");
 
@@ -171,11 +171,11 @@ public class SupplierContractController : ControllerBase
         if (supplierId <= 0)
             throw new DomainValidationException("Debe especificar un ID de proveedor válido.");
 
-        var supplier = _getSupplierById.Execute(supplierId);
+        var supplier = await _getSupplierById.Execute(supplierId);
         if (supplier == null)
             throw new NotFoundException($"Proveedor con ID {supplierId} no encontrado.");
 
-        var contracts = _getContractsBySupplierId.Execute(supplierId);
+        var contracts = await _getContractsBySupplierId.Execute(supplierId);
         if (contracts == null || !contracts.Any())
             throw new NotFoundException("No se encontraron contratos asociados a este proveedor.");
 

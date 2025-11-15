@@ -37,7 +37,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act
-        var result = useCase.Execute(1);
+        var result = useCase.ExecuteAsync(1);
 
         // Assert
         Assert.True(result);
@@ -74,7 +74,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act
-        var result = useCase.Execute(1);
+        var result = useCase.ExecuteAsync(1);
 
         // Assert
         Assert.True(result);
@@ -94,7 +94,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act & Assert
-        var exception = Assert.Throws<KeyNotFoundException>(() => useCase.Execute(999));
+        var exception = Assert.Throws<KeyNotFoundException>(() => useCase.ExecuteAsync(999));
         Assert.Equal("El proveedor con ID 999 no existe", exception.Message);
         mockRepository.Verify(r => r.GetById(999), Times.Once);
         mockRepository.Verify(r => r.Delete(It.IsAny<int>()), Times.Never);
@@ -130,7 +130,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => useCase.Execute(1));
+        var exception = Assert.Throws<InvalidOperationException>(() => useCase.ExecuteAsync(1));
         Assert.Equal("No se puede eliminar un proveedor con contratos activos", exception.Message);
         mockRepository.Verify(r => r.GetById(1), Times.Once);
         mockRepository.Verify(r => r.Delete(It.IsAny<int>()), Times.Never);
@@ -161,7 +161,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => useCase.Execute(1));
+        Assert.Throws<InvalidOperationException>(() => useCase.ExecuteAsync(1));
         mockRepository.Verify(r => r.Delete(It.IsAny<int>()), Times.Never);
     }
 
@@ -189,7 +189,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act
-        var result = useCase.Execute(1);
+        var result = useCase.ExecuteAsync(1);
 
         // Assert
         Assert.True(result);

@@ -4,7 +4,7 @@ namespace ForariaDomain.Application.UseCase;
 
 public interface IDeleteSupplier
 {
-    bool Execute(int supplierId);
+    Task<bool> ExecuteAsync(int supplierId);
 }
 
 public class DeleteSupplier : IDeleteSupplier
@@ -16,9 +16,9 @@ public class DeleteSupplier : IDeleteSupplier
         _supplierRepository = supplierRepository;
     }
 
-    public bool Execute(int supplierId)
+    public async Task<bool> ExecuteAsync(int supplierId)
     {
-        var supplier = _supplierRepository.GetById(supplierId);
+        var supplier = await _supplierRepository.GetById(supplierId);
 
         if (supplier == null)
             throw new KeyNotFoundException($"El proveedor con ID {supplierId} no existe");
