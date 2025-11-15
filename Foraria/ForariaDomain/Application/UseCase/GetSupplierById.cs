@@ -10,9 +10,9 @@ public class GetSupplierById
     {
         _supplierRepository = supplierRepository;
     }
-    public Supplier? Execute(int supplierId)
+    public async Task<Supplier?> Execute(int supplierId)
     {
-        return _supplierRepository.GetById(supplierId);
+        return await _supplierRepository.GetById(supplierId);
     }
 
 }

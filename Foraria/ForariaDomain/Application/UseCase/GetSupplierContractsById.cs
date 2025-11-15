@@ -18,9 +18,9 @@ public class GetSupplierContractsById
         _expirationService = expirationService;
     }
 
-    public List<SupplierContract> Execute(int supplierId)
+    public async Task<List<SupplierContract>> Execute(int supplierId)
     {
-        var contracts = _contractRepository.GetBySupplierId(supplierId);
+        var contracts = await _contractRepository.GetBySupplierId(supplierId);
 
         var contractsToUpdate = new List<SupplierContract>();
 

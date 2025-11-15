@@ -19,21 +19,21 @@ public class SupplierContractRepository : ISupplierContractRepository
         _context = context;
     }
 
-    public SupplierContract Create(SupplierContract contract)
+    public async Task<SupplierContract> Create(SupplierContract contract)
     {
-        _context.SupplierContracts.Add(contract);
-        _context.SaveChanges();
+        await _context.SupplierContracts.AddAsync(contract);
+        await _context.SaveChangesAsync();
         return contract;
     }
 
-    public SupplierContract? GetById(int id)
+    public async Task<SupplierContract?> GetById(int id)
     {
-        return _context.SupplierContracts
+        return await _context.SupplierContracts
             .Include(c => c.Supplier)
-            .FirstOrDefault(c => c.Id == id);
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public List<SupplierContract> GetBySupplierId(int supplierId)
+    public async Task<List<SupplierContract>> GetBySupplierId(int supplierId)
     {
         return _context.SupplierContracts
             .Include(c => c.Supplier)
@@ -42,19 +42,19 @@ public class SupplierContractRepository : ISupplierContractRepository
             .ToList();
     }
 
-    public List<SupplierContract> GetActiveContractsBySupplierId(int supplierId)
+    public async Task<List<SupplierContract>> GetActiveContractsBySupplierId(int supplierId)
     {
-        return _context.SupplierContracts
+        return await _context.SupplierContracts
             .Include(c => c.Supplier)
             .Where(c => c.SupplierId == supplierId && c.Active)
             .OrderByDescending(c => c.CreatedAt)
-            .ToList();
+            .ToListAsync();
     }
 
-    public SupplierContract Update(SupplierContract contract)
+    public async Task<SupplierContract> Update(SupplierContract contract)
     {
         _context.SupplierContracts.Update(contract);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return contract;
     }
 
