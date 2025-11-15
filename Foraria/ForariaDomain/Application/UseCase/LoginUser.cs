@@ -82,7 +82,7 @@ public class LoginUser : ILoginUser
 
         await _refreshTokenRepository.Add(refreshTokenEntity);
 
-        return LoginResult.SuccessResult(accessToken, refreshToken, usuarioLogueado);
+        return LoginResult.SuccessResult(accessToken, refreshToken, usuarioLogueado,consortiumId);
 
     }
 }
