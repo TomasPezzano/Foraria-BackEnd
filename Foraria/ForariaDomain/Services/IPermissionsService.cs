@@ -57,6 +57,9 @@ namespace Foraria.Application.Services
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
+                "Users.ViewTotalOwners", "Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
+                "Users.RefreshToken",  "Users.ViewByConsortium",
+
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
@@ -109,6 +112,9 @@ namespace Foraria.Application.Services
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
+                "Users.ViewTotalOwners","Users.ViewTotalTenants" , "Users.ViewById", "Users.Logout",
+                "Users.RefreshToken", "Users.ViewByConsortium",
+
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
@@ -147,9 +153,12 @@ namespace Foraria.Application.Services
                 "Threads.Create", "Threads.Update", "Threads.View", "Threads.ViewAll",
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
-                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
+                "Users.ViewTotalOwners","Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
+                "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium", 
 
+                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
+
                 "Votes.Cast"
             },
 
@@ -182,8 +191,10 @@ namespace Foraria.Application.Services
                 "Threads.Create", "Threads.Update", "Threads.View", "Threads.ViewAll",
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
-                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
+                "Users.ViewTotalOwners","Users.ViewTotalTenants", "Users.ViewById", "Users.Logout",
+                "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
 
+                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
                 "Votes.Cast"

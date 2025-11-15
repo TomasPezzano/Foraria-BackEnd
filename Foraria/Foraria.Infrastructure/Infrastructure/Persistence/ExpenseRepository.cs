@@ -23,7 +23,7 @@ namespace Foraria.Infrastructure.Repository
 
         public async Task<IEnumerable<Expense>> GetAllExpenses()
         {
-            return await _context.Expenses.Include(e => e.Invoices).ToListAsync();
+            return await _context.Expenses.Include(e => e.Invoices).Include(e => e.Residences).ToListAsync();
         }
 
         public async Task<Expense?> GetExpenseByConsortiumAndMonthAsync(int consortiumId, string month)

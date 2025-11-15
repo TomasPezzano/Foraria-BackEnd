@@ -37,7 +37,7 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateExpense([FromBody] ExpenseDto expenseDto) // si no se puede generar mas de 1 expensa el mismo mes, preguntar si ya hay una creada y devolverla 
     {
-        await _permissionService.EnsurePermissionAsync(User, "Expenses.Create");
+        // await _permissionService.EnsurePermissionAsync(User, "Expenses.Create");
 
         if (expenseDto == null)
             throw new DomainValidationException("El cuerpo de la solicitud está vacío.");
@@ -70,7 +70,15 @@ public class ExpenseController : ControllerBase
                 Description = i.Description,
                 Amount = i.Amount,
                 DateOfIssue = i.DateOfIssue
-            }).ToList() ?? new List<InvoiceResponseDto>()
+            }).ToList() ?? new List<InvoiceResponseDto>(),
+            Residences = expense.Residences?.Select(r => new ResidenceResponseDto
+            {
+                Id = r.Id,
+                Tower = r.Tower,
+                Floor = r.Floor,
+                Number = r.Number,
+                Coeficient = r.Coeficient
+            }).ToList() ?? new List<ResidenceResponseDto>()
         };
 
         return Ok(result);
@@ -87,7 +95,7 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllExpenses()
     {
-        await _permissionService.EnsurePermissionAsync(User, "Expenses.ViewAll"); //admin y consorcio. asumo que si trae TODAS las expensas de la base de datos debe ser para los admins
+        // await _permissionService.EnsurePermissionAsync(User, "Expenses.ViewAll"); //admin y consorcio. asumo que si trae TODAS las expensas de la base de datos debe ser para los admins
 
         var expenses = await _getAllExpenses.Execute();
 

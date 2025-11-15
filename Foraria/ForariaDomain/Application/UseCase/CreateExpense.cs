@@ -11,15 +11,19 @@ public class CreateExpense : ICreateExpense
 {
     private readonly IExpenseRepository _expenseRepository;
     private readonly IInvoiceRepository _invoiceRepository;
+    private readonly IResidenceRepository _residenceRepository;
     private readonly IGetAllInvoicesByMonthAndConsortium _getAllInvoicesByMonthAndConsortium;
     private readonly IGetConsortiumById _getConsortiumById;
+    private readonly IGetAllResidencesByConsortiumWithOwner _getAllResidencesByConsortiumWithOwner;
 
-    public CreateExpense(IExpenseRepository expenseRepository, IGetAllInvoicesByMonthAndConsortium getAllInvoicesByMonthAndConsortium, IGetConsortiumById getConsortiumById, IInvoiceRepository invoiceRepository)
+    public CreateExpense(IExpenseRepository expenseRepository, IGetAllInvoicesByMonthAndConsortium getAllInvoicesByMonthAndConsortium, IGetConsortiumById getConsortiumById, IInvoiceRepository invoiceRepository, IGetAllResidencesByConsortiumWithOwner getAllResidencesByConsortiumWithOwner, IResidenceRepository residenceRepository)
     {
         _expenseRepository = expenseRepository;
         _getAllInvoicesByMonthAndConsortium = getAllInvoicesByMonthAndConsortium;
         _getConsortiumById = getConsortiumById;
         _invoiceRepository = invoiceRepository;
+        _getAllResidencesByConsortiumWithOwner = getAllResidencesByConsortiumWithOwner;
+        _residenceRepository = residenceRepository;
     }
     public async Task<Expense> ExecuteAsync(int consortiumId, string date)
     {
@@ -45,9 +49,14 @@ public class CreateExpense : ICreateExpense
             throw new KeyNotFoundException($"No se encontró ningún consorcio con ID {consortiumId}.");
 
 
-        var invoices = await _getAllInvoicesByMonthAndConsortium.Execute(inicio, consortiumId); // checkear de pasar consortium? 
+        var invoices = await _getAllInvoicesByMonthAndConsortium.Execute(inicio, consortiumId); 
         if (invoices == null || !invoices.Any())
             throw new InvalidOperationException($"No existen facturas registradas para el consorcio {consortiumId} en {inicio:MMMM yyyy}.");
+       
+        
+        var residences = await _getAllResidencesByConsortiumWithOwner.ExecuteAsync(consortiumId); 
+        if (residences == null || !residences.Any())
+            throw new InvalidOperationException($"No existen residencias registradas para el consorcio {consortiumId} ");
 
         double totalAmount = invoices.Sum(i => (double)i.Amount);
         if (totalAmount <= 0)
@@ -62,7 +71,8 @@ public class CreateExpense : ICreateExpense
             TotalAmount = totalAmount,
             ConsortiumId = consortiumId,
             Consortium = consortium,
-            Invoices = invoices.ToList()
+            Invoices = invoices.ToList(),
+            Residences = residences.ToList()
         };
 
         var expense = await _expenseRepository.AddExpenseAsync(newExpense);
@@ -71,6 +81,12 @@ public class CreateExpense : ICreateExpense
         {
             invoice.ExpenseId = expense.Id;
             await _invoiceRepository.UpdateInvoiceAsync(invoice);
+        }
+        
+        foreach (var residence in residences)
+        {
+            residence.Expenses.Add(expense);
+            await _residenceRepository.UpdateExpense(residence);
         }
 
         return expense;

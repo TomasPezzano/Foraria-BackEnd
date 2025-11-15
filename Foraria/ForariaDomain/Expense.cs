@@ -25,5 +25,7 @@ namespace ForariaDomain
 
         public ICollection<ExpenseDetailByResidence?> ExpenseDetailsByResidence { get; set; }
         public ICollection<Invoice> Invoices { get; set; }
+
+        public ICollection<Residence> Residences { get; set; }
     }
 }
