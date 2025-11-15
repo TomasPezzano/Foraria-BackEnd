@@ -1,9 +1,10 @@
-﻿using Foraria.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+﻿using Foraria.Application.Services;
+using Foraria.Infrastructure.Persistence;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Text.Json;
 
 namespace Foraria.Controllers
 {
@@ -14,13 +15,20 @@ namespace Foraria.Controllers
         private readonly CreatePreferenceMP _createPreferenceMP;
         private readonly ProcessWebHookMP _processWebHookMP;
         private readonly ForariaContext _context;
+        private readonly IPermissionService _permissionService;
 
-        public PaymentController(CreatePreferenceMP createPreferenceMP, ForariaContext context, ProcessWebHookMP processWebHookMP)
+        public PaymentController(
+            CreatePreferenceMP createPreferenceMP,
+            ForariaContext context,
+            ProcessWebHookMP processWebHookMP,
+            IPermissionService permissionService)
         {
             _createPreferenceMP = createPreferenceMP;
             _context = context;
             _processWebHookMP = processWebHookMP;
+            _permissionService = permissionService;
         }
+
 
         [HttpPost("create-preference")]
         [SwaggerOperation(
@@ -33,6 +41,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreatePreference(int expenseId, int residenceId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Payments.CreatePreference");
+
             if (expenseId <= 0)
                 throw new DomainValidationException("Debe especificar un ID de expensa válido.");
 

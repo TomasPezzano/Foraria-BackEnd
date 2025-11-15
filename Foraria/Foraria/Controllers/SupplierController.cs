@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -17,19 +18,22 @@ public class SupplierController : ControllerBase
     private readonly GetSupplierById _getSupplierById;
     private readonly IGetAllSupplier _getAllSupplier;
     private readonly IGetConsortiumById _getConsortiumById;
+    private readonly IPermissionService _permissionService;
 
     public SupplierController(
         ICreateSupplier createSupplier,
         IDeleteSupplier deleteSupplier,
         GetSupplierById getSupplierById,
         IGetAllSupplier getAllSupplier,
-        IGetConsortiumById getConsortiumById)
+        IGetConsortiumById getConsortiumById,
+        IPermissionService permissionService)
     {
         _createSupplier = createSupplier;
         _deleteSupplier = deleteSupplier;
         _getSupplierById = getSupplierById;
         _getAllSupplier = getAllSupplier;
         _getConsortiumById = getConsortiumById;
+        _permissionService = permissionService;
     }
 
     [HttpPost]
@@ -44,6 +48,8 @@ public class SupplierController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateAsync([FromBody] SupplierRequestDto request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Suppliers.Create");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos del proveedor no son válidos.");
 
@@ -97,8 +103,10 @@ public class SupplierController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult Delete(int id)
+    public  IActionResult Delete(int id)
     {
+         _permissionService.EnsurePermissionAsync(User, "Suppliers.Delete");
+
         if (id <= 0)
             throw new DomainValidationException("Debe especificar un ID de proveedor válido.");
 
@@ -116,6 +124,8 @@ public class SupplierController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetSupplierById(int id)
     {
+        _permissionService.EnsurePermissionAsync(User, "Suppliers.View");
+
         if (id <= 0)
             throw new DomainValidationException("Debe especificar un ID de proveedor válido.");
 
@@ -152,6 +162,8 @@ public class SupplierController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetAllSuppliers()
     {
+        _permissionService.EnsurePermissionAsync(User, "Suppliers.ViewAll");
+
         var suppliers = _getAllSupplier.Execute();
         if (suppliers == null || !suppliers.Any())
             throw new NotFoundException("No se encontraron proveedores registrados.");

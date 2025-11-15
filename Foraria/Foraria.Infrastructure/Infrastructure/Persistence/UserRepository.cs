@@ -39,7 +39,10 @@ public class UserRepository : IUserRepository
         return _context.Users.Include(u => u.Role).Include(u=>u.Residences).FirstOrDefaultAsync(u => u.Id == id);
     }
 
-
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _context.Users.Include(u => u.Role).Include(u => u.Residences).FirstOrDefaultAsync(u => u.Id == id);
+    }
 
     public async Task<User?> GetByEmailWithRole(string email)
     {

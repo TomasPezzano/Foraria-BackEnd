@@ -1,4 +1,5 @@
-﻿    using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -19,17 +20,20 @@ public class ReserveController : ControllerBase
     public readonly IGetAllReserve _getAllReserve;
     private readonly IUpdateOldReserves _updateOldReserves;
     private readonly IGetPlaceById _getPlaceById;
+    private readonly IPermissionService _permissionService;
 
     public ReserveController(
         ICreateReserve createReserve,
         IGetAllReserve getAllReserve,
         IUpdateOldReserves updateOldReserves,
-        IGetPlaceById getPlaceById)
+        IGetPlaceById getPlaceById,
+        IPermissionService permissionService)
     {
         _createReserve = createReserve;
         _getAllReserve = getAllReserve;
         _updateOldReserves = updateOldReserves;
         _getPlaceById = getPlaceById;
+        _permissionService = permissionService;
     }
 
     [HttpGet("{idConsortium}")]
@@ -66,6 +70,8 @@ public class ReserveController : ControllerBase
 
             reservesDto.Add(reserveDto);
         }
+        await _permissionService.EnsurePermissionAsync(User, "Reserves.ViewAll");
+
 
         if (reserves == null || !reserves.Any())
             throw new NotFoundException($"No se encontraron reservas para el consorcio con ID {idConsortium}.");
@@ -85,6 +91,8 @@ public class ReserveController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Add(ReserveDto reserveDto)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Reserves.Create");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos de la reserva no son válidos.");
 
@@ -140,6 +148,7 @@ public class ReserveController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateOldReserves()
     {
+
         await _updateOldReserves.Execute();
         return Ok("Reservas viejas actualizadas correctamente.");
     }

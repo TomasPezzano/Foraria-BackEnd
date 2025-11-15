@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -22,6 +23,7 @@ namespace Foraria.Controllers
         private readonly GetActivePollCount _getActivePollCount;
         private readonly ChangePollState _changePollState;
         private readonly UpdatePoll _updatePoll;
+        private readonly IPermissionService _permissionService;
 
         public PollController(
             CreatePoll poll,
@@ -32,7 +34,8 @@ namespace Foraria.Controllers
             GetAllPollsWithResults getAllPollsWithResults,
             GetActivePollCount getActivePollCount,
             ChangePollState changePollState,
-            UpdatePoll updatePoll)
+            UpdatePoll updatePoll,
+            IPermissionService permissionService)
         {
             _createPoll = poll;
             _polls = polls;
@@ -43,6 +46,7 @@ namespace Foraria.Controllers
             _getActivePollCount = getActivePollCount;
             _changePollState = changePollState;
             _updatePoll = updatePoll;
+            _permissionService = permissionService;
         }
 
         [HttpPost]
@@ -94,6 +98,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll()
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.Create");
+
             var polls = await _polls.ExecuteAsync();
 
             if (polls == null || !polls.Any())
@@ -127,6 +133,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPollWithResults(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.ViewAll");
+
             var poll = await _getPollWithResults.ExecuteAsync(id);
 
             if (poll == null)
@@ -171,6 +179,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllPollsWithResults()
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.ViewAll");
+
             var polls = await _getAllPollsWithResults.ExecuteAsync();
 
             if (polls == null || !polls.Any())
@@ -212,6 +222,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.ViewAll");
+
             var poll = await _getPollById.ExecuteAsync(id);
             if (poll == null)
                 throw new NotFoundException("La votación solicitada no existe.");
@@ -244,6 +256,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Notarize(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.Notarize");
+
             var poll = await _getPollById.ExecuteAsync(id);
             if (poll == null)
                 throw new NotFoundException("La votación no existe.");
@@ -269,6 +283,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetActivePollCount([FromQuery] int consortiumId, [FromQuery] DateTime? dateTime = null)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.ViewAll");
+
             if (consortiumId <= 0)
                 throw new DomainValidationException("Debe indicar un ID de consorcio válido.");
 
@@ -292,6 +308,8 @@ namespace Foraria.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "La votación o el usuario no fueron encontrados")]
         public async Task<IActionResult> ChangePollState(int pollId, [FromBody] ChangePollStateRequest request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.ChangeState");
+
             if (pollId <= 0)
                 throw new DomainValidationException("El ID de la votación debe ser válido.");
 
@@ -310,6 +328,8 @@ namespace Foraria.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "La votación no fue encontrada")]
         public async Task<IActionResult> UpdatePoll(int pollId, [FromBody] UpdatePollRequest request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.Update");
+
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (!int.TryParse(userIdClaim, out int userId))

@@ -1,5 +1,6 @@
 ﻿using foraria.application.usecase;
 using Foraria;
+using Foraria.Application.Services;
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
@@ -7,6 +8,7 @@ using Foraria.Domain.Service;
 using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
+using Foraria.Infrastructure.Infrastructure.Notifications;
 using Foraria.Infrastructure.Infrastructure.Persistence;
 using Foraria.Infrastructure.Infrastructure.Persistence.Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Infrastructure.Services;
@@ -134,7 +136,7 @@ builder.Services.AddScoped<IGetResponsibleSectorById, GetResponsibleSectorById>(
 builder.Services.AddScoped<IGetClaimById, GetClaimById>();
 builder.Services.AddScoped<GetForumWithCategory>();
 builder.Services.AddScoped<GetThreadCommentCount>();
-builder.Services.AddScoped<IOcrService, AzureOcrService>();
+builder.Services.AddScoped<IOcrService, OcrService>();
 builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
 builder.Services.AddScoped<IFileProcessor, ProcessFile>();
 builder.Services.AddScoped<IGetPlaceById, GetPlaceById>();
@@ -196,6 +198,14 @@ builder.Services.AddScoped<SaveCallRecording>();
 builder.Services.AddScoped<GetCallRecordings>();
 builder.Services.AddScoped<ICallMessageRepository, CallMessageRepository>();
 builder.Services.AddScoped<ICallRecordingRepository, CallRecordingRepository>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationPreferenceRepository, NotificationPreferenceRepository>();
+builder.Services.AddScoped<IFcmPushNotificationService, FcmPushNotificationService>();
+builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+builder.Services.AddScoped<ISendExpenseReminderNotification, SendExpenseReminderNotification>();
+builder.Services.AddScoped<IConfigureNotificationPreferences, ConfigureNotificationPreferences>();
+builder.Services.AddHostedService<ExpenseReminderBackgroundService>();
 
 builder.Services.AddCors(options =>
 {

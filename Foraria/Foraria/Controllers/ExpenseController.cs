@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,16 @@ public class ExpenseController : ControllerBase
 {
     private readonly ICreateExpense _createExpense;
     private readonly IGetAllExpenses _getAllExpenses;
+    private readonly IPermissionService _permissionService;
 
-    public ExpenseController(ICreateExpense createExpense, IGetAllExpenses getAllExpenses)
+    public ExpenseController(
+        ICreateExpense createExpense,
+        IGetAllExpenses getAllExpenses,
+        IPermissionService permissionService)
     {
         _createExpense = createExpense;
         _getAllExpenses = getAllExpenses;
+        _permissionService = permissionService;
     }
 
     [HttpPost]
@@ -31,6 +37,8 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateExpense([FromBody] ExpenseDto expenseDto) // si no se puede generar mas de 1 expensa el mismo mes, preguntar si ya hay una creada y devolverla 
     {
+        await _permissionService.EnsurePermissionAsync(User, "Expenses.Create");
+
         if (expenseDto == null)
             throw new DomainValidationException("El cuerpo de la solicitud está vacío.");
 
@@ -79,6 +87,8 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllExpenses()
     {
+        await _permissionService.EnsurePermissionAsync(User, "Expenses.ViewAll"); //admin y consorcio. asumo que si trae TODAS las expensas de la base de datos debe ser para los admins
+
         var expenses = await _getAllExpenses.Execute();
 
         if (expenses == null)
