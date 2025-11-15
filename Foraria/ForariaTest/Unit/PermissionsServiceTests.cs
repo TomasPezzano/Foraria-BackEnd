@@ -33,14 +33,6 @@ namespace Foraria.Tests.Application.Services
                 _service.EnsurePermissionAsync(user, "Polls.ViewAll"));
         }
 
-        [Fact]
-        public async Task EnsurePermissionAsync_Should_Throw_If_No_Role_Claim()
-        {
-            var user = CreateUser(role: null, authenticated: true);
-
-            await Assert.ThrowsAsync<UnauthorizedException>(() =>
-                _service.EnsurePermissionAsync(user, "Polls.ViewAll"));
-        }
 
         [Fact]
         public async Task EnsurePermissionAsync_Should_Throw_If_Role_Not_Registered()

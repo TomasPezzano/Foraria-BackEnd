@@ -55,6 +55,10 @@ namespace ForariaDomain
 
         public ICollection<PasswordResetToken> PasswordResetTokens { get; set; }
 
+        public ICollection<Notification> Notifications { get; set; }
+
+        public NotificationPreference? NotificationPreference { get; set; }
+
 
     }
 }
