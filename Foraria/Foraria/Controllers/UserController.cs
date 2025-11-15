@@ -218,11 +218,11 @@ public class UserController : ControllerBase
     [Authorize(Policy = "ConsortiumAndAdmin")]
     [HttpGet("count")]
     [SwaggerOperation(Summary = "Obtiene la cantidad total de usuarios.", Description = "Devuelve el total de usuarios registrados en el sistema.")]
-    public async Task<IActionResult> GetUsersCount()
+    public async Task<IActionResult> GetUsersCount(int consortiumId)
     {
         await _permissionService.EnsurePermissionAsync(User, "Users.ViewCount");
 
-        var totalUsers = await _registerUserService.GetAllUsersInNumber();
+        var totalUsers = await _registerUserService.GetAllUsersInNumber(consortiumId);
         return Ok(new { totalUsers });
     }
 

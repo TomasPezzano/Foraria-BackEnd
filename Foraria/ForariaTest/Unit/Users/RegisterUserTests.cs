@@ -179,10 +179,13 @@ public class RegisterUserTests
     [Fact]
     public async Task GetAllUsersInNumber_ShouldReturnTotalUsers()
     {
-        _mockUserRepo.Setup(r => r.GetAllInNumber()).ReturnsAsync(42);
+        int consortiumId = 123;  
+        _mockUserRepo.Setup(r => r.GetAllInNumber(consortiumId)).ReturnsAsync(42);
+
         var service = CreateService();
 
-        var result = await service.GetAllUsersInNumber();
+     
+        var result = await service.GetAllUsersInNumber(consortiumId);
 
         Assert.Equal(42, result);
     }
