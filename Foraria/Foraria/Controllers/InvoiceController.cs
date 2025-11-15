@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -14,10 +15,16 @@ public class InvoiceController : ControllerBase
 {
     public readonly ICreateInvoice _createInvoice;
     public readonly IGetAllInvoices _getAllInvoices;
-    public InvoiceController(ICreateInvoice createInvoice, IGetAllInvoices getAllInvoices)
+    private readonly IPermissionService _permissionService;
+
+    public InvoiceController(
+        ICreateInvoice createInvoice,
+        IGetAllInvoices getAllInvoices,
+        IPermissionService permissionService)
     {
         _createInvoice = createInvoice;
         _getAllInvoices = getAllInvoices;
+        _permissionService = permissionService;
     }
 
     [HttpPost]
@@ -32,6 +39,8 @@ public class InvoiceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateInvoice([FromBody] InvoiceRequestDto invoiceDto)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Invoices.Create");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos de la factura no son válidos.");
 
@@ -112,6 +121,8 @@ public class InvoiceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
     {
+        await _permissionService.EnsurePermissionAsync(User, "Invoices.ViewAll"); //admin y consorcio, igual que expensas, asumo que un usuario no va a ver TODAS las facturas
+
         var invoices = await _getAllInvoices.Execute();
 
         if (invoices == null)

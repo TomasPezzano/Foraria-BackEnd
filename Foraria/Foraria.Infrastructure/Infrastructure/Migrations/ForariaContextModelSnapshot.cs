@@ -657,6 +657,134 @@ namespace Foraria.Migrations
                     b.ToTable("message", (string)null);
                 });
 
+            modelBuilder.Entity("ForariaDomain.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("MetadataJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RelatedEntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RelatedEntityType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "Status");
+
+                    b.ToTable("notification", (string)null);
+                });
+
+            modelBuilder.Entity("ForariaDomain.NotificationPreference", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("ClaimNotificationsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("EmailEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ExpenseNotificationsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FcmToken")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("ForumNotificationsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsConfigured")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("MaintenanceNotificationsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("MeetingNotificationsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PushEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("SmsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("VotingNotificationsEnabled")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("notificationPreference", (string)null);
+                });
+
             modelBuilder.Entity("ForariaDomain.PasswordResetToken", b =>
                 {
                     b.Property<int>("Id")
@@ -1552,6 +1680,28 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ForariaDomain.Notification", b =>
+                {
+                    b.HasOne("ForariaDomain.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ForariaDomain.NotificationPreference", b =>
+                {
+                    b.HasOne("ForariaDomain.User", "User")
+                        .WithOne("NotificationPreference")
+                        .HasForeignKey("ForariaDomain.NotificationPreference", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ForariaDomain.PasswordResetToken", b =>
                 {
                     b.HasOne("ForariaDomain.User", "User")
@@ -1965,6 +2115,10 @@ namespace Foraria.Migrations
                     b.Navigation("ClaimsResponse");
 
                     b.Navigation("Messages");
+
+                    b.Navigation("NotificationPreference");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("PasswordResetTokens");
 

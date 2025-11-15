@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using Foraria.Application.Services;
+using Foraria.Domain.Repository;
 using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -15,12 +16,18 @@ namespace Foraria.Controllers
     {
         private readonly ToggleReaction _toggleReaction;
         private readonly IReactionRepository _repository;
+        private readonly IPermissionService _permissionService;
 
-        public ReactionsController(ToggleReaction toggleReaction, IReactionRepository repository)
+        public ReactionsController(
+            ToggleReaction toggleReaction,
+            IReactionRepository repository,
+            IPermissionService permissionService)
         {
             _toggleReaction = toggleReaction;
             _repository = repository;
+            _permissionService = permissionService;
         }
+
 
         [HttpPost("toggle")]
         [Authorize(Policy = "OwnerAndTenant")]
@@ -33,6 +40,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Toggle([FromBody] ReactionRequest request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Reactions.Toggle");
+
             if (request == null)
                 throw new ValidationException("La solicitud no puede estar vacía.");
 
@@ -76,6 +85,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetMessageReactions(int messageId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Reactions.ViewMessage");
+
             if (messageId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de mensaje válido.");
 
@@ -105,6 +116,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetThreadReactions(int threadId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Reactions.ViewThread");
+
             if (threadId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de hilo válido.");
 

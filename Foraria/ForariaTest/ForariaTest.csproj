@@ -76,4 +76,8 @@
 		<Folder Include="Integration\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Include="Unit\Claims\GetPendingClaimsCountTests.cs" />
+	</ItemGroup>
+
 </Project>

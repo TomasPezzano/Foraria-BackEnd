@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,20 @@ namespace Foraria.Controllers
         private readonly ICreateExpenseDetail _createExpenseDetail;
         private readonly IGetExpenseWithDto _getExpenseWithDto;
         private readonly IGetExpenseDetailByResidence _getExpenseDetailByResidence;
+        private readonly IPermissionService _permissionService;
 
-        public ExpenseDetailController(ICreateExpenseDetail createExpenseDetail, IGetExpenseWithDto getExpenseWithDto, IGetExpenseDetailByResidence getExpenseDetailByResidence)
+        public ExpenseDetailController(
+            ICreateExpenseDetail createExpenseDetail,
+            IGetExpenseWithDto getExpenseWithDto,
+            IGetExpenseDetailByResidence getExpenseDetailByResidence,
+            IPermissionService permissionService)
         {
             _createExpenseDetail = createExpenseDetail;
             _getExpenseWithDto = getExpenseWithDto;
             _getExpenseDetailByResidence = getExpenseDetailByResidence;
+            _permissionService = permissionService;
         }
+
 
         [HttpPost]
         [SwaggerOperation(
@@ -33,6 +41,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateExpenseDetail([FromBody] ExpenseDto expenseDto)
         {
+            await _permissionService.EnsurePermissionAsync(User, "ExpenseDetails.Generate");
+
             if (expenseDto == null)
                 throw new DomainValidationException("El cuerpo de la solicitud no puede estar vacío.");
 
@@ -89,6 +99,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllExpenseDetailByResidence(int id)
         {
+            await _permissionService.EnsurePermissionAsync(User, "ExpenseDetails.ViewByResidence");
+
             if (id <= 0)
                 throw new DomainValidationException("Debe proporcionar un ID de residencia válido.");
 

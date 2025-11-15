@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ public class PermissionController : ControllerBase
 {
     private readonly ITransferPermission _transferPermission;
     private readonly IRevokePermission _revokePermission;
+    private readonly IPermissionService _permissionService;
 
-    public PermissionController(ITransferPermission transferPermission, IRevokePermission revokePermission)
+    public PermissionController(ITransferPermission transferPermission, IRevokePermission revokePermission, IPermissionService permissionService)
     {
         _transferPermission = transferPermission;
         _revokePermission = revokePermission;
+        _permissionService = permissionService;
     }
 
     [HttpPost("transfer")]
@@ -33,6 +36,8 @@ public class PermissionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> TransferPermission([FromBody] TransferPermissionRequestDto request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Permissions.TransferToTenant");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos de la solicitud no son válidos.");
 
@@ -62,6 +67,8 @@ public class PermissionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RevokePermission([FromBody] TransferPermissionRequestDto request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Permissions.RevokeFromTenant");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos de la solicitud no son válidos.");
 

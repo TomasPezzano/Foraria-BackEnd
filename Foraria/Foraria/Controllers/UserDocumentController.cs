@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -20,6 +21,7 @@ public class UserDocumentController : ControllerBase
     private readonly GetUserDocumentsByCategory _getUserDocumentsByCategory;
     private readonly GetLastUploadDate _getLastUploadDate;
     private readonly GetUserDocumentStats _getUserDocumentStats;
+    private readonly IPermissionService _permissionService;
 
     public UserDocumentController(
         ICreateUserDocument createUserDocument,
@@ -27,7 +29,8 @@ public class UserDocumentController : ControllerBase
         UpdateUserDocument updateUserDocument,
         GetUserDocumentsByCategory getUserDocumentsByCategory,
         GetLastUploadDate getLastUploadDate,
-        GetUserDocumentStats getUserDocumentStats)
+        GetUserDocumentStats getUserDocumentStats,
+        IPermissionService permissionService)
     {
         _createUserDocument = createUserDocument;
         _getUserDocuments = getUserDocuments;
@@ -35,7 +38,9 @@ public class UserDocumentController : ControllerBase
         _getUserDocumentsByCategory = getUserDocumentsByCategory;
         _getLastUploadDate = getLastUploadDate;
         _getUserDocumentStats = getUserDocumentStats;
+        _permissionService = permissionService;
     }
+
 
     [HttpGet]
     [Authorize(Policy = "All")]
@@ -45,6 +50,8 @@ public class UserDocumentController : ControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Lista de documentos obtenida correctamente", typeof(List<UserDocumentDto>))]
     public async Task<IActionResult> GetAll()
     {
+        await _permissionService.EnsurePermissionAsync(User, "UserDocuments.ViewAll");
+
         var documents = await _getUserDocuments.Execute();
         if (documents == null || !documents.Any())
             throw new NotFoundException("No se encontraron documentos registrados.");
@@ -72,6 +79,8 @@ public class UserDocumentController : ControllerBase
     [SwaggerResponse(StatusCodes.Status201Created, "Documento creado correctamente", typeof(UserDocumentDto))]
     public async Task<IActionResult> Add([FromBody] CreateUserDocumentDto dto)
     {
+        await _permissionService.EnsurePermissionAsync(User, "UserDocuments.Create");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos del documento son inválidos.");
 
@@ -114,6 +123,8 @@ public class UserDocumentController : ControllerBase
     [SwaggerResponse(StatusCodes.Status404NotFound, "No se encontró el documento especificado")]
     public async Task<IActionResult> UpdateUserDocument(int id, [FromBody] UpdateUserDocumentRequest request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "UserDocuments.Update");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Datos inválidos para actualización de documento.");
 
@@ -152,6 +163,8 @@ public class UserDocumentController : ControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Documentos filtrados correctamente", typeof(List<UserDocumentDto>))]
     public async Task<IActionResult> GetByCategory(string category, [FromQuery] int? userId = null)
     {
+        await _permissionService.EnsurePermissionAsync(User, "UserDocuments.ViewByCategory");
+
         if (string.IsNullOrWhiteSpace(category))
             throw new DomainValidationException("Debe especificar una categoría válida.");
 
@@ -182,6 +195,8 @@ public class UserDocumentController : ControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Fecha obtenida correctamente", typeof(DateTime))]
     public async Task<IActionResult> GetLastUpload([FromQuery] int? userId = null)
     {
+        await _permissionService.EnsurePermissionAsync(User, "UserDocuments.ViewLastUpload");
+
         var date = await _getLastUploadDate.ExecuteAsync(userId);
         if (date == null)
             throw new NotFoundException("No se encontraron documentos para calcular la última carga.");
@@ -197,6 +212,8 @@ public class UserDocumentController : ControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Estadísticas obtenidas correctamente", typeof(UserDocumentStatsDto))]
     public async Task<IActionResult> GetStats([FromQuery] int? userId = null)
     {
+        await _permissionService.EnsurePermissionAsync(User, "UserDocuments.ViewStats");
+
         var stats = await _getUserDocumentStats.ExecuteAsync(userId);
         if (stats == null)
             throw new NotFoundException("No se pudieron calcular las estadísticas.");

@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -18,9 +19,9 @@ public class SupplierContractController : ControllerBase
     private readonly ILocalFileStorageService _localFileStorageService;
     private readonly GetSupplierContractById _getSupplierContractById;
     private readonly GetSupplierContractsById _getContractsBySupplierId;
-    private readonly IGetActiveContractsSupplierCount _getActiveContractsSupplierCountUseCase;
     private static readonly string[] AllowedFileExtensions = { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
     private const long MaxFileSizeInBytes = 10 * 1024 * 1024;
+    private readonly IPermissionService _permissionService;
 
     public SupplierContractController(
         ICreateSupplierContract createSupplierContract,
@@ -28,14 +29,14 @@ public class SupplierContractController : ControllerBase
         ILocalFileStorageService localFileStorageService,
         GetSupplierContractById getSupplierContractById,
         GetSupplierContractsById getSupplierContractsBySupplierId,
-        IGetActiveContractsSupplierCount getActiveContractsSupplierCountUseCase)
+        IPermissionService permissionService)
     {
         _createSupplierContract = createSupplierContract;
         _getSupplierById = getSupplierById;
         _localFileStorageService = localFileStorageService;
         _getSupplierContractById = getSupplierContractById;
         _getContractsBySupplierId = getSupplierContractsBySupplierId;
-        _getActiveContractsSupplierCountUseCase = getActiveContractsSupplierCountUseCase;
+        _permissionService = permissionService;
     }
 
     [HttpPost]
@@ -50,6 +51,8 @@ public class SupplierContractController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Create([FromForm] SupplierContractRequestDto request, IFormFile? file)
     {
+        await _permissionService.EnsurePermissionAsync(User, "SupplierContracts.Create");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos del contrato no son válidos.");
 
@@ -115,6 +118,8 @@ public class SupplierContractController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetById(int id)
     {
+        await _permissionService.EnsurePermissionAsync(User, "SupplierContracts.View");
+
         if (id <= 0)
             throw new DomainValidationException("Debe proporcionar un ID de contrato válido.");
 
@@ -158,6 +163,8 @@ public class SupplierContractController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetBySupplierId(int supplierId)
     {
+        await _permissionService.EnsurePermissionAsync(User, "SupplierContracts.ViewBySupplier");
+
         if (supplierId <= 0)
             throw new DomainValidationException("Debe especificar un ID de proveedor válido.");
 
@@ -193,24 +200,5 @@ public class SupplierContractController : ControllerBase
         }
 
         return Ok(response);
-    }
-
-    [HttpGet("/active-contracts")]
-    [Authorize(Policy = "ConsortiumAndAdmin")]
-    [SwaggerOperation(
-        Summary = "Obtiene la cantidad de contratos de proveedores activos.",
-        Description = "Devuelve el número total de contratos activos del consorcio especificado."
-    )]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetActiveContractsSupplierCount([FromQuery] int ConsortiumId)
-    {
-        if (ConsortiumId <= 0)
-            return BadRequest("ConsortiumId inválido.");
-
-        var count = await _getActiveContractsSupplierCountUseCase.ExecuteAsync(ConsortiumId);
-
-        return Ok(count);
     }
 }

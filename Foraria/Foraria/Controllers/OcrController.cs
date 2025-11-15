@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,12 @@ public class OcrController : ControllerBase
     private readonly IProcessInvoiceOcr _processInvoiceOcr;
     private const long MaxFileSizeInBytes = 10 * 1024 * 1024;
     private static readonly string[] AllowedExtensions = { ".pdf", ".jpg", ".jpeg", ".png", ".tiff", ".bmp" };
+    private readonly IPermissionService _permissionService;
 
-    public OcrController(IProcessInvoiceOcr processInvoiceOcr)
+    public OcrController(IProcessInvoiceOcr processInvoiceOcr, IPermissionService permissionService)
     {
         _processInvoiceOcr = processInvoiceOcr;
+        _permissionService = permissionService;
     }
 
     [HttpPost("process-invoice")]
@@ -32,6 +35,8 @@ public class OcrController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ProcessInvoice([FromForm] ProcessInvoiceRequestDto request)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Ocr.ProcessInvoice");
+
         if (request?.File == null || request.File.Length == 0)
             throw new DomainValidationException("No se proporcionó ningún archivo.");
 

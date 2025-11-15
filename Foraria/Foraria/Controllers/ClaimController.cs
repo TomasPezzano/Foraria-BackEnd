@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -18,17 +19,20 @@ public class ClaimController : ControllerBase
     private readonly IGetClaims _getClaims;
     private readonly IRejectClaim _rejectClaim;
     private readonly IFileProcessor _fileProcessor;
+    private readonly IPermissionService _permissionService;
 
     public ClaimController(
         ICreateClaim createClaim,
         IGetClaims getClaims,
         IRejectClaim rejectClaim,
-        IFileProcessor fileProcessor)
+        IFileProcessor fileProcessor,
+        IPermissionService permissionService)
     {
         _createClaim = createClaim;
         _getClaims = getClaims;
         _rejectClaim = rejectClaim;
         _fileProcessor = fileProcessor;
+        _permissionService = permissionService;
     }
 
 
@@ -43,6 +47,7 @@ public class ClaimController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
     {
+        await _permissionService.EnsurePermissionAsync(User, "Claims.View");
         var claims = await _getClaims.Execute();
 
         if (claims == null || !claims.Any())
@@ -103,6 +108,8 @@ public class ClaimController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Add([FromBody] ClaimDto claimDto)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Claims.Create");
+
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos del reclamo no son válidos.");
 
@@ -164,6 +171,8 @@ public class ClaimController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RejectClaimById(int id)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Claims.Reject");
+
         if (id <= 0)
             throw new DomainValidationException("El ID del reclamo no es válido.");
 
