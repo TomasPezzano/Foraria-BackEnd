@@ -4,6 +4,7 @@ using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -35,8 +36,7 @@ public class ReserveController : ControllerBase
         _permissionService = permissionService;
     }
 
-
-    [HttpGet]
+    [HttpGet("{idConsortium}")]
     [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Obtiene todas las reservas registradas.",
@@ -45,16 +45,39 @@ public class ReserveController : ControllerBase
     [ProducesResponseType(typeof(List<ReserveDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(int idConsortium)
     {
+        var reserves = await _getAllReserve.Execute(idConsortium);
+
+        var reservesDto = new List<ReserveResponseDto>();
+
+        foreach (var reserve in reserves)
+        {
+            var reserveDto = new ReserveResponseDto
+            {
+                Id = reserve.Id,
+                Description = reserve.Description,
+                State = reserve.State,
+                CreatedAt = reserve.Date,
+                DeletedAt = reserve.DeletedAt,
+                Place_id = reserve.Place_id,
+                PlaceName = reserve.Place?.Name,
+                Residence_id = reserve.Residence_id,
+                User_id = reserve.User_id,
+                UserName = reserve.User?.Name,
+                DateReserve = reserve.CreatedAt
+            };
+
+            reservesDto.Add(reserveDto);
+        }
         await _permissionService.EnsurePermissionAsync(User, "Reserves.ViewAll");
 
         var reserves = await _getAllReserve.Execute();
 
         if (reserves == null || !reserves.Any())
-            throw new NotFoundException("No se encontraron reservas registradas.");
+            throw new NotFoundException($"No se encontraron reservas para el consorcio con ID {idConsortium}.");
 
-        return Ok(reserves);
+        return Ok(reservesDto);
     }
 
     [HttpPost]
@@ -77,6 +100,9 @@ public class ReserveController : ControllerBase
         if (reserveDto.Place_id <= 0)
             throw new DomainValidationException("Debe especificar un ID de lugar válido.");
 
+        if (reserveDto.Consortium_id <= 0)
+            throw new DomainValidationException("Debe especificar un ID de consorcio válido.");
+
         var place = await _getPlaceById.Execute(reserveDto.Place_id);
         if (place == null)
             throw new NotFoundException("Lugar no encontrado.");
@@ -88,6 +114,7 @@ public class ReserveController : ControllerBase
             CreatedAt = reserveDto.CreatedAt,
             Place_id = reserveDto.Place_id,
             Residence_id = reserveDto.Residence_id,
+            ConsortiumId = reserveDto.Consortium_id,
             User_id = reserveDto.User_id
         };
 
@@ -110,7 +137,7 @@ public class ReserveController : ControllerBase
             DateReserve = created.CreatedAt
         };
 
-        return CreatedAtAction(nameof(GetAll), new { id = response.Id }, response);
+        return Ok(response);
     }
 
     [HttpPost("update-old")]

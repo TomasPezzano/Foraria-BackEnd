@@ -30,6 +30,9 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CallTranscriptId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ChainId")
                         .HasColumnType("int");
 
@@ -64,11 +67,171 @@ namespace Foraria.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CallTranscriptId");
+
                     b.HasIndex("PollId")
                         .IsUnique()
                         .HasFilter("[PollId] IS NOT NULL");
 
                     b.ToTable("blockchainProof", (string)null);
+                });
+
+            modelBuilder.Entity("ForariaDomain.Call", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EndedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Calls");
+                });
+
+            modelBuilder.Entity("ForariaDomain.CallMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CallId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CallMessages");
+                });
+
+            modelBuilder.Entity("ForariaDomain.CallParticipant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CallId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCameraOn")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsConnected")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsMuted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LeftAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CallId");
+
+                    b.ToTable("CallParticipants");
+                });
+
+            modelBuilder.Entity("ForariaDomain.CallRecording", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CallId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CallRecordings");
+                });
+
+            modelBuilder.Entity("ForariaDomain.CallTranscript", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AudioHash")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("AudioPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BlockchainTxHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CallId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TranscriptHash")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TranscriptPath")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CallId")
+                        .IsUnique();
+
+                    b.ToTable("CallTranscripts");
                 });
 
             modelBuilder.Entity("ForariaDomain.CategoryPoll", b =>
@@ -802,6 +965,9 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ConsortiumId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -829,6 +995,8 @@ namespace Foraria.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ConsortiumId");
 
                     b.HasIndex("Place_id");
 
@@ -1231,12 +1399,36 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("Foraria.Domain.Model.BlockchainProof", b =>
                 {
+                    b.HasOne("ForariaDomain.CallTranscript", "CallTranscript")
+                        .WithMany()
+                        .HasForeignKey("CallTranscriptId");
+
                     b.HasOne("ForariaDomain.Poll", "Poll")
                         .WithOne("BlockchainProof")
                         .HasForeignKey("Foraria.Domain.Model.BlockchainProof", "PollId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("CallTranscript");
+
                     b.Navigation("Poll");
+                });
+
+            modelBuilder.Entity("ForariaDomain.CallParticipant", b =>
+                {
+                    b.HasOne("ForariaDomain.Call", null)
+                        .WithMany()
+                        .HasForeignKey("CallId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ForariaDomain.CallTranscript", b =>
+                {
+                    b.HasOne("ForariaDomain.Call", null)
+                        .WithOne()
+                        .HasForeignKey("ForariaDomain.CallTranscript", "CallId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ForariaDomain.Claim", b =>
@@ -1478,6 +1670,12 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Reserve", b =>
                 {
+                    b.HasOne("ForariaDomain.Consortium", "Consortium")
+                        .WithMany("Reserves")
+                        .HasForeignKey("ConsortiumId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ForariaDomain.Place", "Place")
                         .WithMany("Reserves")
                         .HasForeignKey("Place_id")
@@ -1495,6 +1693,8 @@ namespace Foraria.Migrations
                         .HasForeignKey("User_id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Consortium");
 
                     b.Navigation("Place");
 
@@ -1658,6 +1858,8 @@ namespace Foraria.Migrations
                     b.Navigation("Expenses");
 
                     b.Navigation("Invoices");
+
+                    b.Navigation("Reserves");
 
                     b.Navigation("Residences");
 

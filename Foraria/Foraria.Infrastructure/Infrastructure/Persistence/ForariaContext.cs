@@ -72,6 +72,11 @@ namespace Foraria.Infrastructure.Persistence
         public DbSet<ExpenseDetailByResidence> ExpenseDetailByResidences { get; set; }
 
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<Call> Calls { get; set; }
+        public DbSet<CallParticipant> CallParticipants { get; set; }
+        public DbSet<CallTranscript> CallTranscripts { get; set; }
+        public DbSet<CallMessage> CallMessages { get; set; }
+        public DbSet<CallRecording> CallRecordings { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -106,7 +111,6 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<InvoiceItem>().ToTable("invoiceItem");
             modelBuilder.Entity<ExpenseDetailByResidence>().ToTable("ExpenseDetailByResidences");
             modelBuilder.Entity<PasswordResetToken>().ToTable("passwordResetToken");
-
 
 
             modelBuilder.Entity<User>()
@@ -374,11 +378,54 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(d => d.ConsortiumId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Consortium>()
+                .HasMany(e => e.Reserves)
+                .WithOne(d => d.Consortium)
+                .HasForeignKey(d => d.ConsortiumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<PasswordResetToken>()
                .HasOne (u => u.User)
                .WithMany(i => i.PasswordResetTokens)
                .HasForeignKey(u => u.UserId)
                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Call>()
+                .HasKey(c => c.Id);
+
+            modelBuilder.Entity<Call>()
+                .Property(c => c.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<CallParticipant>()
+                .HasKey(cp => cp.Id);
+
+            modelBuilder.Entity<CallParticipant>()
+                .HasOne<Call>()
+                .WithMany()
+                .HasForeignKey(cp => cp.CallId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CallTranscript>()
+                .HasKey(ct => ct.Id);
+
+            modelBuilder.Entity<CallTranscript>()
+                .HasOne<Call>()
+                .WithOne()
+                .HasForeignKey<CallTranscript>(ct => ct.CallId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CallTranscript>()
+                .Property(ct => ct.TranscriptPath)
+                .HasMaxLength(300)
+                .IsRequired();
+
+            modelBuilder.Entity<CallTranscript>()
+                .Property(ct => ct.TranscriptHash)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<CallTranscript>()
+                .Property(ct => ct.AudioHash)
+                .HasMaxLength(200);
 
 
 

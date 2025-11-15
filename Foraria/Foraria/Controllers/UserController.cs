@@ -227,7 +227,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "All")]
     [SwaggerOperation(Summary = "Obtiene un usuario por su ID.", Description = "Devuelve los datos básicos del usuario solicitado.")]
     public async Task<IActionResult> GetUserById([FromQuery] int id)
     {
@@ -235,18 +235,32 @@ public class UserController : ControllerBase
 
         var user = await _getUserById.Execute(id);
         if (user == null)
-            throw new NotFoundException("Usuario no encontrado.");
+        {
+            return NotFound(new { message = "Usuario no encontrado" });
+        }
+        var residence = user.Residences?.FirstOrDefault();
+        int? residenceId = residence?.Id;
+        int? consortiumId = residence?.ConsortiumId;
 
-        return Ok(new UserDto
+        var response = new UserDto
         {
             Id = user.Id,
             FirstName = user.Name,
             LastName = user.LastName,
+            Photo = user.Photo,
             Email = user.Mail,
             PhoneNumber = user.PhoneNumber,
+            Dni = user.Dni,
             RoleId = user.Role_id,
+            RoleDescription = user.Role.Description,
+            ResidenceId = residenceId,
+            Floor = residence?.Floor,
+            NumberFloor = residence?.Number,
+            ConsortiumId = consortiumId,
             Success = true
-        });
+        };
+
+        return Ok(response);
     }
 
     [HttpGet("totalTenants")]
@@ -288,6 +302,7 @@ public class UserController : ControllerBase
             Mail = u.Mail,
             PhoneNumber = u.PhoneNumber,
             Role = u.Role.Description,
+            ConsortiumId = consortiumId,
             Residences = u.Residences.Select(r => new ResidenceDto
             {
                 Id = r.Id,

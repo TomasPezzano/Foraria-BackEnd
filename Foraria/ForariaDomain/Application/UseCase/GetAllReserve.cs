@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Foraria.Domain.Repository;
-using ForariaDomain.Repository;
+﻿using Foraria.Domain.Repository;
+
 
 namespace ForariaDomain.Application.UseCase;
 
 public interface IGetAllReserve
 {
-    Task<List<Reserve>> Execute();
+    Task<List<Reserve>> Execute(int idConsortium);
 }
 public class GetAllReserve : IGetAllReserve
 {
@@ -19,9 +14,9 @@ public class GetAllReserve : IGetAllReserve
     {
         _reserveRepository = reserveRepository;
     }
-    public async Task<List<Reserve>> Execute()
+    public async Task<List<Reserve>> Execute(int idConsortium)
     {
-       return await _reserveRepository.GetAll();
+       return await _reserveRepository.GetAllInConsortium(idConsortium);
     }
 }
 

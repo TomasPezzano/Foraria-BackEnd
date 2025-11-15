@@ -12,6 +12,9 @@ public class ReserveDto
     [Required(ErrorMessage = "Debe especificar la fecha y hora de la reserva.")]
     public DateTime CreatedAt { get; set; }
 
+    [Required(ErrorMessage = "Debe especificar el consorcio.")]
+    public int Consortium_id { get; set; }
+
     [Required(ErrorMessage = "Debe especificar el lugar.")]
     public int Place_id { get; set; }
 

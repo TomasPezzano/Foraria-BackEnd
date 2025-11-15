@@ -1,4 +1,5 @@
 ﻿using Foraria.Application.Services;
+using Foraria.Application.UseCase;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
@@ -12,11 +13,10 @@ namespace Foraria.Controllers
     [Route("api/dashboard")]
     public class DashboardController : ControllerBase
     {
-        //private readonly GetMonthlyExpenseTotal _getMonthlyExpenseTotal;
-        //private readonly GetExpenseByCategory _getExpenseByCategory;
-        //private readonly GetPendingExpenses _getPendingExpenses;
-        //private readonly GetUserExpenseSummary _getUserExpenseSummary;
-        //private readonly GetUserMonthlyExpenseHistory _getUserMonthlyExpenseHistory;
+        private readonly GetMonthlyExpenseTotal _getMonthlyExpenseTotal;
+        private readonly GetPendingExpenses _getPendingExpenses;
+        private readonly GetUserExpenseSummary _getUserExpenseSummary;
+        private readonly GetUserMonthlyExpenseHistory _getUserMonthlyExpenseHistory;
         private readonly GetActivePollCount _getActivePollCount;
         private readonly GetUpcomingReserves _getUpcomingReserves;
         private readonly GetActiveReserveCount _getActiveReserveCount;
@@ -24,27 +24,25 @@ namespace Foraria.Controllers
 
 
         public DashboardController(
-            //GetMonthlyExpenseTotal getMonthlyExpenseTotal,
-            //GetExpenseByCategory getExpenseByCategory,
-            //GetPendingExpenses getPendingExpenses,
-            //GetUserExpenseSummary getUserExpenseSummary,
-            //GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
+            GetMonthlyExpenseTotal getMonthlyExpenseTotal,
+            GetPendingExpenses getPendingExpenses,
+            GetUserExpenseSummary getUserExpenseSummary,
+            GetUserMonthlyExpenseHistory getUserMonthlyExpenseHistory,
             GetActivePollCount getActivePollCount,
             GetUpcomingReserves getUpcomingReserves,
             GetActiveReserveCount getActiveReserveCount,
             IPermissionService permissionService)
         {
-            //_getMonthlyExpenseTotal = getMonthlyExpenseTotal;
-            //_getExpenseByCategory = getExpenseByCategory;
-            //_getPendingExpenses = getPendingExpenses;
-            //_getUserExpenseSummary = getUserExpenseSummary;
-            //_getUserMonthlyExpenseHistory = getUserMonthlyExpenseHistory;
+            _getMonthlyExpenseTotal = getMonthlyExpenseTotal;
+            _getPendingExpenses = getPendingExpenses;
+            _getUserExpenseSummary = getUserExpenseSummary;
+            _getUserMonthlyExpenseHistory = getUserMonthlyExpenseHistory;
             _getActivePollCount = getActivePollCount;
             _getUpcomingReserves = getUpcomingReserves;
             _getActiveReserveCount = getActiveReserveCount;
             _permissionService = permissionService;
         }
-        /*
+        
         [HttpGet("expenses/total")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(
@@ -71,8 +69,8 @@ namespace Foraria.Controllers
             });
         }
 
-        */
-        /*
+       
+        
         [HttpGet("expenses/pending")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(
@@ -96,8 +94,8 @@ namespace Foraria.Controllers
                 pendingExpenses = result
             });
         }
-        */
-        /*
+       
+        
         [HttpGet("expenses/summary")]
         [Authorize(Policy = "OwnerAndTenant")]
         [SwaggerOperation(
@@ -145,7 +143,7 @@ namespace Foraria.Controllers
 
             return Ok(result);
         }
-        */
+
         [HttpGet("polls/active")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(

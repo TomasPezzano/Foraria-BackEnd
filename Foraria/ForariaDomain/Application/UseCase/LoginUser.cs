@@ -56,6 +56,10 @@ public class LoginUser : ILoginUser
 
         usuarioLogueado.Role = role;
 
+        var residence = usuarioLogueado.Residences.FirstOrDefault();
+        var residenceId = residence?.Id;
+        var consortiumId = residence?.ConsortiumId;
+
         var accessToken = _jwtTokenGenerator.Generate(
             usuarioLogueado.Id,
             usuarioLogueado.Mail,

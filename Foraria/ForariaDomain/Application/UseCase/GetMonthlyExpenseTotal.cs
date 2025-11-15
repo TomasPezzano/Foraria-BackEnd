@@ -1,25 +1,30 @@
-﻿//using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
+using ForariaDomain.Repository;
 
-//namespace Foraria.Application.UseCase
-//{
-//    public class GetMonthlyExpenseTotal
-//    {
-//        private readonly IExpenseRepository _repository;
+namespace Foraria.Application.UseCase
+{
+    public class GetMonthlyExpenseTotal
+    {
+        private readonly IInvoiceRepository _repository;
 
-//        public GetMonthlyExpenseTotal(IExpenseRepository repository)
-//        {
-//            _repository = repository;
-//        }
+        public GetMonthlyExpenseTotal(IInvoiceRepository repository)
+        {
+            _repository = repository;
+        }
 
-//        public async Task<double> ExecuteAsync(int consortiumId)
-//        {
-//            var now = DateTime.UtcNow;
-//            var monthStart = new DateTime(now.Year, now.Month, 1);
-//            var monthEnd = monthStart.AddMonths(1);
+        public async Task<double> ExecuteAsync(int consortiumId)
+        {
+            var now = DateTime.UtcNow;
+            var startOfMonth = new DateTime(now.Year, now.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-//            var expenses = await _repository.GetExpensesByDateRange(consortiumId, monthStart, monthEnd);
+            var invoices = await _repository.GetAllInvoicesByMonthAndConsortium(startOfMonth, consortiumId);
 
-//            return expenses.Sum(e => e.TotalAmount);
-//        }
-//    }
-//}
+            var total = invoices
+                .Where(i => i.ProcessedAt >= startOfMonth && i.ProcessedAt <= endOfMonth)
+                .Sum(i => (double)i.Amount);
+
+            return total;
+        }
+    }
+}

@@ -132,6 +132,7 @@ namespace Foraria.Controllers
                         Id = i.Id,
                         Category = i.Category,
                         Description = i.Description,
+                        ProcessedAt = i.ProcessedAt,
                         Amount = i.Amount
                     }).ToList() ?? new List<InvoiceResponseDto>()
                 }

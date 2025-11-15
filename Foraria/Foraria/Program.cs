@@ -1,4 +1,5 @@
-﻿using Foraria;
+﻿using foraria.application.usecase;
+using Foraria;
 using Foraria.Application.Services;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
@@ -7,13 +8,16 @@ using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
 using Foraria.Infrastructure.Infrastructure.Persistence;
+using Foraria.Infrastructure.Infrastructure.Persistence.Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Infrastructure.Services;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using Foraria.SignalRImplementation;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
+using ForariaDomain.Application.UseCase.Foraria.Application.UseCase;
 using ForariaDomain.Repository;
+using ForariaDomain.Repository.ForariaDomain.Repository;
 using ForariaDomain.Services;
 using MercadoPago.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,10 +45,10 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
 builder.Services.AddScoped<IRegisterUser, RegisterUser>();
 builder.Services.AddScoped<IGeneratePassword, GeneratePassword>();
-builder.Services.AddScoped<IPasswordHash, PasswordHash>();
+builder.Services.AddScoped<IPasswordHash, HashPassword>();
 builder.Services.AddScoped<ISendEmail, SmtpEmailService>();
 builder.Services.AddScoped<ICreateResidence, CreateResidence>();
-builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<IJwtTokenGenerator, GenerateJwtToken>();
 builder.Services.AddScoped<ILoginUser, LoginUser>();
 builder.Services.AddScoped<ILogoutUser, LogoutUser>();
 builder.Services.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
@@ -87,16 +91,15 @@ builder.Services.AddScoped<ISignalRNotification, SignalRNotification>();
 builder.Services.AddScoped<GetSupplierById>();
 builder.Services.AddScoped<GetSupplierContractById>();
 builder.Services.AddScoped<GetSupplierContractsById>();
-//builder.Services.AddScoped<GetMonthlyExpenseTotal>();
-//builder.Services.AddScoped<GetExpenseByCategory>();
+builder.Services.AddScoped<GetMonthlyExpenseTotal>();
 builder.Services.AddScoped<GetActivePollCount>();
-//builder.Services.AddScoped<GetPendingExpenses>();
-//builder.Services.AddScoped<GetUserExpenseSummary>();
-//builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
+builder.Services.AddScoped<GetPendingExpenses>();
+builder.Services.AddScoped<GetUserExpenseSummary>();
+builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
 builder.Services.AddScoped<GetTotalUsers>();
 builder.Services.AddScoped<GetLatestPendingClaim>();
 builder.Services.AddScoped<GetPendingClaimsCount>();    
-//builder.Services.AddScoped<GetCollectedExpensesPercentage>();
+builder.Services.AddScoped<GetCollectedExpensesPercentage>();
 builder.Services.AddScoped<GetUpcomingReserves>();
 builder.Services.AddScoped<GetForumWithThreads>();
 builder.Services.AddScoped<DeleteForum>();
@@ -133,7 +136,7 @@ builder.Services.AddScoped<GetForumWithCategory>();
 builder.Services.AddScoped<GetThreadCommentCount>();
 builder.Services.AddScoped<IOcrService, OcrService>();
 builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
-builder.Services.AddScoped<IFileProcessor, FileProcessor>();
+builder.Services.AddScoped<IFileProcessor, ProcessFile>();
 builder.Services.AddScoped<IGetPlaceById, GetPlaceById>();
 builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
 builder.Services.AddScoped<GetActiveReserveCount>();
@@ -156,7 +159,6 @@ builder.Services.AddScoped<IGetAllResidencesByConsortium, GetAllResidencesByCons
 builder.Services.AddScoped<ITransferPermission, TransferPermission>();
 builder.Services.AddScoped<IRevokePermission, RevokePermission>();
 builder.Services.AddScoped<ICreateExpense, CreateExpense>();
-//builder.Services.AddScoped<IGetAllInvoicesByMonth, GetAllInvoicesByMonth>();
 builder.Services.AddScoped<IGetAllInvoicesByMonthAndConsortium, GetAllInvoicesByMonthAndConsortium>();
 builder.Services.AddScoped<IGetAllExpenses, GetAllExpenses>();
 builder.Services.AddScoped<ICreateExpenseDetail, CreateExpenseDetail>();
@@ -169,10 +171,31 @@ builder.Services.AddScoped<UpdatePoll>();
 builder.Services.AddScoped<ChangePollState>();
 builder.Services.AddScoped<GetUserDocumentsByCategory>();
 builder.Services.AddScoped<GetUserDocumentStats>();
-builder.Services.AddScoped<IPasswordResetTokenGenerator, PasswordResetTokenGenerator>();
+builder.Services.AddScoped<IPasswordResetTokenGenerator, ResetTokenGeneratorPassword>();
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
 builder.Services.AddScoped<IResetPassword, ResetPassword>();
+builder.Services.AddScoped<ICallRepository, CallRepository>();
+builder.Services.AddScoped<ICallParticipantRepository, CallParticipantRepository>();
+builder.Services.AddScoped<ICallTranscriptRepository, CallTranscriptRepository>();
+builder.Services.AddScoped<CreateCall>();
+builder.Services.AddScoped<EndCall>();
+builder.Services.AddScoped<JoinCall>();
+builder.Services.AddScoped<FinalizeCallTranscriptionAndNotarize>();
+builder.Services.AddScoped<RegisterTranscriptionResult>();
+builder.Services.AddScoped<VerifyTranscriptIntegrity>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<GetCallDetails>();
+builder.Services.AddScoped<GetCallParticipants>();
+builder.Services.AddScoped<GetCallMessages>();
+builder.Services.AddScoped<ToggleMute>();
+builder.Services.AddScoped<ToggleCamera>();
+builder.Services.AddScoped<LeaveCall>();
+builder.Services.AddScoped<SaveCallMessage>();
+builder.Services.AddScoped<SaveCallRecording>();
+builder.Services.AddScoped<GetCallRecordings>();
+builder.Services.AddScoped<ICallMessageRepository, CallMessageRepository>();
+builder.Services.AddScoped<ICallRecordingRepository, CallRecordingRepository>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 
 
@@ -269,6 +292,11 @@ builder.Services.AddAuthorization(options =>
         }));
 });
 
+builder.Services.AddHttpClient("TranscriptionService", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["TranscriptionService:BaseUrl"]);
+});
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -354,6 +382,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.MapHub<PollHub>("/pollHub");
+app.MapHub<CallHub>("/callHub");
 
 app.UseHttpsRedirection();
 

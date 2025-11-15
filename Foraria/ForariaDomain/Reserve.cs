@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Schema;
-using System.Xml;
 
 namespace ForariaDomain
 {
@@ -36,5 +29,8 @@ namespace ForariaDomain
 
         public User User { get; set; }
         public DateTime Date { get; set; }
+
+        public int ConsortiumId { get; set; }
+        public Consortium Consortium { get; set; }
     }
 }

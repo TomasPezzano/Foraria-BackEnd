@@ -1,10 +1,10 @@
 ﻿using Foraria.Application.Services;
+using foraria.application.usecase;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
 
 namespace Foraria.Controllers
 {
@@ -15,7 +15,7 @@ namespace Foraria.Controllers
         private readonly GetTotalUsers _getTotalUsers;
         private readonly GetPendingClaimsCount _getPendingClaimsCount;
         private readonly GetLatestPendingClaim _getLatestPendingClaim;
-        //private readonly GetCollectedExpensesPercentage _getCollectedExpensesPercentage;
+        private readonly GetCollectedExpensesPercentage _getCollectedExpensesPercentage;
         private readonly GetUpcomingReserves _getUpcomingReserves;
         private readonly IPermissionService _permissionService;
 
@@ -30,7 +30,7 @@ namespace Foraria.Controllers
             _getTotalUsers = getTotalUsers;
             _getPendingClaimsCount = getPendingClaimsCount;
             _getLatestPendingClaim = getLatestPendingClaim;
-            //_getCollectedExpensesPercentage = getCollectedExpensesPercentage;
+            _getCollectedExpensesPercentage = getCollectedExpensesPercentage;
             _getUpcomingReserves = getUpcomingReserves;
             _permissionService = permissionService;
         }
@@ -88,9 +88,9 @@ namespace Foraria.Controllers
 
             return Ok(claim);
         }
-        /*
+        
         [HttpGet("expenses/collected-percentage")]
-        [Authorize(Policy = "ConsortiumAndAdmin")]
+        //[Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Obtiene el porcentaje de expensas recaudadas.",
             Description = "Calcula el porcentaje total de expensas cobradas frente al total emitido, para el consorcio indicado y la fecha (opcional)."
@@ -105,7 +105,7 @@ namespace Foraria.Controllers
             var result = await _getCollectedExpensesPercentage.ExecuteAsync(consortiumId, date);
             return Ok(result);
         }
-        */
+       
         [HttpGet("reservations/upcoming")]
         [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(

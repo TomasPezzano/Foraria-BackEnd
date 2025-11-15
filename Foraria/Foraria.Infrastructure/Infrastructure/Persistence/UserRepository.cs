@@ -17,6 +17,8 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByEmail(string email)
     {
         return await _context.Users
+            .Include(u => u.Residences)
+                .ThenInclude(r => r.Consortium)
             .FirstOrDefaultAsync(u => u.Mail == email);
     }
 
@@ -34,7 +36,7 @@ public class UserRepository : IUserRepository
 
     public Task<User?> GetById(int id)
     {
-        return _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        return _context.Users.Include(u => u.Role).Include(u=>u.Residences).FirstOrDefaultAsync(u => u.Id == id);
     }
 
 

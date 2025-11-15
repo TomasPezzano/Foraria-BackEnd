@@ -60,7 +60,7 @@ public class RegisterUser : IRegisterUser
         user.HasPermission = role.Description == "Propietario";
 
         var temporaryPassword = await _generatePasswordUseCase.Generate();
-        var passwordHash = _passwordHashUseCase.HashPassword(temporaryPassword);
+        var passwordHash = _passwordHashUseCase.Execute(temporaryPassword);
         user.Password = passwordHash;
         user.Residences = new List<Residence> { residence };
         user.RequiresPasswordChange = true;

@@ -53,7 +53,7 @@ public class ResetPassword : IResetPassword
         }
 
         var user = resetToken.User;
-        user.Password = _passwordHash.HashPassword(newPassword);
+        user.Password = _passwordHash.Execute(newPassword);
 
         // Si el usuario tenía RequiresPasswordChange, lo mantenemos así
         // porque esto es un reset, no el primer login
