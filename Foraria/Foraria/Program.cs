@@ -1,6 +1,7 @@
 ﻿using foraria.application.usecase;
 using Foraria;
 using Foraria.Application.Services;
+using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
 using Foraria.Domain.Service;

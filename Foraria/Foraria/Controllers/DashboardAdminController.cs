@@ -23,7 +23,7 @@ namespace Foraria.Controllers
             GetTotalUsers getTotalUsers,
             GetPendingClaimsCount getPendingClaimsCount,
             GetLatestPendingClaim getLatestPendingClaim,
-            //GetCollectedExpensesPercentage getCollectedExpensesPercentage,
+            GetCollectedExpensesPercentage getCollectedExpensesPercentage,
             GetUpcomingReserves getUpcomingReserves,
             IPermissionService permissionService)
         {

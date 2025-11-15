@@ -72,7 +72,6 @@ public class ReserveController : ControllerBase
         }
         await _permissionService.EnsurePermissionAsync(User, "Reserves.ViewAll");
 
-        var reserves = await _getAllReserve.Execute();
 
         if (reserves == null || !reserves.Any())
             throw new NotFoundException($"No se encontraron reservas para el consorcio con ID {idConsortium}.");

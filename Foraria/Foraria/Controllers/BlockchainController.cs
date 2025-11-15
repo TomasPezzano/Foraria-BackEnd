@@ -21,9 +21,10 @@ namespace Foraria.Controllers
         public BlockchainController(
             IBlockchainService blockchainService,
             IBlockchainProofRepository proofRepository,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            IUnitOfWork uow) // <-- Añadir este parámetro
         {
-            _notarizeFile = new NotarizeFile(blockchainService, proofRepository);
+            _notarizeFile = new NotarizeFile(blockchainService, proofRepository, uow); 
             _verifyFileProof = new VerifyFileProof(blockchainService, proofRepository);
             _permissionService = permissionService;
         }
