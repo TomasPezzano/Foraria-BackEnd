@@ -5,7 +5,7 @@ using ForariaDomain;
 using ForariaDomain.Exceptions;
 using ForariaDomain.Application.UseCase;
 
-namespace ForariaTest.Tests.Forum
+namespace ForariaTest.Tests.Forums
 {
     public class DeleteForumTests
     {

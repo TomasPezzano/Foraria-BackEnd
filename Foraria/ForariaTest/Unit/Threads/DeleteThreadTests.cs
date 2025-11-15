@@ -3,7 +3,7 @@ using FluentAssertions;
 using Foraria.Domain.Repository;
 using ForariaDomain.Application.UseCase;
 
-namespace ForariaTest.Tests.Thread
+namespace ForariaTest.Tests.Threads
 {
     public class DeleteThreadTests
     {

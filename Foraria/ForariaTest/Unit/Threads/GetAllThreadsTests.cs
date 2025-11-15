@@ -8,7 +8,7 @@ using Foraria.Domain.Repository;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
 
-namespace ForariaTest.Unit.Thread
+namespace ForariaTest.Unit.Threads
 {
     public class GetAllThreadsTests
     {
