@@ -15,7 +15,7 @@ public interface IUserRepository
     Task<int> GetTotalOwnerUsersAsync(int idConsortium);
     Task<User?> GetByIdWithRole(int id);
     Task Update(User user);
-    Task<int> GetAllInNumber();
+    Task<int> GetAllInNumber(int consortiumId);
     Task<List<User>> GetUsersByConsortiumIdAsync(int consortiumId);
     Task<bool> ExistsUserWithRoleInResidence(int residenceId, string roleDescription);
 
