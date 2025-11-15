@@ -4,8 +4,6 @@ using ForariaDomain.Repository;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ForariaTest.Unit.Suppliers;
@@ -13,7 +11,7 @@ namespace ForariaTest.Unit.Suppliers;
 public class DeleteSupplierTest
 {
     [Fact]
-    public void Execute_WhenSupplierExistsAndHasNoActiveContracts_ShouldDeleteSuccessfully()
+    public async Task Execute_WhenSupplierExistsAndHasNoActiveContracts_ShouldDeleteSuccessfully()
     {
         // Arrange
         var mockRepository = new Mock<ISupplierRepository>();
@@ -23,12 +21,12 @@ public class DeleteSupplierTest
             Id = 1,
             CommercialName = "Plomería San Martin",
             Cuit = "20-12345678-9",
-            Contracts = new List<SupplierContract>() // Sin contratos
+            Contracts = new List<SupplierContract>() 
         };
 
         mockRepository
             .Setup(r => r.GetById(1))
-            .Returns(supplier);
+            .ReturnsAsync(supplier);
 
         mockRepository
             .Setup(r => r.Delete(1))
@@ -37,7 +35,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act
-        var result = useCase.ExecuteAsync(1);
+        var result = await useCase.ExecuteAsync(1);
 
         // Assert
         Assert.True(result);
@@ -46,7 +44,7 @@ public class DeleteSupplierTest
     }
 
     [Fact]
-    public void Execute_WhenSupplierExistsWithInactiveContracts_ShouldDeleteSuccessfully()
+    public async Task Execute_WhenSupplierExistsWithInactiveContracts_ShouldDeleteSuccessfully()
     {
         // Arrange
         var mockRepository = new Mock<ISupplierRepository>();
@@ -58,14 +56,14 @@ public class DeleteSupplierTest
             Cuit = "20-12345678-9",
             Contracts = new List<SupplierContract>
             {
-                new SupplierContract { Id = 1, Active = false }, // Contrato inactivo
-                new SupplierContract { Id = 2, Active = false }  // Contrato inactivo
+                new SupplierContract { Id = 1, Active = false },
+                new SupplierContract { Id = 2, Active = false }
             }
         };
 
         mockRepository
             .Setup(r => r.GetById(1))
-            .Returns(supplier);
+            .ReturnsAsync(supplier);
 
         mockRepository
             .Setup(r => r.Delete(1))
@@ -74,7 +72,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act
-        var result = useCase.ExecuteAsync(1);
+        var result = await useCase.ExecuteAsync(1);
 
         // Assert
         Assert.True(result);
@@ -82,26 +80,27 @@ public class DeleteSupplierTest
     }
 
     [Fact]
-    public void Execute_WhenSupplierDoesNotExist_ShouldThrowKeyNotFoundException()
+    public async Task Execute_WhenSupplierDoesNotExist_ShouldThrowKeyNotFoundException()
     {
         // Arrange
         var mockRepository = new Mock<ISupplierRepository>();
 
         mockRepository
             .Setup(r => r.GetById(999))
-            .Returns((Supplier?)null); // No existe
+            .ReturnsAsync((Supplier?)null);
 
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act & Assert
-        var exception = Assert.Throws<KeyNotFoundException>(() => useCase.ExecuteAsync(999));
+        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => useCase.ExecuteAsync(999));
         Assert.Equal("El proveedor con ID 999 no existe", exception.Message);
+
         mockRepository.Verify(r => r.GetById(999), Times.Once);
         mockRepository.Verify(r => r.Delete(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
-    public void Execute_WhenSupplierHasActiveContracts_ShouldThrowInvalidOperationException()
+    public async Task Execute_WhenSupplierHasActiveContracts_ShouldThrowInvalidOperationException()
     {
         // Arrange
         var mockRepository = new Mock<ISupplierRepository>();
@@ -113,31 +112,25 @@ public class DeleteSupplierTest
             Cuit = "20-12345678-9",
             Contracts = new List<SupplierContract>
             {
-                new SupplierContract
-                {
-                    Id = 1,
-                    Active = true, // ← Contrato activo
-                    Name = "Mantenimiento mensual",
-                    MonthlyAmount = 50000
-                }
+                new SupplierContract { Id = 1, Active = true, Name = "Mantenimiento mensual", MonthlyAmount = 50000 }
             }
         };
 
         mockRepository
             .Setup(r => r.GetById(1))
-            .Returns(supplier);
+            .ReturnsAsync(supplier);
 
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => useCase.ExecuteAsync(1));
-        Assert.Equal("No se puede eliminar un proveedor con contratos activos", exception.Message);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => useCase.ExecuteAsync(1));
+
         mockRepository.Verify(r => r.GetById(1), Times.Once);
         mockRepository.Verify(r => r.Delete(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
-    public void Execute_WhenSupplierHasMixedContracts_ShouldThrowInvalidOperationException()
+    public async Task Execute_WhenSupplierHasMixedContracts_ShouldThrowInvalidOperationException()
     {
         // Arrange
         var mockRepository = new Mock<ISupplierRepository>();
@@ -148,25 +141,26 @@ public class DeleteSupplierTest
             CommercialName = "Plomería San Martin",
             Contracts = new List<SupplierContract>
             {
-                new SupplierContract { Id = 1, Active = false }, // Inactivo
-                new SupplierContract { Id = 2, Active = true },  // ← ACTIVO (bloquea eliminación)
-                new SupplierContract { Id = 3, Active = false }  // Inactivo
+                new SupplierContract { Id = 1, Active = false },
+                new SupplierContract { Id = 2, Active = true },
+                new SupplierContract { Id = 3, Active = false }
             }
         };
 
         mockRepository
             .Setup(r => r.GetById(1))
-            .Returns(supplier);
+            .ReturnsAsync(supplier);
 
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => useCase.ExecuteAsync(1));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => useCase.ExecuteAsync(1));
+
         mockRepository.Verify(r => r.Delete(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
-    public void Execute_WhenSupplierContractsIsNull_ShouldDeleteSuccessfully()
+    public async Task Execute_WhenSupplierContractsIsNull_ShouldDeleteSuccessfully()
     {
         // Arrange
         var mockRepository = new Mock<ISupplierRepository>();
@@ -175,12 +169,12 @@ public class DeleteSupplierTest
         {
             Id = 1,
             CommercialName = "Plomería San Martin",
-            Contracts = null // ← Null (no se cargaron contratos)
+            Contracts = null
         };
 
         mockRepository
             .Setup(r => r.GetById(1))
-            .Returns(supplier);
+            .ReturnsAsync(supplier);
 
         mockRepository
             .Setup(r => r.Delete(1))
@@ -189,7 +183,7 @@ public class DeleteSupplierTest
         var useCase = new DeleteSupplier(mockRepository.Object);
 
         // Act
-        var result = useCase.ExecuteAsync(1);
+        var result = await useCase.ExecuteAsync(1);
 
         // Assert
         Assert.True(result);

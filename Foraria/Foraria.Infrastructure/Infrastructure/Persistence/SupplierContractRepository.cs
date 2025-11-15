@@ -19,10 +19,10 @@ public class SupplierContractRepository : ISupplierContractRepository
         _context = context;
     }
 
-    public SupplierContract Create(SupplierContract contract)
+    public async Task<SupplierContract> Create(SupplierContract contract)
     {
-        _context.SupplierContracts.Add(contract);
-        _context.SaveChanges();
+        await _context.SupplierContracts.AddAsync(contract);
+        await _context.SaveChangesAsync();
         return contract;
     }
 
@@ -42,19 +42,19 @@ public class SupplierContractRepository : ISupplierContractRepository
             .ToList();
     }
 
-    public List<SupplierContract> GetActiveContractsBySupplierId(int supplierId)
+    public async Task<List<SupplierContract>> GetActiveContractsBySupplierId(int supplierId)
     {
-        return _context.SupplierContracts
+        return await _context.SupplierContracts
             .Include(c => c.Supplier)
             .Where(c => c.SupplierId == supplierId && c.Active)
             .OrderByDescending(c => c.CreatedAt)
-            .ToList();
+            .ToListAsync();
     }
 
-    public SupplierContract Update(SupplierContract contract)
+    public async Task<SupplierContract> Update(SupplierContract contract)
     {
         _context.SupplierContracts.Update(contract);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return contract;
     }
 

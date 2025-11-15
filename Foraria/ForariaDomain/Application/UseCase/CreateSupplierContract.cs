@@ -1,5 +1,7 @@
 ﻿using ForariaDomain.Repository;
-
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ForariaDomain.Application.UseCase;
 
@@ -62,6 +64,7 @@ public class CreateSupplierContract : ICreateSupplierContract
         contract.Active = true;
         contract.CreatedAt = DateTime.UtcNow;
 
-        return _contractRepository.Create(contract);
+        var created = await _contractRepository.Create(contract);
+        return created;
     }
 }

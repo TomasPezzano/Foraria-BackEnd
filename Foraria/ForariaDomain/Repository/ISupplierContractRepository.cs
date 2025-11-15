@@ -8,11 +8,10 @@ namespace ForariaDomain.Repository;
 
 public interface ISupplierContractRepository
 {
-    SupplierContract Create(SupplierContract contract);
+    Task<SupplierContract> Create(SupplierContract contract);
     Task<SupplierContract?> GetById(int id);
     Task<List<SupplierContract>> GetBySupplierId(int supplierId);
-    List<SupplierContract> GetActiveContractsBySupplierId(int supplierId);
-    SupplierContract Update(SupplierContract contract);
-
+    Task<List<SupplierContract>> GetActiveContractsBySupplierId(int supplierId);
+    Task<SupplierContract> Update(SupplierContract contract);
     Task<int> GetActiveContractsCount(int consortiumId);
 }
