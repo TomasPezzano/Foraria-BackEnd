@@ -1,6 +1,7 @@
-﻿using ForariaDomain.Application.UseCase;
+﻿using Foraria.Application.Services;
 using Foraria.DTOs;
 using ForariaDomain;
+using ForariaDomain.Application.UseCase;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,17 +18,20 @@ public class ClaimResponseController : ControllerBase
     private readonly IGetUserById _getUserById;
     private readonly IGetClaimById _getClaimById;
     private readonly IGetResponsibleSectorById _getResponsibleSectorById;
+    private readonly IPermissionService _permissionService;
 
     public ClaimResponseController(
         ICreateClaimResponse createClaimResponse,
         IGetUserById getUserById,
         IGetClaimById getClaimById,
-        IGetResponsibleSectorById getResponsibleSectorById)
+        IGetResponsibleSectorById getResponsibleSectorById,
+        IPermissionService permissionService)
     {
         _createClaimResponse = createClaimResponse;
         _getUserById = getUserById;
         _getClaimById = getClaimById;
         _getResponsibleSectorById = getResponsibleSectorById;
+        _permissionService = permissionService;
     }
 
 
@@ -45,6 +49,8 @@ public class ClaimResponseController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] ClaimResponseDto dto)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Claims.Respond");
+
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 

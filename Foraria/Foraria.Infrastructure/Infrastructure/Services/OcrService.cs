@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Foraria.Infrastructure.Infrastructure.Services;
 
-public class AzureOcrService : IOcrService
+public class OcrService : IOcrService
 {
     private readonly DocumentIntelligenceClient _client;
-    private readonly ILogger<AzureOcrService> _logger;
+    private readonly ILogger<OcrService> _logger;
     private const string PrebuiltInvoiceModel = "prebuilt-invoice";
 
-    public AzureOcrService(IConfiguration configuration, ILogger<AzureOcrService> logger)
+    public OcrService(IConfiguration configuration, ILogger<OcrService> logger)
     {
         _logger = logger;
         

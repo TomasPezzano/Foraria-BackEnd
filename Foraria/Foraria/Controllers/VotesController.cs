@@ -1,4 +1,5 @@
-﻿using Foraria.DTOs;
+﻿using Foraria.Application.Services;
+using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
@@ -15,10 +16,12 @@ namespace Foraria.Controllers
     public class VotesController : ControllerBase
     {
         private readonly CreateVote _createVoteUseCase;
+        private readonly IPermissionService _permissionService;
 
-        public VotesController(CreateVote createVoteUseCase)
+        public VotesController(CreateVote createVoteUseCase, IPermissionService permissionService)
         {
             _createVoteUseCase = createVoteUseCase;
+            _permissionService = permissionService;
         }
 
         [HttpPost]
@@ -32,6 +35,8 @@ namespace Foraria.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error interno del servidor")]
         public async Task<IActionResult> PostVote([FromBody] VoteDto request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Votes.Cast");
+
             if (!ModelState.IsValid)
                 throw new DomainValidationException("Los datos del voto son inválidos.");
 

@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using Foraria.Application.Services;
+using Foraria.Domain.Repository;
 using Foraria.Domain.Service;
 using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
@@ -15,13 +16,17 @@ namespace Foraria.Controllers
     {
         private readonly NotarizeFile _notarizeFile;
         private readonly VerifyFileProof _verifyFileProof;
+        private readonly IPermissionService _permissionService;
 
         public BlockchainController(
-            NotarizeFile notarizeFile,
-            VerifyFileProof verifyFileProof)
+            IBlockchainService blockchainService,
+            IBlockchainProofRepository proofRepository,
+            IPermissionService permissionService,
+            IUnitOfWork uow) // <-- Añadir este parámetro
         {
-            _notarizeFile = notarizeFile;
-            _verifyFileProof = verifyFileProof;
+            _notarizeFile = new NotarizeFile(blockchainService, proofRepository, uow); 
+            _verifyFileProof = new VerifyFileProof(blockchainService, proofRepository);
+            _permissionService = permissionService;
         }
 
         [HttpPost("notarize-file")]
@@ -34,6 +39,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> NotarizeFile([FromForm] NotarizeFileRequestDto request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Blockchain.Notarize");
+
             if (request.File == null || request.File.Length == 0)
                 throw new ValidationException("Debe subir un archivo válido.");
 
@@ -84,6 +91,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> VerifyFile([FromForm] VerifyFileRequestDto request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Blockchain.Verify");
+
             if (request.File == null || request.File.Length == 0)
                 throw new ValidationException("Debe subir un archivo válido.");
 
