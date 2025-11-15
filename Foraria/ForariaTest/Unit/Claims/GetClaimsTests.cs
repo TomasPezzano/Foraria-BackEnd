@@ -22,38 +22,48 @@ namespace ForariaTest.Unit.Claims
         [Fact]
         public async Task Execute_ShouldReturnListOfClaims()
         {
+            
+            int consortiumId = 5;
+
             var claimsMock = new List<Claim>
             {
-                new Claim { Id = 1, Title = "Claim A" },
-                new Claim { Id = 2, Title = "Claim B" }
+                new Claim { Id = 1, Title = "Claim A", ConsortiumId = consortiumId },
+                new Claim { Id = 2, Title = "Claim B", ConsortiumId = consortiumId }
             };
 
             _mockRepo
-                .Setup(repo => repo.GetAll())
+                .Setup(repo => repo.GetAll(consortiumId))
                 .ReturnsAsync(claimsMock);
 
-            var result = await _useCase.Execute();
+            
+            var result = await _useCase.Execute(consortiumId);
 
+         
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("Claim A", result[0].Title);
 
-            _mockRepo.Verify(repo => repo.GetAll(), Times.Once);
+            _mockRepo.Verify(repo => repo.GetAll(consortiumId), Times.Once);
         }
 
         [Fact]
         public async Task Execute_ShouldReturnEmptyList_WhenNoClaimsExist()
         {
-            _mockRepo
-                .Setup(repo => repo.GetAll())
-                .ReturnsAsync(new List<Claim>()); 
+           
+            int consortiumId = 3;
 
-            var result = await _useCase.Execute();
+            _mockRepo
+                .Setup(repo => repo.GetAll(consortiumId))
+                .ReturnsAsync(new List<Claim>());
+
+       
+            var result = await _useCase.Execute(consortiumId);
+
 
             Assert.NotNull(result);
             Assert.Empty(result);
 
-            _mockRepo.Verify(repo => repo.GetAll(), Times.Once);
+            _mockRepo.Verify(repo => repo.GetAll(consortiumId), Times.Once);
         }
     }
 }

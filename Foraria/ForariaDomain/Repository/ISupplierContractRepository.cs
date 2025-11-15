@@ -13,4 +13,6 @@ public interface ISupplierContractRepository
     List<SupplierContract> GetBySupplierId(int supplierId);
     List<SupplierContract> GetActiveContractsBySupplierId(int supplierId);
     SupplierContract Update(SupplierContract contract);
+
+    Task<int> GetActiveContractsCount(int consortiumId);
 }

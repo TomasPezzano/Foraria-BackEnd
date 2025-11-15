@@ -50,7 +50,7 @@ namespace Foraria.Application.Services
 
                 "Residences.Create", "Residences.View", "Residences.ViewAllByConsortium",
 
-                "SupplierContracts.Create", "SupplierContracts.View", "SupplierContracts.ViewBySupplier",
+                "SupplierContracts.Create", "SupplierContracts.View", "SupplierContracts.ViewBySupplier", "SupplierContracts.ViewActiveContractsCount",
 
                 "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll",
 
@@ -102,7 +102,7 @@ namespace Foraria.Application.Services
 
                 "Residences.Create", "Residences.View", "Residences.ViewAllByConsortium",
 
-                "SupplierContracts.Create", "SupplierContracts.View", "SupplierContracts.ViewBySupplier",
+                "SupplierContracts.Create", "SupplierContracts.View", "SupplierContracts.ViewBySupplier",  "SupplierContracts.ViewActiveContractsCount",
 
                 "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll",
 

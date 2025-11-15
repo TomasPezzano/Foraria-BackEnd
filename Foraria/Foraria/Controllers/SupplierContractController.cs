@@ -22,6 +22,7 @@ public class SupplierContractController : ControllerBase
     private static readonly string[] AllowedFileExtensions = { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
     private const long MaxFileSizeInBytes = 10 * 1024 * 1024;
     private readonly IPermissionService _permissionService;
+    private readonly IGetActiveContractsSupplierCount _getActiveContractsSupplierCount;
 
     public SupplierContractController(
         ICreateSupplierContract createSupplierContract,
@@ -29,6 +30,7 @@ public class SupplierContractController : ControllerBase
         ILocalFileStorageService localFileStorageService,
         GetSupplierContractById getSupplierContractById,
         GetSupplierContractsById getSupplierContractsBySupplierId,
+        IGetActiveContractsSupplierCount getActiveContractsSupplierCount,
         IPermissionService permissionService)
     {
         _createSupplierContract = createSupplierContract;
@@ -36,6 +38,7 @@ public class SupplierContractController : ControllerBase
         _localFileStorageService = localFileStorageService;
         _getSupplierContractById = getSupplierContractById;
         _getContractsBySupplierId = getSupplierContractsBySupplierId;
+        _getActiveContractsSupplierCount = getActiveContractsSupplierCount;
         _permissionService = permissionService;
     }
 
@@ -200,5 +203,26 @@ public class SupplierContractController : ControllerBase
         }
 
         return Ok(response);
+    }
+
+    [HttpGet("/active-contracts")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
+    [SwaggerOperation(
+        Summary = "Obtiene la cantidad de contratos de proveedores activos.",
+        Description = "Devuelve el número total de contratos activos del consorcio especificado."
+    )]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetActiveContractsSupplierCount([FromQuery] int ConsortiumId)
+    {
+        await _permissionService.EnsurePermissionAsync(User, "SupplierContracts.ViewActiveContractsCount");
+
+        if (ConsortiumId <= 0)
+            return BadRequest("ConsortiumId inválido.");
+
+        var count = await _getActiveContractsSupplierCount.ExecuteAsync(ConsortiumId);
+
+        return Ok(count);
     }
 }

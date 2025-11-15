@@ -21,10 +21,12 @@ public class ClaimDto
     [Required(ErrorMessage = "La categoría es obligatoria")]
     [StringLength(50, ErrorMessage = "La categoría no puede superar los 50 caracteres")]
     public string Category { get; set; }
-    public string? Archive { get; set;}
+    public string? Archive { get; set; }
     public int? User_id { get; set; }
 
     public int ResidenceId { get; set; }
     public DateTime? CreatedAt { get; set; }
     public string? State { get; set; }
+
+    public int ConsortiumId { get; set; }
 }

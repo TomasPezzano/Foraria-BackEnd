@@ -57,4 +57,13 @@ public class SupplierContractRepository : ISupplierContractRepository
         _context.SaveChanges();
         return contract;
     }
+
+    public async Task<int> GetActiveContractsCount(int consortiumId)
+    {
+        return await _context.SupplierContracts
+            .Where(c => c.Active &&
+                        c.EndDate >= DateTime.UtcNow &&     
+                        c.Supplier.ConsortiumId == consortiumId)
+            .CountAsync();
+    }
 }
