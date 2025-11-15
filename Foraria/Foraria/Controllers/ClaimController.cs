@@ -45,10 +45,10 @@ public class ClaimController : ControllerBase
     [ProducesResponseType(typeof(List<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(int consortiumId)
     {
         await _permissionService.EnsurePermissionAsync(User, "Claims.View");
-        var claims = await _getClaims.Execute();
+        var claims = await _getClaims.Execute(consortiumId);
 
         if (claims == null || !claims.Any())
             throw new NotFoundException("No se encontraron reclamos registrados.");
@@ -65,7 +65,9 @@ public class ClaimController : ControllerBase
                 Category = c.Category,
                 Archive = c.Archive,
                 User_id = c.User_id,
-                CreatedAt = c.CreatedAt
+                CreatedAt = c.CreatedAt,
+                ResidenceId = c.ResidenceId,
+                ConsortiumId = c.ConsortiumId
             },
 
             user = c.User != null ? new UserDto
@@ -73,12 +75,7 @@ public class ClaimController : ControllerBase
                 Id = c.User.Id,
                 FirstName = c.User.Name,
                 LastName = c.User.LastName,
-                Residences = c.User.Residences?
-                    .Select(r => new ResidenceDto
-                    {
-                        Id = r.Id,
-                        ConsortiumId = r.ConsortiumId
-                    }).ToList()
+         
             } : null,
 
             claimResponse = c.ClaimResponse != null ? new ClaimResponseDto
@@ -137,6 +134,7 @@ public class ClaimController : ControllerBase
             User_id = claimDto.User_id,
             ResidenceId = claimDto.ResidenceId,
             CreatedAt = DateTime.UtcNow,
+            ConsortiumId = claimDto.ConsortiumId,
             State = "Nuevo"
         };
 
@@ -152,10 +150,11 @@ public class ClaimController : ControllerBase
             createdClaim.Description,
             createdClaim.Priority,
             createdClaim.Category,
+            createdClaim.ConsortiumId,
             ArchiveUrl = filePath
         };
 
-        return CreatedAtAction(nameof(GetAll), new { id = createdClaim.Id }, response);
+        return Ok(response);
     }
 
 

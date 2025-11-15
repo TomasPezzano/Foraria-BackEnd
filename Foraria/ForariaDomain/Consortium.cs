@@ -29,5 +29,5 @@ public class Consortium
 
     public ICollection<Reserve> Reserves { get; set; }
 
-
+    public ICollection<Claim> Claims { get; set; }
 }

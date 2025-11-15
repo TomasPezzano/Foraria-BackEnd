@@ -6,7 +6,7 @@ public interface IClaimRepository
 {
     Task Add(Claim claim);
 
-    Task<List<Claim>> GetAll();
+    Task<List<Claim>> GetAll(int consortiumId);
 
     Task Update(Claim claim);
 

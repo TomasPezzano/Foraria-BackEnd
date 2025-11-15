@@ -17,11 +17,12 @@ public class ClaimImplementation : IClaimRepository
         await  _context.SaveChangesAsync();
     }
 
-    public async Task<List<Claim>> GetAll()
+    public async Task<List<Claim>> GetAll(int consortiumId)
     {
         return  await _context.Claims
                    .Include(c => c.ClaimResponse)
-                   .ThenInclude(cr => cr.User)
+                   .Include(c => c.User)
+                   .Where(c => c.ConsortiumId == consortiumId)
                    .ToListAsync();
     }
 

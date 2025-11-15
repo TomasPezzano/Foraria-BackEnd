@@ -38,5 +38,7 @@ namespace ForariaDomain
         public int ResidenceId { get; set; }
         public Residence Residence { get; set; }
 
+        public int ConsortiumId { get; set; }
+        public Consortium Consortium { get; set; }
     }
 }

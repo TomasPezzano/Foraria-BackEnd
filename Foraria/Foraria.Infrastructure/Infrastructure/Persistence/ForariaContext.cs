@@ -387,6 +387,12 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(d => d.ConsortiumId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Consortium>()
+                .HasMany(e => e.Claims)
+                .WithOne(d => d.Consortium)
+                .HasForeignKey(d => d.ConsortiumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<PasswordResetToken>()
                .HasOne(u => u.User)
                .WithMany(i => i.PasswordResetTokens)

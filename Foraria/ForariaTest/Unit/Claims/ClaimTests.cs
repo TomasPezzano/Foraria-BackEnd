@@ -4,8 +4,10 @@ using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Security.Claims;
 
 public class ClaimTests
 {
@@ -23,11 +25,34 @@ public class ClaimTests
         _rejectClaimMock = new Mock<IRejectClaim>();
         _fileProcessorMock = new Mock<IFileProcessor>();
         _permissionServiceMock = new Mock<IPermissionService>();
-        _controller = new ClaimController(_createClaimMock.Object, _getClaimsMock.Object, _rejectClaimMock.Object, _fileProcessorMock.Object, _permissionServiceMock.Object);
+
+        // Mock básico: siempre permite el permiso
+        _permissionServiceMock
+            .Setup(p => p.EnsurePermissionAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        _controller = new ClaimController(
+            _createClaimMock.Object,
+            _getClaimsMock.Object,
+            _rejectClaimMock.Object,
+            _fileProcessorMock.Object,
+            _permissionServiceMock.Object
+        );
+
+        // SE AGREGA EL USUARIO VACÍO (REQUIRED por ASP.NET Core)
+        var httpContext = new DefaultHttpContext
+        {
+            User = new ClaimsPrincipal(new ClaimsIdentity()) // usuario vacío
+        };
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = httpContext
+        };
     }
 
     [Fact]
-    public async Task Add_ValidClaimDtoWithArchive_ReturnsCreatedAtAction()
+    public async Task Add_ValidClaimDtoWithArchive_ReturnsOkObjectResult()
     {
         var dto = new ClaimDto
         {
@@ -37,10 +62,11 @@ public class ClaimTests
             Category = "Servicios",
             Archive = "data:image/png;base64,VALIDBASE64==",
             User_id = 1,
-            ResidenceId = 2
+            ResidenceId = 2,
+            ConsortiumId = 9
         };
 
-        var claim = new Claim
+        var claim = new ForariaDomain.Claim
         {
             Id = 99,
             Title = dto.Title,
@@ -51,25 +77,32 @@ public class ClaimTests
             User_id = dto.User_id,
             ResidenceId = dto.ResidenceId,
             CreatedAt = DateTime.UtcNow,
-            State = "Nuevo"
+            State = "Nuevo",
+            ConsortiumId = 9
         };
 
-        _fileProcessorMock.Setup(fp => fp.SaveBase64FileAsync(dto.Archive, "claims"))
+        _fileProcessorMock
+            .Setup(fp => fp.SaveBase64FileAsync(dto.Archive, "claims"))
             .ReturnsAsync("claims/archivo.png");
 
-        _createClaimMock.Setup(x => x.Execute(It.IsAny<Claim>()))
+        _createClaimMock
+            .Setup(x => x.Execute(It.IsAny<ForariaDomain.Claim>()))
             .ReturnsAsync(claim);
 
+        // Act
         var result = await _controller.Add(dto);
 
-        var created = Assert.IsType<CreatedAtActionResult>(result);
-        Assert.Equal(99, created.RouteValues["id"]);
+        // Assert
+        var ok = Assert.IsType<OkObjectResult>(result);
 
-        var response = created.Value;
-        var archiveProp = response.GetType().GetProperty("ArchiveUrl");
-        var archiveUrl = archiveProp?.GetValue(response)?.ToString();
+        // Anonymous type → dictionary
+        var dict = ok.Value
+            .GetType()
+            .GetProperties()
+            .ToDictionary(p => p.Name, p => p.GetValue(ok.Value));
 
-        Assert.Equal("claims/archivo.png", archiveUrl);
+        Assert.Equal(99, (int)dict["Id"]);
+        Assert.Equal("claims/archivo.png", dict["ArchiveUrl"]);
     }
 
     [Fact]
@@ -83,13 +116,17 @@ public class ClaimTests
             Category = "General",
             Archive = "data:image/png;base64,estoNoEsBase64",
             User_id = 1,
-            ResidenceId = 2
+            ResidenceId = 2,
+            ConsortiumId = 3
         };
 
-        _fileProcessorMock.Setup(fp => fp.SaveBase64FileAsync(dto.Archive, "claims"))
+        _fileProcessorMock
+            .Setup(fp => fp.SaveBase64FileAsync(dto.Archive, "claims"))
             .ThrowsAsync(new FormatException());
 
-        var ex = await Assert.ThrowsAsync<DomainValidationException>(() => _controller.Add(dto));
+        var ex = await Assert.ThrowsAsync<DomainValidationException>(() =>
+            _controller.Add(dto)
+        );
 
         Assert.Equal("El formato del archivo Base64 no es válido.", ex.Message);
     }
