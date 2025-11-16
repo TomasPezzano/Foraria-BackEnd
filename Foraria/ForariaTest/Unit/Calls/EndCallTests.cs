@@ -1,25 +1,25 @@
+﻿using System;
 using FluentAssertions;
 using Moq;
 using Xunit;
 using ForariaDomain;
-using ForariaDomain.Exceptions;
 using ForariaDomain.Repository;
-using ForariaDomain.Application.UseCase;
+using Foraria.Application.UseCase;
+using ForariaDomain.Exceptions;
 
 namespace ForariaTest.Unit.CallTests
 {
-    public class GetCallDetailsTests
+    public class EndCallTests
     {
         [Fact]
-        public void Execute_ShouldReturnCall_WhenCallExists()
+        public void Execute_ShouldEndCall_WhenCallExists()
         {
             // Arrange
-            int callId = 10;
-
-            var call = new Call
+            int callId = 5;
+            var existingCall = new Call
             {
                 Id = callId,
-                CreatedByUserId = 2,
+                CreatedByUserId = 1,
                 StartedAt = DateTime.UtcNow,
                 Status = "Active"
             };
@@ -28,34 +28,34 @@ namespace ForariaTest.Unit.CallTests
 
             mockRepo
                 .Setup(r => r.GetById(callId))
-                .Returns(call);
+                .Returns(existingCall);
 
-            var useCase = new GetCallDetails(mockRepo.Object);
+            var useCase = new EndCall(mockRepo.Object);
 
             // Act
-            var result = useCase.Execute(callId);
+            useCase.Execute(callId);
 
             // Assert
-            result.Should().NotBeNull();
-            result.Id.Should().Be(callId);
-            result.Status.Should().Be("Active");
-            result.CreatedByUserId.Should().Be(2);
+            existingCall.Status.Should().Be("Ended");
+            existingCall.EndedAt.Should().NotBeNull();
+            existingCall.EndedAt.Value.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
 
             mockRepo.Verify(r => r.GetById(callId), Times.Once);
+            mockRepo.Verify(r => r.Update(existingCall), Times.Once);
         }
 
         [Fact]
         public void Execute_ShouldThrowNotFound_WhenCallDoesNotExist()
         {
             // Arrange
-            int callId = 999;
+            int callId = 99;
             var mockRepo = new Mock<ICallRepository>();
 
             mockRepo
                 .Setup(r => r.GetById(callId))
                 .Returns((Call?)null);
 
-            var useCase = new GetCallDetails(mockRepo.Object);
+            var useCase = new EndCall(mockRepo.Object);
 
             // Act
             Action act = () => useCase.Execute(callId);
@@ -63,9 +63,9 @@ namespace ForariaTest.Unit.CallTests
             // Assert
             act.Should()
                 .Throw<NotFoundException>()
-                .WithMessage("La llamada no existe.");
+                .WithMessage("Llamada no encontrada");
 
-            mockRepo.Verify(r => r.GetById(callId), Times.Once);
+            mockRepo.Verify(r => r.Update(It.IsAny<Call>()), Times.Never);
         }
     }
 }
