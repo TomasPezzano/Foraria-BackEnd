@@ -129,6 +129,8 @@ namespace Foraria.Application.Services
 
                 "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", "Dashboard.ViewReservationsCount",
 
+                "Expenses.ViewAll",
+
                 "ExpenseDetails.ViewByResidence",
 
                 "Forums.View", "Forums.ViewAll", "Forums.ViewThreads", "Forums.ViewWithCategory",
@@ -169,6 +171,8 @@ namespace Foraria.Application.Services
                 "Claims.Create", "Claims.View",
 
                 "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", "Dashboard.ViewReservationsCount",
+
+                "Expenses.ViewAll",
 
                 "ExpenseDetails.ViewByResidence",
 

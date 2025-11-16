@@ -31,9 +31,6 @@ namespace Foraria.DTOs
         [Range(1, int.MaxValue, ErrorMessage = "El ID del usuario debe ser un número válido.")]
         public int UserId { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-
-        public string State { get; set; }
     }
 
     public class UpdateThreadRequest

@@ -4,7 +4,6 @@ using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Nethereum.Contracts.QueryHandlers.MultiCall;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
@@ -77,7 +76,7 @@ namespace Foraria.Controllers
                 Description = request.Description.Trim(),
                 ForumId = request.ForumId,
                 UserId = request.UserId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 State = "Active"
             };
 
