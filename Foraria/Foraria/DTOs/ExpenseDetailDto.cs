@@ -14,4 +14,6 @@ public class ExpenseDetailDto
     public int ExpenseId { get; set; }
     public ExpenseResponseDto? Expense { get; set; }
     public int ResidenceId { get; set; }
+
+    public ResidenceResponseDto? residenceResponseDtos { get; set; }
 }

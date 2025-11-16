@@ -12,6 +12,9 @@ namespace Foraria.DTOs
         public int UserId { get; set; }
         public int ForumId { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        public string? UserName { get; set; }
+        public string? UserLastName { get; set; }
     }
     public class CreateThreadRequest
     {

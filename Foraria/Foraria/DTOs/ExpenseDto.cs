@@ -27,4 +27,6 @@ public class ExpenseResponseDto
     public ICollection<InvoiceResponseDto> Invoices { get; set; }
 
     public ICollection<ResidenceResponseDto> Residences { get; set; }
+
+    public ICollection<ExpenseDetailDto> expenseDetailDtos { get; set; }
 }

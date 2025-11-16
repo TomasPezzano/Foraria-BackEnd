@@ -390,6 +390,12 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(d => d.ConsortiumId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Residence>()
+                .HasMany(e => e.Invoices)
+                .WithOne(d => d.Residence)
+                .HasForeignKey(d => d.ResidenceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Consortium>()
                 .HasMany(e => e.Reserves)
                 .WithOne(d => d.Consortium)

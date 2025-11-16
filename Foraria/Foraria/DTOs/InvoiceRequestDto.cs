@@ -60,4 +60,6 @@ public class InvoiceRequestDto
     public List<InvoiceItemDto> Items { get; set; } = new();
 
     public int? ConsortiumId { get; set; }
+
+    public int? ResidenceId { get; set; }
 }

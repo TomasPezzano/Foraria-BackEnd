@@ -22,5 +22,6 @@ public class InvoiceResponseDto
     public DateTime CreatedAt { get; set; }
 
     public int? ConsortiumId { get; set; }
+    public int? ResidenceId { get; set; }
     public List<InvoiceItemDto> Items { get; set; } = new();
 }

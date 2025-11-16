@@ -38,7 +38,7 @@ public class InvoiceRepository : IInvoiceRepository
     {
         var fin = inicio.AddMonths(1).AddDays(-1);
 
-        return await _context.Invoices.Where(i => i.ProcessedAt >= inicio && i.ProcessedAt <= fin && i.ConsortiumId == consortiumId).Include(i => i.Items).ToListAsync();
+        return await _context.Invoices.Where(i => i.ProcessedAt >= inicio && i.ProcessedAt <= fin && i.ConsortiumId == consortiumId && i.ResidenceId == null).Include(i => i.Items).ToListAsync();
     }
 
     public Task UpdateInvoiceAsync(Invoice invoice)

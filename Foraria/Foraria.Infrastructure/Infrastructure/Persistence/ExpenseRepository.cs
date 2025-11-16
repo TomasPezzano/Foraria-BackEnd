@@ -1,5 +1,6 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Infrastructure.Persistence;
+using Foraria.Migrations;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,33 @@ namespace Foraria.Infrastructure.Repository
 
         public async Task<IEnumerable<Expense>> GetAllExpenses()
         {
-            return await _context.Expenses.Include(e => e.Invoices).Include(e => e.Residences).ToListAsync();
+
+            var expenses =  await _context.Expenses
+                            .Include(e => e.Invoices)
+                            .Include(e => e.ExpenseDetailsByResidence)
+                                    .ThenInclude(ed => ed.Residence)
+                                        .ThenInclude(r => r.Invoices)
+                            .Include(e => e.ExpenseDetailsByResidence)
+                                    .ThenInclude(ed => ed.Residence)
+                                        .ThenInclude(r => r.Users)
+                                            .ThenInclude(u => u.Role)
+                            .ToListAsync();
+
+            foreach (var expense in expenses)
+            {
+                // ids de invoices de la expensa
+                var invoiceIds = expense.Invoices.Select(x => x.Id).ToHashSet();
+
+                // filtro las invoices de cada residence
+                foreach (var detail in expense.ExpenseDetailsByResidence)
+                {
+                    detail.Residence.Invoices = detail.Residence.Invoices
+                        .Where(inv => !invoiceIds.Contains(inv.Id))
+                        .ToList();
+                }
+            }
+
+            return expenses;
         }
 
         public async Task<Expense?> GetExpenseByConsortiumAndMonthAsync(int consortiumId, string month)
