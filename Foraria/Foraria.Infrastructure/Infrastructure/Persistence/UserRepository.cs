@@ -76,9 +76,10 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<int> GetAllInNumber()
+    public async Task<int> GetAllInNumber(int consortiumId)
     {
-        return await _context.Users.CountAsync();
+        return await _context.Users.Include(u => u.Residences)
+            .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId)).CountAsync();
     }
 
     public async Task<int> GetTotalUsersByTenantIdAsync(int idConsortium)

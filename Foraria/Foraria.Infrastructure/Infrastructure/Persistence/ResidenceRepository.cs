@@ -55,4 +55,12 @@ public class ResidenceRepository : IResidenceRepository
             .Where(r => r.Users.Any(u => u.Id == userId))
             .ToListAsync();
     }
+
+    public  Task UpdateExpense(Residence residence)
+    {
+         _context.Residence.Update(residence);
+        return  _context.SaveChangesAsync();
+
+
+    }
 }

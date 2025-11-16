@@ -2,6 +2,7 @@
 using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -30,6 +31,7 @@ public class ExpenseController : ControllerBase
         Summary = "Crea una nueva expensa mensual.",
         Description = "Genera una expensa para un consorcio en el mes especificado. Si ya existe una expensa para ese mes, se devuelve un error de negocio."
     )]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     [ProducesResponseType(typeof(ExpenseResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -70,7 +72,15 @@ public class ExpenseController : ControllerBase
                 Description = i.Description,
                 Amount = i.Amount,
                 DateOfIssue = i.DateOfIssue
-            }).ToList() ?? new List<InvoiceResponseDto>()
+            }).ToList() ?? new List<InvoiceResponseDto>(),
+            Residences = expense.Residences?.Select(r => new ResidenceResponseDto
+            {
+                Id = r.Id,
+                Tower = r.Tower,
+                Floor = r.Floor,
+                Number = r.Number,
+                Coeficient = r.Coeficient
+            }).ToList() ?? new List<ResidenceResponseDto>()
         };
 
         return Ok(result);
@@ -81,13 +91,14 @@ public class ExpenseController : ControllerBase
         Summary = "Obtiene todas las expensas registradas.",
         Description = "Devuelve la lista de todas las expensas disponibles, incluyendo las facturas asociadas si existen."
     )]
+    [Authorize(Policy = "All")]
     [ProducesResponseType(typeof(IEnumerable<ExpenseResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllExpenses()
     {
-        await _permissionService.EnsurePermissionAsync(User, "Expenses.ViewAll"); //admin y consorcio. asumo que si trae TODAS las expensas de la base de datos debe ser para los admins
+         await _permissionService.EnsurePermissionAsync(User, "Expenses.ViewAll"); //admin y consorcio. asumo que si trae TODAS las expensas de la base de datos debe ser para los admins
 
         var expenses = await _getAllExpenses.Execute();
 
