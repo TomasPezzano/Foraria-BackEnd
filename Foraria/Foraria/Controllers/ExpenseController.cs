@@ -109,13 +109,18 @@ public class ExpenseController : ControllerBase
             throw new NotFoundException("No se encontraron facturas o expensas registradas.");
 
         var emptyExpenses = expenses.Where(e => e.Invoices == null || !e.Invoices.Any()).ToList();
+        var expensesWithInvoices = expenses
+        .Where(e => e.Invoices != null && e.Invoices.Any())
+        .ToList();
         if (emptyExpenses.Any())
         {
             return Ok(new
             {
                 message = "Se encontraron expensas, pero algunas no tienen facturas asociadas.",
                 totalExpenses = expenses.Count(),
-                expensesWithoutInvoices = emptyExpenses.Select(e => e.Id).ToList()
+                expensesWithoutInvoices = emptyExpenses.Select(e => e.Id).ToList(),
+                expensesWithInvoices = expensesWithInvoices
+
             });
         }
 
