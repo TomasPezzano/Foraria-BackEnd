@@ -12,4 +12,5 @@ public interface IResidenceRepository
 
     Task<IEnumerable<Residence>> GetResidenceByUserId(int userId);
     Task UpdateExpense(Residence residence);
+    Task<IEnumerable<Invoice>> GetInvoicesByResidenceIdAsync(int id, DateTime date);
 }

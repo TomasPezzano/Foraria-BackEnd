@@ -108,17 +108,66 @@ public class ExpenseController : ControllerBase
         if (!expenses.Any())
             throw new NotFoundException("No se encontraron facturas o expensas registradas.");
 
-        var emptyExpenses = expenses.Where(e => e.Invoices == null || !e.Invoices.Any()).ToList();
-        if (emptyExpenses.Any())
+        var response = expenses.Select(expense => new ExpenseResponseDto
         {
-            return Ok(new
-            {
-                message = "Se encontraron expensas, pero algunas no tienen facturas asociadas.",
-                totalExpenses = expenses.Count(),
-                expensesWithoutInvoices = emptyExpenses.Select(e => e.Id).ToList()
-            });
-        }
+            Id = expense.Id,
+            Description = expense.Description,
+            TotalAmount = expense.TotalAmount,
+            CreatedAt = expense.CreatedAt,
+            ExpirationDate = expense.ExpirationDate,
+            ConsortiumId = expense.ConsortiumId,
 
-        return Ok(expenses);
+            Invoices = expense.Invoices.Select(i => new InvoiceResponseDto
+            {
+                Id = i.Id,
+                Concept = i.Concept,
+                Category = i.Category,
+                Amount = i.Amount,
+                CreatedAt = i.CreatedAt
+            }).ToList(),
+
+
+            expenseDetailDtos = expense.ExpenseDetailsByResidence
+         .Select(d => new ExpenseDetailDto
+         {
+             Id = d.Id,
+             Total = d.TotalAmount,
+
+             residenceResponseDtos = new ResidenceResponseDto
+             {
+                 Id = d.Residence.Id,
+                 Number = d.Residence.Number,
+                 Floor = d.Residence.Floor,
+                 Tower = d.Residence.Tower,
+                 Coeficient = d.Residence.Coeficient,
+                 InvoiceExtraordinary = d.Residence.Invoices
+                        .Select(inv => new InvoiceResponseDto
+                        {
+                            Id = inv.Id,
+                            Concept = inv.Concept,
+                            Category = inv.Category,
+                            Amount = inv.Amount,
+                            CreatedAt = inv.CreatedAt
+                        })
+                        .ToList(),
+                 Users = d.Residence.Users
+                     .Where(u => u.Role_id == 3) 
+                     .Select(u => new UserDto
+                     {
+                         Id = u.Id,
+                         FirstName = u.Name,
+                         LastName = u.LastName,
+                         Email = u.Mail,
+                         PhoneNumber = u.PhoneNumber,
+                         RoleId = u.Role_id
+                     }).ToList()
+             }
+         }).ToList()
+
+        }).ToList();
+
+
+        return Ok(response);
+
     }
 }

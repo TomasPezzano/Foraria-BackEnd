@@ -60,14 +60,14 @@ public class Invoice
     public string FilePath { get; set; } = string.Empty;
 
     [MaxLength(500)]
-    public string? SupplierAddress { get; set; }  
+    public string? SupplierAddress { get; set; }
 
     [MaxLength(100)]
-    public string? PurchaseOrder { get; set; } 
+    public string? PurchaseOrder { get; set; }
 
-    public float? ConfidenceScore { get; set; } 
+    public float? ConfidenceScore { get; set; }
 
-    public DateTime ProcessedAt { get; set; } 
+    public DateTime ProcessedAt { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -75,10 +75,14 @@ public class Invoice
 
     public int? ExpenseId { get; set; }
 
-    public Expense? Expense { get; set;}
+    public Expense? Expense { get; set; }
 
     public int? ConsortiumId { get; set; }
 
     public Consortium? Consortium { get; set; }
+
+    public int? ResidenceId { get; set; }
+
+    public Residence? Residence { get; set; }
 }
 
