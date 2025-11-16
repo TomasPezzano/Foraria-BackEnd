@@ -112,6 +112,7 @@ public class InvoiceController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     [SwaggerOperation(
         Summary = "Obtiene todas las facturas registradas.",
         Description = "Devuelve la lista completa de facturas junto con sus ítems asociados."

@@ -8,4 +8,6 @@ public class ResidenceResponseDto
     public string Tower { get; set; }
     public bool Success { get; set; }
     public string? Message { get; set; }
+
+    public double Coeficient { get; set; }
 }

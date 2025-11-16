@@ -2,6 +2,7 @@
 using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -25,6 +26,7 @@ public class OcrController : ControllerBase
     [HttpPost("process-invoice")]
     [RequestSizeLimit(10 * 1024 * 1024)]
     [Consumes("multipart/form-data")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     [SwaggerOperation(
         Summary = "Procesa una factura mediante OCR.",
         Description = "Analiza el archivo de la factura (PDF o imagen) para extraer automáticamente los datos principales y los ítems asociados."

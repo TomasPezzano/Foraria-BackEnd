@@ -11,4 +11,5 @@ public interface IResidenceRepository
     Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner(int consortiumId);
 
     Task<IEnumerable<Residence>> GetResidenceByUserId(int userId);
+    Task UpdateExpense(Residence residence);
 }

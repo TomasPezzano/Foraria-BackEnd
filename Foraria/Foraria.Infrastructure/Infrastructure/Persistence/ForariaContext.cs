@@ -316,6 +316,15 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(d => d.ExpenseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Expense>()
+                 .HasMany(u => u.Residences)
+                 .WithMany(r => r.Expenses)
+                 .UsingEntity<Dictionary<string, object>>(
+                     "ExpenseResidence",
+                     j => j.HasOne<Residence>().WithMany().HasForeignKey("ResidenceId"),
+                     j => j.HasOne<Expense>().WithMany().HasForeignKey("ExpenseId")
+                 );
+
 
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Residence)
