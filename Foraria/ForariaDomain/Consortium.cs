@@ -18,6 +18,10 @@ public class Consortium
 
     public string Description { get; set; }
 
+    public int? AdministratorId { get; set; }
+
+    public User? Administrator { get; set; }
+
     public ICollection<UserDocument> UserDocuments { get; set; }
 
     public ICollection<Expense> Expenses { get; set; }

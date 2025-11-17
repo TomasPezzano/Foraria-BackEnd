@@ -20,8 +20,7 @@ public class RegisterUserRequestDto
     [Required(ErrorMessage = "Rol es requerido")]
     public int RoleId { get; set; }
 
-    [Required(ErrorMessage = "Residencia es requerida")]
-    public int ResidenceId { get; set; }
-
+    public int? ResidenceId { get; set; }
+    public int? ConsortiumId { get; set; }
 
 }

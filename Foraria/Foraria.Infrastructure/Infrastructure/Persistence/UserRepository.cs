@@ -3,6 +3,7 @@ using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Foraria.Infrastructure.Persistence;
 
@@ -36,7 +37,7 @@ public class UserRepository : IUserRepository
 
     public Task<User?> GetById(int id)
     {
-        return _context.Users.Include(u => u.Role).Include(u=>u.Residences).FirstOrDefaultAsync(u => u.Id == id);
+        return _context.Users.Include(u => u.Role).Include(u => u.Residences).FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<User?> GetByIdAsync(int id)
@@ -115,4 +116,58 @@ public class UserRepository : IUserRepository
                 u.Residences.Any(r => r.Id == residenceId));
     }
 
+    public List<int> GetConsortiumIdsByUserId(int userId)
+    {
+        var user = _context.Users
+            .Include(u => u.Residences)
+            .Include(u => u.Role)
+            .FirstOrDefault(u => u.Id == userId);
+
+        if (user == null)
+            return new List<int>();
+
+        var consortiumIds = new List<int>();
+
+        if (user.Role.Description == "Administrador")
+        {
+            var adminConsortiumIds = _context.Consortium
+                .Where(c => c.AdministratorId == userId)
+                .Select(c => c.Id)
+                .ToList(); 
+
+            if (adminConsortiumIds.Any())
+                consortiumIds.AddRange(adminConsortiumIds); 
+        }
+
+        if (user.Residences != null && user.Residences.Any())
+        {
+            consortiumIds.AddRange(
+                user.Residences
+                    .Where(r => r != null)
+                    .Select(r => r.ConsortiumId)
+            );
+        }
+
+        return consortiumIds.Distinct().ToList();
+    }
+
+    public async Task<User?> GetByEmailWithoutFilters(string email)
+    {
+        return await _context.Users
+            .IgnoreQueryFilters() 
+            .Include(u => u.Residences)
+                .ThenInclude(r => r.Consortium)
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Mail == email);
+    }
+
+    public async Task<User?> GetByIdWithoutFilters(int id)
+    {
+        return await _context.Users
+            .IgnoreQueryFilters()
+            .Include(u => u.Role)
+            .Include(u => u.Residences)
+                .ThenInclude(r => r.Consortium)
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
 }

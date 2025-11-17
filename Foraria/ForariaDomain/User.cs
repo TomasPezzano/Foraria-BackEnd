@@ -34,7 +34,7 @@ namespace ForariaDomain
 
         public ICollection<ClaimResponse> ClaimsResponse { get; set; }
 
-        public ICollection<Residence> Residences { get; set; }
+        public ICollection<Residence?> Residences { get; set; }
 
         public ICollection<Reserve> Reserves { get; set; }
 
@@ -59,6 +59,7 @@ namespace ForariaDomain
 
         public NotificationPreference? NotificationPreference { get; set; }
 
+        public ICollection<Consortium>? AdministeredConsortiums { get; set; }
 
     }
 }

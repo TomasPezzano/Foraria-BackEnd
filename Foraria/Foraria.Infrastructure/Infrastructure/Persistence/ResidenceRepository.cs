@@ -63,4 +63,18 @@ public class ResidenceRepository : IResidenceRepository
 
 
     }
+    public async Task<Residence?> GetByIdWithoutFilters(int id)
+    {
+        return await _context.Residence
+            .IgnoreQueryFilters()
+            .Include(r => r.Consortium)
+            .FirstOrDefaultAsync(r => r.Id == id);
+    }
+
+    public async Task<bool> ExistsWithoutFilters(int id)
+    {
+        return await _context.Residence
+            .IgnoreQueryFilters()
+            .AnyAsync(r => r.Id == id);
+    }
 }

@@ -74,6 +74,20 @@ public class UserController : ControllerBase
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos del usuario no son válidos.");
 
+        //if (request.ResidenceId.HasValue && !request.ConsortiumId.HasValue)
+        //{
+        //    // Obtener la residencia para saber a qué consorcio pertenece
+        //    var residence = await _residenceRepository.GetByIdWithoutFilters(request.ResidenceId.Value);
+        //    if (residence == null)
+        //        throw new NotFoundException("Residencia no encontrada.");
+
+        //    // Verificar que el usuario actual tenga acceso a ese consorcio
+        //    var currentUserConsortiums = _permissionService.GetUserConsortiumIds(User);
+        //    if (!currentUserConsortiums.Contains(residence.ConsortiumId))
+        //        throw new ForbiddenAccessException(
+        //            "No tienes permiso para registrar usuarios en este consorcio.");
+        //}
+
         var user = new User
         {
             Name = request.FirstName,
@@ -83,7 +97,7 @@ public class UserController : ControllerBase
             Role_id = request.RoleId,
         };
 
-        var result = await _registerUserService.Register(user, request.ResidenceId);
+        var result = await _registerUserService.Register(user, request.ResidenceId, request.ConsortiumId);
 
         var response = new RegisterUserResponseDto
         {
@@ -117,7 +131,12 @@ public class UserController : ControllerBase
             throw new DomainValidationException("Los datos de inicio de sesión no son válidos.");
 
         var ipAddress = GetIpAddress();
+
         var usuarioLogeado = await _getUserByEmail.Execute(request.Email);
+
+        if (usuarioLogeado == null)
+            throw new UnauthorizedException("Credenciales inválidas.");
+
         var result = await _loginUserService.Login(usuarioLogeado, request.Password, ipAddress);
 
         return Ok(result);

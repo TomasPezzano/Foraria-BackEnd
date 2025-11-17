@@ -117,6 +117,7 @@ namespace Foraria.Application.Services
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
+                "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
                 "Votes.Cast"
             },
@@ -156,7 +157,7 @@ namespace Foraria.Application.Services
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
                 "Users.ViewTotalOwners","Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
-                "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium", 
+                "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",

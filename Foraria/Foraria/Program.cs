@@ -40,7 +40,8 @@ builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
 // Add services to the container.
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
@@ -207,6 +208,10 @@ builder.Services.AddScoped<ISendExpenseReminderNotification, SendExpenseReminder
 builder.Services.AddScoped<IConfigureNotificationPreferences, ConfigureNotificationPreferences>();
 builder.Services.AddHostedService<ExpenseReminderBackgroundService>();
 builder.Services.AddScoped<IGetActiveContractsSupplierCount, GetActiveContractsSupplierCount>();
+builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
+builder.Services.AddScoped<ISelectConsortium, SelectConsortium>();
+builder.Services.AddScoped<IAssignConsortiumToAdmin, AssignConsortiumToAdmin>();
+builder.Services.AddScoped<IGetUserConsortiums, GetUserConsortiums>();
 
 builder.Services.AddCors(options =>
 {
@@ -349,9 +354,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddDbContext<ForariaContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))
-);
+builder.Services.AddDbContext<ForariaContext>((serviceProvider, options) =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"));
+});
 
 builder.Services.AddScoped<IPollRepository, PollRepositoryImplementation>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

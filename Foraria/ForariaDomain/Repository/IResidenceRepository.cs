@@ -12,4 +12,6 @@ public interface IResidenceRepository
 
     Task<IEnumerable<Residence>> GetResidenceByUserId(int userId);
     Task UpdateExpense(Residence residence);
+    Task<Residence?> GetByIdWithoutFilters(int id);
+    Task<bool> ExistsWithoutFilters(int id);
 }
