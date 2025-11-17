@@ -194,5 +194,55 @@ namespace ForariaTest.Tests.UserDocuments
             result.Should().NotBeNull();
             result.Should().BeEmpty();
         }
+
+        [Fact]
+        public async Task Execute_ShouldThrowArgumentException_WhenCategoryIsInvalid()
+        {
+            var document = new global::ForariaDomain.UserDocument
+            {
+                Title = "Documento con categoría inválida",
+                Category = "CategoriaInexistente",
+                Url = "https://ejemplo.com/doc.pdf",
+                User_id = 1,
+                Consortium_id = 1
+            };
+
+            var user = new global::ForariaDomain.User { Id = 1 };
+            var consortium = new global::ForariaDomain.Consortium { Id = 1 };
+
+            _userRepoMock.Setup(r => r.GetById(1)).ReturnsAsync(user);
+            _consortiumRepoMock.Setup(r => r.FindById(1)).ReturnsAsync(consortium);
+
+            Func<Task> act = async () => await _createUserDocument.Execute(document);
+
+            await act.Should().ThrowAsync<ArgumentException>()
+                .WithMessage("La categoría del documento no es válida.");
+        }
+
+
+        [Fact]
+        public async Task Execute_ShouldThrowArgumentException_WhenDocumentExtensionIsInvalid()
+        {
+            var document = new global::ForariaDomain.UserDocument
+            {
+                Title = "Documento con extensión inválida",
+                Category = "Contrato",
+                Url = "https://ejemplo.com/archivo.exe",  
+                User_id = 1,
+                Consortium_id = 1
+            };
+
+            var user = new global::ForariaDomain.User { Id = 1 };
+            var consortium = new global::ForariaDomain.Consortium { Id = 1 };
+
+            _userRepoMock.Setup(r => r.GetById(1)).ReturnsAsync(user);
+            _consortiumRepoMock.Setup(r => r.FindById(1)).ReturnsAsync(consortium);
+
+            Func<Task> act = async () => await _createUserDocument.Execute(document);
+
+            await act.Should().ThrowAsync<ArgumentException>()
+                .WithMessage("El formato del documento no es válido (solo .pdf, .jpg, .png, docx, txt, xls, xlsx, csv, ppt, pptx y odt).");
+        }
+
     }
 }

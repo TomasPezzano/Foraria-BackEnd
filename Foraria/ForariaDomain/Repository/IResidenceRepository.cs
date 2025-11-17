@@ -14,4 +14,5 @@ public interface IResidenceRepository
     Task UpdateExpense(Residence residence);
     Task<Residence?> GetByIdWithoutFilters(int id);
     Task<bool> ExistsWithoutFilters(int id);
+    Task<IEnumerable<Invoice>> GetInvoicesByResidenceIdAsync(int id, DateTime date);
 }

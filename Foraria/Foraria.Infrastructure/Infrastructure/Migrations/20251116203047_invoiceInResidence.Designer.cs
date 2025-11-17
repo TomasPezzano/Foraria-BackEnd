@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251116203047_invoiceInResidence")]
+    partial class invoiceInResidence
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -368,9 +371,6 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AdministratorId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -380,8 +380,6 @@ namespace Foraria.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AdministratorId");
 
                     b.ToTable("consortium", (string)null);
                 });
@@ -1656,16 +1654,6 @@ namespace Foraria.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Consortium", b =>
-                {
-                    b.HasOne("ForariaDomain.User", "Administrator")
-                        .WithMany("AdministeredConsortiums")
-                        .HasForeignKey("AdministratorId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Administrator");
-                });
-
             modelBuilder.Entity("ForariaDomain.Expense", b =>
                 {
                     b.HasOne("ForariaDomain.Consortium", "Consortium")
@@ -2184,8 +2172,6 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.User", b =>
                 {
-                    b.Navigation("AdministeredConsortiums");
-
                     b.Navigation("Claims");
 
                     b.Navigation("ClaimsResponse");

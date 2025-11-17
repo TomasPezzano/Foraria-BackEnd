@@ -10,4 +10,7 @@ public class ResidenceResponseDto
     public string? Message { get; set; }
 
     public double Coeficient { get; set; }
+    public List<UserDto?> Users { get; set; }
+
+    public ICollection<InvoiceResponseDto> InvoiceExtraordinary { get; set; }
 }

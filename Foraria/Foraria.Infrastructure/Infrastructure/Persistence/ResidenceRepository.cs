@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using Azure;
+using Foraria.Domain.Repository;
 using ForariaDomain;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,8 +61,21 @@ public class ResidenceRepository : IResidenceRepository
     {
          _context.Residence.Update(residence);
         return  _context.SaveChangesAsync();
+    }
 
+    public async Task<IEnumerable<Invoice>> GetInvoicesByResidenceIdAsync(int residenceId, DateTime date)
+    {
+        var inicio = date.AddMonths(-1);
 
+        var fin = date;
+
+        var response = await _context.Residence
+            .Where(r => r.Id == residenceId)
+            .SelectMany(r => r.Invoices)
+            .Where(i => i.CreatedAt >= inicio && i.CreatedAt <= fin)
+            .ToListAsync();
+
+        return response;
     }
     public async Task<Residence?> GetByIdWithoutFilters(int id)
     {

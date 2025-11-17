@@ -159,6 +159,8 @@ namespace Foraria.Controllers
                 CreatedAt = t.CreatedAt,
                 State = t.State,
                 UserId = t.UserId,
+                UserName = t.User.Name,
+                UserLastName = t.User.LastName,
                 ForumId = t.ForumId
             });
 

@@ -161,8 +161,8 @@ namespace Foraria.Application.Services
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
-
-                "Votes.Cast"
+                "Votes.Cast",
+                "Users.ViewById"
             },
 
             ["Inquilino"] = new()
