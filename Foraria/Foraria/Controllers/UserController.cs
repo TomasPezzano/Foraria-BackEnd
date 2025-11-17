@@ -241,7 +241,7 @@ public class UserController : ControllerBase
     {
         await _permissionService.EnsurePermissionAsync(User, "Users.ViewCount");
 
-        var totalUsers = await _registerUserService.GetAllUsersInNumber(consortiumId);
+        var totalUsers = await _registerUserService.GetAllUsersInNumber();
         return Ok(new { totalUsers });
     }
 
@@ -289,7 +289,7 @@ public class UserController : ControllerBase
     {
         await _permissionService.EnsurePermissionAsync(User, "Users.ViewTotalTenants");
 
-        var totalTenants = await _getTotalTenantUsers.ExecuteAsync(consortiumId);
+        var totalTenants = await _getTotalTenantUsers.ExecuteAsync();
         return Ok(new { totalTenants });
     }
 
@@ -300,7 +300,7 @@ public class UserController : ControllerBase
     {
         await _permissionService.EnsurePermissionAsync(User, "Users.ViewTotalOwners");
 
-        var totalOwners = await _getTotalOwnerUsers.ExecuteAsync(consortiumId);
+        var totalOwners = await _getTotalOwnerUsers.ExecuteAsync();
         return Ok(new { totalOwners });
     }
 
@@ -311,7 +311,7 @@ public class UserController : ControllerBase
     {
         await _permissionService.EnsurePermissionAsync(User, "Users.ViewByConsortium");
 
-        var users = await _getUsersByConsortium.ExecuteAsync(consortiumId);
+        var users = await _getUsersByConsortium.ExecuteAsync();
 
         var usersDto = users.Select(u => new UserDetailDto
         {

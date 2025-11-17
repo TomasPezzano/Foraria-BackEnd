@@ -18,17 +18,17 @@ public class GetActiveReserveCountTests
     public async Task ExecuteAsync_ShouldReturnZero_WhenNoActiveReservations()
     {
         _reserveRepoMock
-            .Setup(x => x.GetActiveReservationsAsync(1, It.IsAny<DateTime>()))
+            .Setup(x => x.GetActiveReservationsAsync(It.IsAny<DateTime>()))
             .ReturnsAsync(new List<ForariaDomain.Reserve>());
 
         var useCase = CreateUseCase();
 
-        var result = await useCase.ExecuteAsync(1);
+        var result = await useCase.ExecuteAsync();
 
         Assert.Equal(0, result);
 
         _reserveRepoMock.Verify(
-            x => x.GetActiveReservationsAsync(1, It.IsAny<DateTime>()),
+            x => x.GetActiveReservationsAsync(It.IsAny<DateTime>()),
             Times.Once
         );
     }
@@ -44,17 +44,17 @@ public class GetActiveReserveCountTests
         };
 
         _reserveRepoMock
-            .Setup(x => x.GetActiveReservationsAsync(5, It.IsAny<DateTime>()))
+            .Setup(x => x.GetActiveReservationsAsync(It.IsAny<DateTime>()))
             .ReturnsAsync(reservations);
 
         var useCase = CreateUseCase();
 
-        var result = await useCase.ExecuteAsync(5);
+        var result = await useCase.ExecuteAsync();
 
         Assert.Equal(2, result);
 
         _reserveRepoMock.Verify(
-            x => x.GetActiveReservationsAsync(5, It.IsAny<DateTime>()),
+            x => x.GetActiveReservationsAsync(It.IsAny<DateTime>()),
             Times.Once
         );
     }
@@ -66,17 +66,17 @@ public class GetActiveReserveCountTests
         var fixedDate = new DateTime(2023, 10, 1);
 
         _reserveRepoMock
-            .Setup(x => x.GetActiveReservationsAsync(3, fixedDate))
+            .Setup(x => x.GetActiveReservationsAsync(fixedDate))
             .ReturnsAsync(new List<ForariaDomain.Reserve>());
 
         var useCase = CreateUseCase();
 
-        var result = await useCase.ExecuteAsync(3, fixedDate);
+        var result = await useCase.ExecuteAsync(fixedDate);
 
         Assert.Equal(0, result);
 
         _reserveRepoMock.Verify(
-            x => x.GetActiveReservationsAsync(3, fixedDate),
+            x => x.GetActiveReservationsAsync(fixedDate),
             Times.Once
         );
     }

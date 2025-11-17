@@ -17,7 +17,7 @@ public class CreateReserve : ICreateReserve
     public async Task<Reserve> Execute(Reserve reserve)
     {
 
-        var obtainedReserve = await _reserveRepository.getReserveByPlaceAndCreatedAt(reserve.ConsortiumId,reserve.CreatedAt, reserve.Place_id);
+        var obtainedReserve = await _reserveRepository.getReserveByPlaceAndCreatedAt(reserve.CreatedAt, reserve.Place_id);
         if(obtainedReserve != null) {
             if(reserve.CreatedAt == obtainedReserve.CreatedAt && reserve.Place_id == obtainedReserve.Place_id)
             {

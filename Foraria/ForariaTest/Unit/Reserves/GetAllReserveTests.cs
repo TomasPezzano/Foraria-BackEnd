@@ -28,11 +28,11 @@ public class GetAllReserveTests
         };
 
         _reserveRepositoryMock
-            .Setup(r => r.GetAllInConsortium(consortiumId))
+            .Setup(r => r.GetAllInConsortium())
             .ReturnsAsync(expectedReserves);
 
         // Act
-        var result = await _useCase.Execute(consortiumId);
+        var result = await _useCase.Execute();
 
         // Assert
         Assert.NotNull(result);
@@ -40,7 +40,7 @@ public class GetAllReserveTests
         Assert.Contains(result, r => r.Id == 1);
         Assert.Contains(result, r => r.Id == 2);
 
-        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(consortiumId), Times.Once);
+        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(), Times.Once);
     }
 
     [Fact]
@@ -50,17 +50,17 @@ public class GetAllReserveTests
         int consortiumId = 1;
 
         _reserveRepositoryMock
-            .Setup(r => r.GetAllInConsortium(consortiumId))
+            .Setup(r => r.GetAllInConsortium())
             .ReturnsAsync(new List<Reserve>());
 
         // Act
-        var result = await _useCase.Execute(consortiumId);
+        var result = await _useCase.Execute();
 
         // Assert
         Assert.NotNull(result);
         Assert.Empty(result);
 
-        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(consortiumId), Times.Once);
+        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(), Times.Once);
     }
 
     [Fact]
@@ -70,12 +70,12 @@ public class GetAllReserveTests
         int consortiumId = 1;
 
         _reserveRepositoryMock
-            .Setup(r => r.GetAllInConsortium(consortiumId))
+            .Setup(r => r.GetAllInConsortium())
             .ThrowsAsync(new Exception("DB Error"));
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(consortiumId));
+        await Assert.ThrowsAsync<Exception>(() => _useCase.Execute());
 
-        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(consortiumId), Times.Once);
+        _reserveRepositoryMock.Verify(r => r.GetAllInConsortium(), Times.Once);
     }
 }

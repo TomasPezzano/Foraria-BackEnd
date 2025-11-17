@@ -57,7 +57,7 @@ public class SendExpenseReminderNotificationTests
                         .ReturnsAsync(expense);
 
         // FIX: siempre devolver lista vacía para evitar ArgumentNullException
-        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync(10))
+        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync())
                      .ReturnsAsync(new List<User>());
 
         await _useCase.ExecuteAsync(1);
@@ -90,7 +90,7 @@ public class SendExpenseReminderNotificationTests
         _expenseRepoMock.Setup(x => x.GetByIdAsync(1))
                         .ReturnsAsync(expense);
 
-        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync(10))
+        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync())
                      .ReturnsAsync(new List<User>()); // sin users
 
         await _useCase.ExecuteAsync(1);
@@ -131,7 +131,7 @@ public class SendExpenseReminderNotificationTests
             new User { Id = 4, Role = new Role { Description = "Administrador" } }
         };
 
-        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync(10))
+        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync())
                      .ReturnsAsync(users);
 
         await _useCase.ExecuteAsync(1);
@@ -164,7 +164,7 @@ public class SendExpenseReminderNotificationTests
         _expenseRepoMock.Setup(x => x.GetByIdAsync(5))
                         .ReturnsAsync(expense);
 
-        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync(20))
+        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync())
                      .ReturnsAsync(new List<User>
                      {
                          new User { Id = 10, Role = new Role { Description = "Propietario" } }
@@ -200,7 +200,7 @@ public class SendExpenseReminderNotificationTests
         _expenseRepoMock.Setup(x => x.GetByIdAsync(7))
             .ReturnsAsync(expense);
 
-        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync(50))
+        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync())
             .ReturnsAsync(new List<User>
             {
                 new User { Id = 4, Role = new Role { Description = "Propietario" } }
@@ -236,7 +236,7 @@ public class SendExpenseReminderNotificationTests
         _expenseRepoMock.Setup(x => x.GetByIdAsync(100))
             .ReturnsAsync(expense);
 
-        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync(200))
+        _userRepoMock.Setup(x => x.GetUsersByConsortiumIdAsync())
             .ReturnsAsync(new List<User>
             {
                 new User { Id = 1, Role = new Role { Description = "Propietario" } }

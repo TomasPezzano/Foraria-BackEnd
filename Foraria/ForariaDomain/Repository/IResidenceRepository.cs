@@ -5,9 +5,9 @@ namespace Foraria.Domain.Repository;
 public interface IResidenceRepository
 {
     Task<bool> Exists(int? id);
-    Task<Residence> Create(Residence residence, int consortiumId);
+    Task<Residence> Create(Residence residence);
     Task<Residence?> GetById(int id);
-    Task<List<Residence>> GetResidenceByConsortiumIdAsync(int consortiumId);
+    Task<List<Residence>> GetResidencesAsync();
     Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner();
 
     Task<IEnumerable<Residence>> GetResidenceByUserId(int userId);

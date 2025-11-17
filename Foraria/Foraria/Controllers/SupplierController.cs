@@ -164,7 +164,7 @@ public class SupplierController : ControllerBase
     {
         await _permissionService.EnsurePermissionAsync(User, "Suppliers.ViewAll");
 
-        var suppliers = await _getAllSupplier.Execute(consortiumId);
+        var suppliers = await _getAllSupplier.Execute();
 
         if (suppliers == null || !suppliers.Any())
             throw new NotFoundException("No se encontraron proveedores registrados.");
@@ -198,7 +198,7 @@ public class SupplierController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSupplierCategoriesCount(int consortiumId)
     {
-        var suppliers = await _getAllSupplier.Execute(consortiumId);
+        var suppliers = await _getAllSupplier.Execute();
         if (suppliers == null || !suppliers.Any())
             throw new NotFoundException("No se encontraron proveedores registrados.");
         var distinctCategoryCount = suppliers

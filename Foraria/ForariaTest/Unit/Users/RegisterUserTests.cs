@@ -224,12 +224,12 @@ public class RegisterUserTests
     {
         // Arrange
         int consortiumId = 123;
-        _mockUserRepo.Setup(r => r.GetAllInNumber(consortiumId)).ReturnsAsync(42);
+        _mockUserRepo.Setup(r => r.GetAllInNumber()).ReturnsAsync(42);
 
         var service = CreateService();
 
         // Act
-        var result = await service.GetAllUsersInNumber(consortiumId);
+        var result = await service.GetAllUsersInNumber();
 
         // Assert
         Assert.Equal(42, result);

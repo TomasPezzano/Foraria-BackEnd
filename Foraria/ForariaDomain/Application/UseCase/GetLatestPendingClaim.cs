@@ -11,9 +11,9 @@ public class GetLatestPendingClaim
         _repository = repository;
     }
 
-    public async Task<object?> ExecuteAsync(int? consortiumId = null)
+    public async Task<object?> ExecuteAsync()
     {
-        var claim = await _repository.GetLatestPendingAsync(consortiumId);
+        var claim = await _repository.GetLatestPendingAsync();
 
         if (claim == null)
             return null;

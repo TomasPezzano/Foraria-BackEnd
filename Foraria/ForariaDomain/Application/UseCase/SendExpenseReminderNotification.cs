@@ -33,7 +33,7 @@ public class SendExpenseReminderNotification : ISendExpenseReminderNotification
         {
             return;
         }
-        var users = await _userRepository.GetUsersByConsortiumIdAsync(expense.ConsortiumId);
+        var users = await _userRepository.GetUsersByConsortiumIdAsync();
         var usersToNotify = users.Where(u =>
             u.Role.Description == "Propietario" ||
             (u.Role.Description == "Inquilino" && u.HasPermission)

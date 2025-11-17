@@ -81,7 +81,7 @@ public class CreateResidenceTests
         };
 
         _residenceRepositoryMock
-            .Setup(x => x.GetResidenceByConsortiumIdAsync(1))
+            .Setup(x => x.GetResidencesAsync())
             .ReturnsAsync(existingResidences);
 
         var useCase = CreateUseCase();
@@ -103,7 +103,7 @@ public class CreateResidenceTests
             .ReturnsAsync(consortium);
 
         _residenceRepositoryMock
-            .Setup(x => x.GetResidenceByConsortiumIdAsync(1))
+            .Setup(x => x.GetResidencesAsync())
             .ReturnsAsync(new List<ForariaDomain.Residence>());  // No residencias existentes
 
         var createdResidence = new ForariaDomain.Residence
@@ -116,7 +116,7 @@ public class CreateResidenceTests
         };
 
         _residenceRepositoryMock
-            .Setup(x => x.Create(It.IsAny<ForariaDomain.Residence>(), 1))
+            .Setup(x => x.Create(It.IsAny<ForariaDomain.Residence>()))
             .ReturnsAsync(createdResidence);
 
         var useCase = CreateUseCase();
@@ -131,7 +131,7 @@ public class CreateResidenceTests
 
         // Se verifica que Create haya sido llamado correctamente
         _residenceRepositoryMock.Verify(
-            x => x.Create(It.IsAny<ForariaDomain.Residence>(), 1),
+            x => x.Create(It.IsAny<ForariaDomain.Residence>()),
             Times.Once
         );
     }

@@ -24,13 +24,13 @@ namespace ForariaTest.Unit.Claims
             int expected = 12;
 
             _mockClaimRepo
-                .Setup(r => r.GetPendingCountAsync(consortiumId))
+                .Setup(r => r.GetPendingCountAsync( ))
                 .ReturnsAsync(expected);
 
-            var result = await _useCase.ExecuteAsync(consortiumId);
+            var result = await _useCase.ExecuteAsync();
 
             Assert.Equal(expected, result);
-            _mockClaimRepo.Verify(r => r.GetPendingCountAsync(consortiumId), Times.Once);
+            _mockClaimRepo.Verify(r => r.GetPendingCountAsync(), Times.Once);
         }
 
         [Fact]
@@ -39,23 +39,23 @@ namespace ForariaTest.Unit.Claims
             int expected = 7;
 
             _mockClaimRepo
-                .Setup(r => r.GetPendingCountAsync(null))
+                .Setup(r => r.GetPendingCountAsync())
                 .ReturnsAsync(expected);
 
-            var result = await _useCase.ExecuteAsync(null);
+            var result = await _useCase.ExecuteAsync();
 
             Assert.Equal(expected, result);
-            _mockClaimRepo.Verify(r => r.GetPendingCountAsync(null), Times.Once);
+            _mockClaimRepo.Verify(r => r.GetPendingCountAsync(), Times.Once);
         }
 
         [Fact]
         public async Task ExecuteAsync_ShouldReturnZero_WhenRepositoryReturnsZero()
         {
             _mockClaimRepo
-                .Setup(r => r.GetPendingCountAsync(It.IsAny<int?>()))
+                .Setup(r => r.GetPendingCountAsync())
                 .ReturnsAsync(0);
 
-            var result = await _useCase.ExecuteAsync(1);
+            var result = await _useCase.ExecuteAsync();
 
             Assert.Equal(0, result);
         }

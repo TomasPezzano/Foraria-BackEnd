@@ -50,7 +50,7 @@ namespace Foraria.Controllers
             if (consortiumId is < 0)
                 throw new DomainValidationException("El ID del consorcio no puede ser negativo.");
 
-            var count = await _getTotalUsers.ExecuteAsync(consortiumId);
+            var count = await _getTotalUsers.ExecuteAsync();
             return Ok(new { consortiumId, totalUsers = count });
         }
 
@@ -67,7 +67,7 @@ namespace Foraria.Controllers
             if (consortiumId is < 0)
                 throw new DomainValidationException("El ID del consorcio no puede ser negativo.");
 
-            var count = await _getPendingClaimsCount.ExecuteAsync(consortiumId);
+            var count = await _getPendingClaimsCount.ExecuteAsync();
             return Ok(new { consortiumId, pendingClaims = count });
         }
 
@@ -81,7 +81,7 @@ namespace Foraria.Controllers
         {
             await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewLatestClaim");
 
-            var claim = await _getLatestPendingClaim.ExecuteAsync(consortiumId);
+            var claim = await _getLatestPendingClaim.ExecuteAsync();
 
             if (claim == null)
                 throw new NotFoundException("No hay reclamos pendientes para este consorcio.");
@@ -102,7 +102,7 @@ namespace Foraria.Controllers
             if (consortiumId <= 0)
                 throw new DomainValidationException("Debe especificar un ID de consorcio válido.");
 
-            var result = await _getCollectedExpensesPercentage.ExecuteAsync(consortiumId, date);
+            var result = await _getCollectedExpensesPercentage.ExecuteAsync(date);
             return Ok(result);
         }
        
@@ -121,7 +121,7 @@ namespace Foraria.Controllers
             if (limit <= 0)
                 throw new DomainValidationException("El límite debe ser mayor a cero.");
 
-            var result = await _getUpcomingReserves.ExecuteAsync(consortiumId, limit);
+            var result = await _getUpcomingReserves.ExecuteAsync(limit);
 
             if (result is IEnumerable<object> collection && !collection.Any())
                 throw new NotFoundException("No se encontraron reservas próximas.");

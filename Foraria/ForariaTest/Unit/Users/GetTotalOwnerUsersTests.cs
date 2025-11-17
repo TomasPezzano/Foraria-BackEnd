@@ -1,60 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Moq;
-using Xunit;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain.Application.UseCase;
-using Foraria.Domain.Repository;
-using ForariaDomain.Repository;
+using Moq;
 
-namespace ForariaTest.Unit.Users
+namespace ForariaTest.Unit.Users;
+
+public class GetTotalOwnerUsersTests
 {
-    public class GetTotalOwnerUsersTests
+    private readonly Mock<IUserRepository> _mockUserRepo;
+    private readonly GetTotalOwnerUsers _useCase;
+
+    public GetTotalOwnerUsersTests()
     {
-        private readonly Mock<IUserRepository> _mockUserRepo;
-        private readonly Mock<IConsortiumRepository> _mockConsortiumRepo;
-        private readonly GetTotalOwnerUsers _useCase;
+        _mockUserRepo = new Mock<IUserRepository>();
+        _useCase = new GetTotalOwnerUsers(_mockUserRepo.Object);
+    }
 
-        public GetTotalOwnerUsersTests()
-        {
-            _mockUserRepo = new Mock<IUserRepository>();
-            _mockConsortiumRepo = new Mock<IConsortiumRepository>();
-            _useCase = new GetTotalOwnerUsers(_mockUserRepo.Object, _mockConsortiumRepo.Object);
-        }
+    [Fact]
+    public async Task ExecuteAsync_ShouldReturnZero_WhenNoOwnersExist()
+    {
+        // Arrange
+        _mockUserRepo.Setup(r => r.GetTotalOwnerUsersAsync())
+                     .ReturnsAsync(0);
 
-        [Fact]
-        public async Task ExecuteAsync_ShouldReturnTotalOwnerUsers_WhenConsortiumExists()
-        {
-            int consortiumId = 1;
-            int expectedTotal = 5;
+        // Act
+        var result = await _useCase.ExecuteAsync();
 
-            _mockConsortiumRepo.Setup(r => r.FindById(consortiumId))
-                               .ReturnsAsync(new ForariaDomain.Consortium { Id = consortiumId });
+        // Assert
+        Assert.Equal(0, result);
+        _mockUserRepo.Verify(r => r.GetTotalOwnerUsersAsync(), Times.Once);
+    }
 
-            _mockUserRepo.Setup(r => r.GetTotalOwnerUsersAsync(consortiumId))
-                         .ReturnsAsync(expectedTotal);
+    [Fact]
+    public async Task ExecuteAsync_ShouldReturnTotalOwners_WhenOwnersExist()
+    {
+        // Arrange
+        int expectedCount = 25;
+        _mockUserRepo.Setup(r => r.GetTotalOwnerUsersAsync())
+                     .ReturnsAsync(expectedCount);
 
-            var result = await _useCase.ExecuteAsync(consortiumId);
+        // Act
+        var result = await _useCase.ExecuteAsync();
 
-            Assert.Equal(expectedTotal, result);
-            _mockConsortiumRepo.Verify(r => r.FindById(consortiumId), Times.Once);
-            _mockUserRepo.Verify(r => r.GetTotalOwnerUsersAsync(consortiumId), Times.Once);
-        }
+        // Assert
+        Assert.Equal(expectedCount, result);
+        _mockUserRepo.Verify(r => r.GetTotalOwnerUsersAsync(), Times.Once);
+    }
 
-        [Fact]
-        public async Task ExecuteAsync_ShouldThrowKeyNotFoundException_WhenConsortiumDoesNotExist()
-        {
-            int consortiumId = 999;
+    [Fact]
+    public async Task ExecuteAsync_ShouldPropagateException_WhenRepositoryThrows()
+    {
+        // Arrange
+        _mockUserRepo.Setup(r => r.GetTotalOwnerUsersAsync())
+                     .ThrowsAsync(new Exception("DB Error"));
 
-            _mockConsortiumRepo.Setup(r => r.FindById(consortiumId))
-                               .ReturnsAsync((ForariaDomain.Consortium?)null);
-
-            Func<Task> act = async () => await _useCase.ExecuteAsync(consortiumId);
-
-            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(act);
-            Assert.Equal($"El consorcio con ID {consortiumId} no existe.", exception.Message);
-            _mockConsortiumRepo.Verify(r => r.FindById(consortiumId), Times.Once);
-            _mockUserRepo.Verify(r => r.GetTotalOwnerUsersAsync(It.IsAny<int>()), Times.Never);
-        }
+        // Act & Assert
+        await Assert.ThrowsAsync<Exception>(() => _useCase.ExecuteAsync());
+        _mockUserRepo.Verify(r => r.GetTotalOwnerUsersAsync(), Times.Once);
     }
 }
