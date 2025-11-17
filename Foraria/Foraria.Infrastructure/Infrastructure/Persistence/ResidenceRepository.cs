@@ -41,11 +41,11 @@ public class ResidenceRepository : IResidenceRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner(int consortiumId)
+    public async Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner()
     {
         return await _context.Residence
              .Include(r => r.Users)
-             .Where(r => r.ConsortiumId == consortiumId && r.Users.Count() > 0)
+             .Where(r => r.Users.Count() > 0)
              .ToListAsync();
     }
 

@@ -132,6 +132,7 @@ namespace Foraria.Infrastructure.Persistence
                     .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
                                          e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
 
+
                 modelBuilder.Entity<Invoice>()
                     .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
                                          e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());

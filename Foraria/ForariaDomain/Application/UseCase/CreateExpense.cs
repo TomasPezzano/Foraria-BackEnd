@@ -1,11 +1,12 @@
 ﻿using Foraria.Domain.Repository;
 using ForariaDomain.Repository;
+using ForariaDomain.Services;
 
 namespace ForariaDomain.Application.UseCase;
 
 public interface ICreateExpense
 {
-    Task<Expense> ExecuteAsync(int consortiumId, string date);
+    Task<Expense> ExecuteAsync(string date);
 }
 public class CreateExpense : ICreateExpense
 {
@@ -15,8 +16,12 @@ public class CreateExpense : ICreateExpense
     private readonly IGetAllInvoicesByMonthAndConsortium _getAllInvoicesByMonthAndConsortium;
     private readonly IGetConsortiumById _getConsortiumById;
     private readonly IGetAllResidencesByConsortiumWithOwner _getAllResidencesByConsortiumWithOwner;
+    private readonly ITenantContext _tenantContext;
 
-    public CreateExpense(IExpenseRepository expenseRepository, IGetAllInvoicesByMonthAndConsortium getAllInvoicesByMonthAndConsortium, IGetConsortiumById getConsortiumById, IInvoiceRepository invoiceRepository, IGetAllResidencesByConsortiumWithOwner getAllResidencesByConsortiumWithOwner, IResidenceRepository residenceRepository)
+    public CreateExpense(IExpenseRepository expenseRepository, IGetAllInvoicesByMonthAndConsortium getAllInvoicesByMonthAndConsortium, 
+        IGetConsortiumById getConsortiumById, IInvoiceRepository invoiceRepository, 
+        IGetAllResidencesByConsortiumWithOwner getAllResidencesByConsortiumWithOwner,
+        IResidenceRepository residenceRepository, ITenantContext tenantContext)
     {
         _expenseRepository = expenseRepository;
         _getAllInvoicesByMonthAndConsortium = getAllInvoicesByMonthAndConsortium;
@@ -24,8 +29,9 @@ public class CreateExpense : ICreateExpense
         _invoiceRepository = invoiceRepository;
         _getAllResidencesByConsortiumWithOwner = getAllResidencesByConsortiumWithOwner;
         _residenceRepository = residenceRepository;
+        _tenantContext = tenantContext;
     }
-    public async Task<Expense> ExecuteAsync(int consortiumId, string date)
+    public async Task<Expense> ExecuteAsync(string date)
     {
         DateTime inicio;
         try
@@ -44,19 +50,21 @@ public class CreateExpense : ICreateExpense
             throw new FormatException("El formato de la fecha es inválido. Usa 'YYYY-MM' (por ejemplo, '2025-10').");
         }
 
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
         var consortium =  await _getConsortiumById.Execute(consortiumId);
         if (consortium == null)
-            throw new KeyNotFoundException($"No se encontró ningún consorcio con ID {consortiumId}.");
+            throw new KeyNotFoundException($"No se encontró ningún consorcio con ID.");
 
 
-        var invoices = await _getAllInvoicesByMonthAndConsortium.Execute(inicio, consortiumId); 
+        var invoices = await _getAllInvoicesByMonthAndConsortium.Execute(inicio); 
         if (invoices == null || !invoices.Any())
-            throw new InvalidOperationException($"No existen facturas registradas para el consorcio {consortiumId} en {inicio:MMMM yyyy}.");
+            throw new InvalidOperationException($"No existen facturas registradas para el consorcio en {inicio:MMMM yyyy}.");
        
         
-        var residences = await _getAllResidencesByConsortiumWithOwner.ExecuteAsync(consortiumId); 
+        var residences = await _getAllResidencesByConsortiumWithOwner.ExecuteAsync(); 
         if (residences == null || !residences.Any())
-            throw new InvalidOperationException($"No existen residencias registradas para el consorcio {consortiumId} ");
+            throw new InvalidOperationException($"No existen residencias registradas para el consorcio");
 
         double totalAmount = invoices.Sum(i => (double)i.Amount);
         if (totalAmount <= 0)

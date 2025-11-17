@@ -53,25 +53,23 @@ namespace Foraria.Infrastructure.Repository
             return expenses;
         }
 
-        public async Task<Expense?> GetExpenseByConsortiumAndMonthAsync(int consortiumId, string month)
+        public async Task<Expense?> GetExpenseByConsortiumAndMonthAsync(string month)
         {
             var partes = month.Split('-');
             int anio = int.Parse(partes[0]);
             int mesNumero = int.Parse(partes[1]);
 
             return await _context.Expenses
-                .Where(e => e.ConsortiumId == consortiumId &&
-                            e.CreatedAt.Year == anio &&
+                .Where(e => e.CreatedAt.Year == anio &&
                             e.CreatedAt.Month == mesNumero)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Expense>> GetExpensesByDateRange(int consortiumId, DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<Expense>> GetExpensesByDateRange(DateTime startDate, DateTime endDate)
         {
             return await _context.Expenses
-            .Where(e => e.ConsortiumId == consortiumId &&
-                     e.CreatedAt >= startDate &&
-                     e.CreatedAt < endDate)
+            .Where(e =>  e.CreatedAt >= startDate &&
+                        e.CreatedAt < endDate)
             .ToListAsync();
         }
         public async Task<IEnumerable<Expense>> GetPendingExpenses(int consortiumId)

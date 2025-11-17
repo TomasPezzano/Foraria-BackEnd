@@ -13,28 +13,27 @@ namespace ForariaTest.Unit.Residences
         [Fact]
         public async Task ExecuteAsync_ShouldReturnResidences_FromRepository()
         {
-            var consortiumId = 5;
-
             var expectedResidences = new List<Residence>
-        {
-            new Residence { Id = 1, ConsortiumId = consortiumId },
-            new Residence { Id = 2, ConsortiumId = consortiumId }
-        };
+            {
+                new Residence { Id = 1, ConsortiumId = 5 },
+                new Residence { Id = 2, ConsortiumId = 5 }
+            };
 
             var residenceRepositoryMock = new Mock<IResidenceRepository>();
 
             residenceRepositoryMock
-                .Setup(r => r.GetAllResidencesByConsortiumWithOwner(consortiumId))
+                .Setup(r => r.GetAllResidencesByConsortiumWithOwner())
                 .ReturnsAsync(expectedResidences);
 
             var useCase = new GetAllResidencesByConsortiumWithOwner(residenceRepositoryMock.Object);
 
-            var result = await useCase.ExecuteAsync(consortiumId);
+            var result = await useCase.ExecuteAsync();
 
             Assert.NotNull(result);
             Assert.Equal(expectedResidences, result);
+
             residenceRepositoryMock.Verify(
-                r => r.GetAllResidencesByConsortiumWithOwner(consortiumId),
+                r => r.GetAllResidencesByConsortiumWithOwner(),
                 Times.Once
             );
         }

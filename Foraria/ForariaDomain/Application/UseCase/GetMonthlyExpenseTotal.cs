@@ -18,7 +18,7 @@ namespace Foraria.Application.UseCase
             var startOfMonth = new DateTime(now.Year, now.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
-            var invoices = await _repository.GetAllInvoicesByMonthAndConsortium(startOfMonth, consortiumId);
+            var invoices = await _repository.GetAllInvoicesByMonthAndConsortium(startOfMonth);
 
             var total = invoices
                 .Where(i => i.ProcessedAt >= startOfMonth && i.ProcessedAt <= endOfMonth)
