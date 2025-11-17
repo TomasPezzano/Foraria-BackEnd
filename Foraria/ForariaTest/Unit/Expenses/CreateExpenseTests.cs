@@ -2,6 +2,7 @@
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
+using ForariaDomain.Services;
 using Moq;
 
 namespace ForariaTest.Unit.Expenses;
@@ -14,6 +15,7 @@ public class CreateExpenseTests
     private readonly Mock<IGetConsortiumById> _getConsortiumMock = new();
     private readonly Mock<IGetAllResidencesByConsortiumWithOwner> _getResidencesMock = new();
     private readonly Mock<IResidenceRepository> _residenceRepositoryMock = new();
+    private readonly Mock<ITenantContext> _tenantContextMock = new();
 
     private CreateExpense CreateUseCase()
     {
@@ -23,10 +25,10 @@ public class CreateExpenseTests
             _getConsortiumMock.Object,
             _invoiceRepositoryMock.Object,
             _getResidencesMock.Object,
-            _residenceRepositoryMock.Object
+            _residenceRepositoryMock.Object,
+            _tenantContextMock.Object
         );
     }
-
 
     [Theory]
     [InlineData("2025/10")]
@@ -38,41 +40,43 @@ public class CreateExpenseTests
     {
         var useCase = CreateUseCase();
 
-        var exception = await Assert.ThrowsAsync<FormatException>(() =>
-            useCase.ExecuteAsync(1, invalidDate)
+        var ex = await Assert.ThrowsAsync<FormatException>(() =>
+            useCase.ExecuteAsync(invalidDate)
         );
 
-        Assert.StartsWith("El formato de la fecha es inválido", exception.Message);
+        Assert.StartsWith("El formato de la fecha es inválido", ex.Message);
     }
 
     [Fact]
     public async Task ExecuteAsync_ShouldThrowKeyNotFoundException_WhenConsortiumDoesNotExist()
     {
-        _getConsortiumMock.Setup(x => x.Execute(99))
-            .ReturnsAsync((Consortium)null);
+        _tenantContextMock.Setup(x => x.GetCurrentConsortiumId()).Returns(50);
+        _getConsortiumMock.Setup(x => x.Execute(50)).ReturnsAsync((Consortium)null);
 
         var useCase = CreateUseCase();
 
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            useCase.ExecuteAsync(99, "2025-10")
+        var ex = await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            useCase.ExecuteAsync("2025-10")
         );
 
-        Assert.Contains("99", exception.Message);
+        Assert.Contains("ningún consorcio", ex.Message);
     }
 
     [Fact]
     public async Task ExecuteAsync_ShouldThrowInvalidOperationException_WhenNoInvoicesFound()
     {
+        _tenantContextMock.Setup(x => x.GetCurrentConsortiumId()).Returns(1);
+
         _getConsortiumMock.Setup(x => x.Execute(1))
             .ReturnsAsync(new Consortium { Id = 1 });
 
-        _getAllInvoicesMock.Setup(x => x.Execute(It.IsAny<DateTime>(), 1))
+        _getAllInvoicesMock.Setup(x => x.Execute(It.IsAny<DateTime>()))
             .ReturnsAsync(new List<Invoice>());
 
         var useCase = CreateUseCase();
 
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            useCase.ExecuteAsync(1, "2025-10")
+            useCase.ExecuteAsync("2025-10")
         );
 
         Assert.StartsWith("No existen facturas registradas", ex.Message);
@@ -82,31 +86,32 @@ public class CreateExpenseTests
     public async Task ExecuteAsync_ShouldThrowInvalidOperationException_WhenTotalAmountIsZeroOrNegative()
     {
         var invoices = new List<Invoice>
-    {
-        new Invoice { Id = 1, Amount = 0 }
-    };
+        {
+            new Invoice { Id = 1, Amount = 0 }
+        };
+
+        _tenantContextMock.Setup(x => x.GetCurrentConsortiumId()).Returns(1);
 
         _getConsortiumMock.Setup(x => x.Execute(1))
             .ReturnsAsync(new Consortium { Id = 1 });
 
-        _getAllInvoicesMock.Setup(x => x.Execute(It.IsAny<DateTime>(), 1))
+        _getAllInvoicesMock.Setup(x => x.Execute(It.IsAny<DateTime>()))
             .ReturnsAsync(invoices);
 
-        _getResidencesMock.Setup(x => x.ExecuteAsync(1))
+        _getResidencesMock.Setup(x => x.ExecuteAsync())
             .ReturnsAsync(new List<Residence>
             {
-            new Residence { Id = 1, Expenses = new List<Expense>() }
+                new Residence { Id = 1, Expenses = new List<Expense>() }
             });
 
         var useCase = CreateUseCase();
 
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            useCase.ExecuteAsync(1, "2025-10")
+            useCase.ExecuteAsync("2025-10")
         );
 
         Assert.Equal("El total de las facturas no puede ser cero o negativo.", ex.Message);
     }
-
 
     [Fact]
     public async Task ExecuteAsync_ShouldCreateExpenseSuccessfully()
@@ -125,15 +130,17 @@ public class CreateExpenseTests
             new Residence { Id = 2, Expenses = new List<Expense>() }
         };
 
-        var expectedExpenseId = 123;
+        var expectedExpenseId = 999;
+
+        _tenantContextMock.Setup(x => x.GetCurrentConsortiumId()).Returns(1);
 
         _getConsortiumMock.Setup(x => x.Execute(1))
             .ReturnsAsync(consortium);
 
-        _getAllInvoicesMock.Setup(x => x.Execute(It.IsAny<DateTime>(), 1))
+        _getAllInvoicesMock.Setup(x => x.Execute(It.IsAny<DateTime>()))
             .ReturnsAsync(invoices);
 
-        _getResidencesMock.Setup(x => x.ExecuteAsync(1))
+        _getResidencesMock.Setup(x => x.ExecuteAsync())
             .ReturnsAsync(residences);
 
         _expenseRepositoryMock
@@ -145,13 +152,14 @@ public class CreateExpenseTests
             });
 
         var useCase = CreateUseCase();
-        var result = await useCase.ExecuteAsync(1, "2025-10");
 
+        var result = await useCase.ExecuteAsync("2025-10");
 
         Assert.NotNull(result);
         Assert.Equal(expectedExpenseId, result.Id);
         Assert.Equal(750, result.TotalAmount);
         Assert.Equal(2, result.Invoices.Count);
+        Assert.Equal(2, result.Residences.Count);
 
 
         _invoiceRepositoryMock.Verify(
@@ -159,12 +167,10 @@ public class CreateExpenseTests
             Times.Exactly(2)
         );
 
-
         _residenceRepositoryMock.Verify(
             x => x.UpdateExpense(It.IsAny<Residence>()),
             Times.Exactly(2)
         );
-
 
         Assert.All(residences, r =>
             Assert.Contains(result, r.Expenses)

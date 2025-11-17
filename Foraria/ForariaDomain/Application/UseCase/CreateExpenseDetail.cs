@@ -35,7 +35,7 @@ public class CreateExpenseDetail : ICreateExpenseDetail
             if (expense.TotalAmount <= 0)
                 throw new InvalidOperationException("El monto total de la expensa debe ser mayor que cero.");
 
-            var residences = await _getAllResidencesByConsortiumWithOwner.ExecuteAsync(expense.ConsortiumId);
+            var residences = await _getAllResidencesByConsortiumWithOwner.ExecuteAsync();
 
             if (residences == null)
                 throw new InvalidOperationException("No se pudieron obtener las residencias del consorcio.");

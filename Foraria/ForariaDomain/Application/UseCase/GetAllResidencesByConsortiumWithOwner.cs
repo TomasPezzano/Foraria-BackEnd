@@ -4,7 +4,7 @@ namespace ForariaDomain.Application.UseCase;
 
 public interface IGetAllResidencesByConsortiumWithOwner
 {
-    Task<IEnumerable<Residence>> ExecuteAsync(int consortiumId);
+    Task<IEnumerable<Residence>> ExecuteAsync();
 }
 
 public class GetAllResidencesByConsortiumWithOwner : IGetAllResidencesByConsortiumWithOwner
@@ -17,8 +17,8 @@ public class GetAllResidencesByConsortiumWithOwner : IGetAllResidencesByConsorti
         _residenceRepository = residenceRepository;
     }
 
-    public async Task<IEnumerable<Residence>> ExecuteAsync(int consortiumId)
+    public async Task<IEnumerable<Residence>> ExecuteAsync()
     {
-        return await _residenceRepository.GetAllResidencesByConsortiumWithOwner(consortiumId);
+        return await _residenceRepository.GetAllResidencesByConsortiumWithOwner();
     }
 }

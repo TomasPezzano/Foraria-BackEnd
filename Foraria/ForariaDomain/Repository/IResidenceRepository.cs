@@ -8,7 +8,7 @@ public interface IResidenceRepository
     Task<Residence> Create(Residence residence, int consortiumId);
     Task<Residence?> GetById(int id);
     Task<List<Residence>> GetResidenceByConsortiumIdAsync(int consortiumId);
-    Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner(int consortiumId);
+    Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner();
 
     Task<IEnumerable<Residence>> GetResidenceByUserId(int userId);
     Task UpdateExpense(Residence residence);

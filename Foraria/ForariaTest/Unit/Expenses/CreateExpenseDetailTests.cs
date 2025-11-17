@@ -4,7 +4,6 @@ using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
 using Moq;
 
-
 public class CreateExpenseDetailTests
 {
     private readonly Mock<IExpenseDetailRepository> _expenseDetailRepositoryMock = new();
@@ -60,9 +59,15 @@ public class CreateExpenseDetailTests
     [Fact]
     public async Task ExecuteAsync_ShouldThrowInvalidOperation_WhenResidencesIsNull()
     {
-        var expense = new Expense { Id = 1, ConsortiumId = 1, TotalAmount = 1000 };
+        var expense = new Expense
+        {
+            Id = 1,
+            ConsortiumId = 1,
+            TotalAmount = 1000,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        _getResidencesMock.Setup(x => x.ExecuteAsync(1))
+        _getResidencesMock.Setup(x => x.ExecuteAsync())
             .ReturnsAsync((IEnumerable<Residence>)null);
 
         var useCase = CreateUseCase();
@@ -73,9 +78,15 @@ public class CreateExpenseDetailTests
     [Fact]
     public async Task ExecuteAsync_ShouldThrowKeyNotFound_WhenResidencesIsEmpty()
     {
-        var expense = new Expense { Id = 1, ConsortiumId = 1, TotalAmount = 1000 };
+        var expense = new Expense
+        {
+            Id = 1,
+            ConsortiumId = 1,
+            TotalAmount = 1000,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        _getResidencesMock.Setup(x => x.ExecuteAsync(1))
+        _getResidencesMock.Setup(x => x.ExecuteAsync())
             .ReturnsAsync(new List<Residence>());
 
         var useCase = CreateUseCase();
@@ -86,14 +97,20 @@ public class CreateExpenseDetailTests
     [Fact]
     public async Task ExecuteAsync_ShouldThrowInvalidOperation_WhenResidenceHasInvalidCoeficient()
     {
-        var expense = new Expense { Id = 1, ConsortiumId = 1, TotalAmount = 1000 };
+        var expense = new Expense
+        {
+            Id = 1,
+            ConsortiumId = 1,
+            TotalAmount = 1000,
+            CreatedAt = DateTime.UtcNow
+        };
 
         var residences = new List<Residence>
         {
             new Residence { Id = 5, Coeficient = 0 }
         };
 
-        _getResidencesMock.Setup(x => x.ExecuteAsync(1)).ReturnsAsync(residences);
+        _getResidencesMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(residences);
 
         var useCase = CreateUseCase();
 
@@ -103,17 +120,24 @@ public class CreateExpenseDetailTests
     [Fact]
     public async Task ExecuteAsync_ShouldThrowInvalidOperation_WhenDetailCreationFails()
     {
-        var expense = new Expense { Id = 1, ConsortiumId = 1, TotalAmount = 1000 };
+        var expense = new Expense
+        {
+            Id = 1,
+            ConsortiumId = 1,
+            TotalAmount = 1000,
+            CreatedAt = DateTime.UtcNow
+        };
 
         var residences = new List<Residence>
         {
             new Residence { Id = 5, Coeficient = 0.2 }
         };
 
-        _getResidencesMock.Setup(x => x.ExecuteAsync(1)).ReturnsAsync(residences);
+        _getResidencesMock.Setup(x => x.ExecuteAsync()).ReturnsAsync(residences);
+
         _residenceRepositoryMock
-                        .Setup(x => x.GetInvoicesByResidenceIdAsync(5, It.IsAny<DateTime>()))
-                        .ReturnsAsync(new List<Invoice>());
+            .Setup(x => x.GetInvoicesByResidenceIdAsync(5, expense.CreatedAt))
+            .ReturnsAsync(new List<Invoice>());
 
         _expenseDetailRepositoryMock.Setup(x =>
             x.AddExpenseDetailAsync(It.IsAny<ExpenseDetailByResidence>())
@@ -127,7 +151,13 @@ public class CreateExpenseDetailTests
     [Fact]
     public async Task ExecuteAsync_ShouldCreateExpenseDetailsSuccessfully()
     {
-        var expense = new Expense { Id = 1, ConsortiumId = 1, TotalAmount = 1000 };
+        var expense = new Expense
+        {
+            Id = 1,
+            ConsortiumId = 1,
+            TotalAmount = 1000,
+            CreatedAt = DateTime.UtcNow
+        };
 
         var residences = new List<Residence>
         {
@@ -135,12 +165,12 @@ public class CreateExpenseDetailTests
             new Residence { Id = 2, Coeficient = 0.5 }
         };
 
-        _getResidencesMock.Setup(x => x.ExecuteAsync(1))
+        _getResidencesMock.Setup(x => x.ExecuteAsync())
             .ReturnsAsync(residences);
 
         _residenceRepositoryMock
-                .Setup(x => x.GetInvoicesByResidenceIdAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
-                .ReturnsAsync(new List<Invoice>());
+            .Setup(x => x.GetInvoicesByResidenceIdAsync(It.IsAny<int>(), expense.CreatedAt))
+            .ReturnsAsync(new List<Invoice>());
 
         _expenseDetailRepositoryMock
             .Setup(x => x.AddExpenseDetailAsync(It.IsAny<ExpenseDetailByResidence>()))

@@ -1,86 +1,87 @@
-﻿using ForariaDomain;
+﻿using System;
+using System.Threading.Tasks;
+using Moq;
+using Xunit;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
-using Moq;
+using ForariaDomain;
 
-
-namespace ForariaTest.Unit.Invoices;
-public class GetAllInvoicesByMonthAndConsortiumTests
+namespace ForariaTest.Unit.Invoices
 {
-    private readonly Mock<IInvoiceRepository> _repositoryMock;
-    private readonly GetAllInvoicesByMonthAndConsortium _useCase;
-
-    public GetAllInvoicesByMonthAndConsortiumTests()
+    public class GetAllInvoicesByMonthAndConsortiumTests
     {
-        _repositoryMock = new Mock<IInvoiceRepository>();
-        _useCase = new GetAllInvoicesByMonthAndConsortium(_repositoryMock.Object);
-    }
+        private readonly Mock<IInvoiceRepository> _repositoryMock;
+        private readonly GetAllInvoicesByMonthAndConsortium _useCase;
 
-    [Fact]
-    public async Task Execute_ShouldReturnInvoices_WhenRepositoryReturnsData()
-    {
-        var date = new DateTime(2024, 10, 1);
-        var consortiumId = 3;
-
-        var expectedInvoices = new List<Invoice>
+        public GetAllInvoicesByMonthAndConsortiumTests()
         {
-            new Invoice { Id = 1, Amount = 900 },
-            new Invoice { Id = 2, Amount = 1200 }
-        };
+            _repositoryMock = new Mock<IInvoiceRepository>();
+            _useCase = new GetAllInvoicesByMonthAndConsortium(_repositoryMock.Object);
+        }
 
-        _repositoryMock
-            .Setup(r => r.GetAllInvoicesByMonthAndConsortium(date, consortiumId))
-            .ReturnsAsync(expectedInvoices);
+        [Fact]
+        public async Task Execute_ShouldReturnInvoices_WhenRepositoryReturnsData()
+        {
+            var date = new DateTime(2024, 10, 1);
 
-        var result = await _useCase.Execute(date, consortiumId);
+            var expectedInvoices = new List<Invoice>
+            {
+                new Invoice { Id = 1, Amount = 900 },
+                new Invoice { Id = 2, Amount = 1200 }
+            };
 
-        Assert.NotNull(result);
-        Assert.Equal(2, result.Count());
-        Assert.Contains(result, i => i.Id == 1);
-        Assert.Contains(result, i => i.Id == 2);
+            _repositoryMock
+                .Setup(r => r.GetAllInvoicesByMonthAndConsortium(date))
+                .ReturnsAsync(expectedInvoices);
 
-        _repositoryMock.Verify(
-            r => r.GetAllInvoicesByMonthAndConsortium(date, consortiumId),
-            Times.Once
-        );
-    }
+            var result = await _useCase.Execute(date);
 
-    [Fact]
-    public async Task Execute_ShouldReturnEmpty_WhenRepositoryReturnsEmpty()
-    {
-        var date = new DateTime(2024, 10, 1);
-        var consortiumId = 3;
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count());
+            Assert.Contains(result, i => i.Id == 1);
+            Assert.Contains(result, i => i.Id == 2);
 
-        _repositoryMock
-            .Setup(r => r.GetAllInvoicesByMonthAndConsortium(date, consortiumId))
-            .ReturnsAsync(new List<Invoice>());
+            _repositoryMock.Verify(
+                r => r.GetAllInvoicesByMonthAndConsortium(date),
+                Times.Once
+            );
+        }
 
-        var result = await _useCase.Execute(date, consortiumId);
+        [Fact]
+        public async Task Execute_ShouldReturnEmpty_WhenRepositoryReturnsEmpty()
+        {
+            var date = new DateTime(2024, 10, 1);
 
-        Assert.NotNull(result);
-        Assert.Empty(result);
+            _repositoryMock
+                .Setup(r => r.GetAllInvoicesByMonthAndConsortium(date))
+                .ReturnsAsync(new List<Invoice>());
 
-        _repositoryMock.Verify(
-            r => r.GetAllInvoicesByMonthAndConsortium(date, consortiumId),
-            Times.Once
-        );
-    }
+            var result = await _useCase.Execute(date);
 
-    [Fact]
-    public async Task Execute_ShouldPropagateException_WhenRepositoryThrows()
-    {
-        var date = DateTime.Now;
-        var consortiumId = 7;
+            Assert.NotNull(result);
+            Assert.Empty(result);
 
-        _repositoryMock
-            .Setup(r => r.GetAllInvoicesByMonthAndConsortium(date, consortiumId))
-            .ThrowsAsync(new Exception("DB Error"));
+            _repositoryMock.Verify(
+                r => r.GetAllInvoicesByMonthAndConsortium(date),
+                Times.Once
+            );
+        }
 
-        await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(date, consortiumId));
+        [Fact]
+        public async Task Execute_ShouldPropagateException_WhenRepositoryThrows()
+        {
+            var date = DateTime.Now;
 
-        _repositoryMock.Verify(
-            r => r.GetAllInvoicesByMonthAndConsortium(date, consortiumId),
-            Times.Once
-        );
+            _repositoryMock
+                .Setup(r => r.GetAllInvoicesByMonthAndConsortium(date))
+                .ThrowsAsync(new Exception("DB Error"));
+
+            await Assert.ThrowsAsync<Exception>(() => _useCase.Execute(date));
+
+            _repositoryMock.Verify(
+                r => r.GetAllInvoicesByMonthAndConsortium(date),
+                Times.Once
+            );
+        }
     }
 }

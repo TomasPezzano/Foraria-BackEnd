@@ -52,7 +52,7 @@ namespace Foraria.Controllers
             if (string.IsNullOrWhiteSpace(expenseDto.month))
                 throw new DomainValidationException("Debe especificar un mes válido (por ejemplo, '2025-09').");
 
-            var expense = await _getExpenseWithDto.ExecuteAsync(expenseDto.ConsortiumId, expenseDto.month);
+            var expense = await _getExpenseWithDto.ExecuteAsync(expenseDto.month);
             if (expense == null)
                 throw new NotFoundException($"No se encontró una expensa para el consorcio ID {expenseDto.ConsortiumId} y el mes {expenseDto.month}.");
 

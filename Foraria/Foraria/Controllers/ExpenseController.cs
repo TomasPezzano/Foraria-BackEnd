@@ -53,7 +53,7 @@ public class ExpenseController : ControllerBase
         if (string.IsNullOrWhiteSpace(expenseDto.month))
             throw new DomainValidationException("El mes de la expensa es obligatorio (formato 'YYYY-MM').");
 
-        var expense = await _createExpense.ExecuteAsync(expenseDto.ConsortiumId, expenseDto.month);
+        var expense = await _createExpense.ExecuteAsync(expenseDto.month);
 
         if (expense == null)
             throw new BusinessException("No se pudo crear la expensa.");
