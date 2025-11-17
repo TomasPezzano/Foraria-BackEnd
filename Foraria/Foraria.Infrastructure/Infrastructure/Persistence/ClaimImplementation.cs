@@ -17,12 +17,11 @@ public class ClaimImplementation : IClaimRepository
         await  _context.SaveChangesAsync();
     }
 
-    public async Task<List<Claim>> GetAll(int consortiumId)
+    public async Task<List<Claim>> GetAll()
     {
         return  await _context.Claims
                    .Include(c => c.ClaimResponse)
                    .Include(c => c.User)
-                   .Where(c => c.ConsortiumId == consortiumId)
                    .ToListAsync();
     }
 
@@ -35,32 +34,22 @@ public class ClaimImplementation : IClaimRepository
     {
         return await _context.Claims.FirstOrDefaultAsync(c => c.Id == id);
     }
-    public async Task<int> GetPendingCountAsync(int? consortiumId = null)
+    public async Task<int> GetPendingCountAsync()
     {
         var query = _context.Claims
             .Include(c => c.Residence)
             .AsQueryable();
 
-        if (consortiumId.HasValue)
-        {
-            query = query.Where(c => c.Residence.ConsortiumId == consortiumId.Value);
-        }
-
         return await query.CountAsync(c => c.State == "Pending");
     }
 
-    public async Task<Claim?> GetLatestPendingAsync(int? consortiumId = null)
+    public async Task<Claim?> GetLatestPendingAsync()
     {
         var query = _context.Claims
             .Include(c => c.User)
             .Include(c => c.Residence)
                 .ThenInclude(r => r.Consortium)
             .AsQueryable();
-
-        if (consortiumId.HasValue)
-        {
-            query = query.Where(c => c.Residence.ConsortiumId == consortiumId.Value);
-        }
 
         return await query
             .Where(c => c.State == "Pending")

@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Foraria.Domain.Repository;
 using ForariaDomain;
+using ForariaDomain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Foraria.Infrastructure.Persistence;
@@ -8,10 +9,12 @@ namespace Foraria.Infrastructure.Persistence;
 public class ResidenceRepository : IResidenceRepository
 {
     private readonly ForariaContext _context;
+    private readonly ITenantContext _tenantContext;
 
-    public ResidenceRepository(ForariaContext context)
+    public ResidenceRepository(ForariaContext context, ITenantContext tenantContext)
     {
         _context = context;
+        _tenantContext = tenantContext;
     }
 
     public async Task<bool> Exists(int? id)
@@ -20,9 +23,11 @@ public class ResidenceRepository : IResidenceRepository
         return await _context.Residence.AnyAsync(r => r.Id == id);
     }
 
-    public async Task<Residence> Create(Residence residence, int consortiumId)
+    public async Task<Residence> Create(Residence residence)
     {
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
         residence.ConsortiumId = consortiumId;
+
         _context.Residence.Add(residence);
         await _context.SaveChangesAsync();
         return residence;
@@ -33,11 +38,10 @@ public class ResidenceRepository : IResidenceRepository
         return await _context.Residence.FindAsync(id);
     }
 
-    public async Task<List<Residence>> GetResidenceByConsortiumIdAsync(int consortiumId)
+    public async Task<List<Residence>> GetResidencesAsync()
     {
         return await _context.Residence
             .Include(r => r.Users)
-            .Where(r => r.ConsortiumId == consortiumId)
             .ToListAsync();
     }
 

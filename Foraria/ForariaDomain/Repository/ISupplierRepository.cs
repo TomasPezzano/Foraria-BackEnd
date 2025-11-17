@@ -10,6 +10,6 @@ public interface ISupplierRepository
 {
     Task<Supplier> Create(Supplier supplier);
     void Delete(int supplierId);
-    Task<List <Supplier>> GetAll(int consortiumId);
+    Task<List <Supplier>> GetAll();
     Task<Supplier?> GetById(int supplierId);
 }

@@ -23,10 +23,10 @@ namespace ForariaTest.Unit.Claims
         public async Task ExecuteAsync_ShouldReturnNull_WhenNoClaimExists()
         {
             _repositoryMock
-                .Setup(r => r.GetLatestPendingAsync(It.IsAny<int?>()))
+                .Setup(r => r.GetLatestPendingAsync())
                 .ReturnsAsync((Claim?)null);
 
-            var result = await _useCase.ExecuteAsync(1);
+            var result = await _useCase.ExecuteAsync();
 
             Assert.Null(result);
         }

@@ -1,5 +1,6 @@
 ﻿using Foraria.Domain.Repository;
 using ForariaDomain;
+using ForariaDomain.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Diagnostics.Contracts;
@@ -10,9 +11,11 @@ namespace Foraria.Infrastructure.Persistence;
 public class UserRepository : IUserRepository
 {
     private readonly ForariaContext _context;
-    public UserRepository(ForariaContext context)
+    private readonly ITenantContext _tenantContext;
+    public UserRepository(ForariaContext context, ITenantContext tenantContext)
     {
         _context = context;
+        _tenantContext = tenantContext;
     }
 
     public async Task<User?> GetByEmail(string email)
@@ -51,15 +54,16 @@ public class UserRepository : IUserRepository
             .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Mail == email);
     }
-    public async Task<int> GetTotalUsersAsync(int? consortiumId = null)
+    public async Task<int> GetTotalUsersAsync()
     {
         var query = _context.Users.AsQueryable();
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
 
-        if (consortiumId.HasValue)
+        if (consortiumId > 0)
         {
             query = query
                 .Include(u => u.Residences)
-                .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId.Value));
+                .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId));
         }
 
         return await query.CountAsync();
@@ -77,28 +81,36 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<int> GetAllInNumber(int consortiumId)
+    public async Task<int> GetAllInNumber()
     {
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
         return await _context.Users.Include(u => u.Residences)
             .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId)).CountAsync();
     }
 
-    public async Task<int> GetTotalUsersByTenantIdAsync(int idConsortium)
+    public async Task<int> GetTotalUsersByTenantIdAsync()
     {
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
         return await _context.Users
-            .Where(u => u.Role.Description == "Inquilino" && u.Residences.Any(r => r.ConsortiumId == idConsortium))
+            .Where(u => u.Role.Description == "Inquilino" && u.Residences.Any(r => r.ConsortiumId == consortiumId))
             .CountAsync();
     }
 
-    public async Task<int> GetTotalOwnerUsersAsync(int idConsortium)
+    public async Task<int> GetTotalOwnerUsersAsync()
     {
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
         return await _context.Users
-            .Where(u => u.Role.Description == "Propietario" && u.Residences.Any(r => r.ConsortiumId == idConsortium))
+            .Where(u => u.Role.Description == "Propietario" && u.Residences.Any(r => r.ConsortiumId == consortiumId))
             .CountAsync();
     }
 
-    public async Task<List<User>> GetUsersByConsortiumIdAsync(int consortiumId)
+    public async Task<List<User>> GetUsersByConsortiumIdAsync()
     {
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
         return await _context.Users
             .Include(u => u.Role)
             .Include(u => u.Residences)

@@ -44,8 +44,8 @@ public class SupplierRepository : ISupplierRepository
         }
     }
 
-    public async Task<List<Supplier>> GetAll(int consortiumId)
+    public async Task<List<Supplier>> GetAll()
     {
-        return await _context.Suppliers.Where(s => s.ConsortiumId == consortiumId).ToListAsync();
+        return await _context.Suppliers.ToListAsync();
     }
 }

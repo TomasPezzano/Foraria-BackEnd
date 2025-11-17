@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ForariaDomain.Application.UseCase;
 public interface IGetActiveContractsSupplierCount
 {
-    Task<int> ExecuteAsync(int supplierId);
+    Task<int> ExecuteAsync();
 }
 public class GetActiveContractsSupplierCount : IGetActiveContractsSupplierCount
 {
@@ -19,8 +19,8 @@ public class GetActiveContractsSupplierCount : IGetActiveContractsSupplierCount
         _supplierContractRepository = supplierContractRepository;
     }
 
-    public async Task<int> ExecuteAsync(int consortiumId)
+    public async Task<int> ExecuteAsync()
     {
-        return await _supplierContractRepository.GetActiveContractsCount(consortiumId);
+        return await _supplierContractRepository.GetActiveContractsCount();
     }
 }

@@ -6,27 +6,20 @@ namespace ForariaDomain.Application.UseCase;
 
 public interface IGetTotalTenantUsers
 {
-    Task<int> ExecuteAsync(int idConsortium);
+    Task<int> ExecuteAsync();
 }
+
 public class GetTotalTenantUsers : IGetTotalTenantUsers
 {
     private readonly IUserRepository _userRepository;
-    private readonly IConsortiumRepository _consortiumRepository;
 
-    public GetTotalTenantUsers(IUserRepository userRepository, IConsortiumRepository consortiumRepository)
+    public GetTotalTenantUsers(IUserRepository userRepository)
     {
         _userRepository = userRepository;
-        _consortiumRepository = consortiumRepository;
     }
-    public async Task<int> ExecuteAsync(int idConsortium)
+
+    public async Task<int> ExecuteAsync()
     {
-        var consortium = await _consortiumRepository.FindById(idConsortium);
-
-        if (consortium == null)
-        {
-            throw new KeyNotFoundException($"El consorcio con ID {idConsortium} no existe.");
-        }
-
-        return await _userRepository.GetTotalUsersByTenantIdAsync(idConsortium);
+        return await _userRepository.GetTotalUsersByTenantIdAsync();
     }
 }

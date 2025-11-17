@@ -24,18 +24,18 @@ namespace ForariaTest.Unit.Suppliers
             int consortiumId = 10;
 
             mockRepository
-                .Setup(repo => repo.GetAll(consortiumId))
+                .Setup(repo => repo.GetAll())
                 .ReturnsAsync(suppliersMock);
 
             var useCase = new GetAllSupplier(mockRepository.Object);
 
-            var result = await useCase.Execute(consortiumId);
+            var result = await useCase.Execute();
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("Proveedor 1", result[0].CommercialName);
 
-            mockRepository.Verify(repo => repo.GetAll(consortiumId), Times.Once);
+            mockRepository.Verify(repo => repo.GetAll(), Times.Once);
         }
     }
 }
