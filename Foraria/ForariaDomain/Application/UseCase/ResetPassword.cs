@@ -1,5 +1,4 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain.Repository;
 
 namespace ForariaDomain.Application.UseCase;
@@ -54,7 +53,7 @@ public class ResetPassword : IResetPassword
         }
 
         var user = resetToken.User;
-        user.Password = _passwordHash.HashPassword(newPassword);
+        user.Password = _passwordHash.Execute(newPassword);
 
         // Si el usuario tenía RequiresPasswordChange, lo mantenemos así
         // porque esto es un reset, no el primer login
@@ -63,7 +62,7 @@ public class ResetPassword : IResetPassword
 
         // Marcar token como usado
         resetToken.IsUsed = true;
-        resetToken.UsedAt = DateTime.UtcNow;
+        resetToken.UsedAt = DateTime.Now;
         resetToken.UsedByIp = ipAddress;
         await _passwordResetTokenRepository.Update(resetToken);
 

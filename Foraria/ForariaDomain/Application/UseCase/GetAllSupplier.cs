@@ -1,16 +1,10 @@
-﻿using ForariaDomain;
-using ForariaDomain.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ForariaDomain.Repository;
 
 namespace ForariaDomain.Application.UseCase;
 
 public interface IGetAllSupplier
 {
-    List<Supplier> Execute();
+    Task<List<Supplier>> Execute();
 }
 
 public class GetAllSupplier : IGetAllSupplier
@@ -20,8 +14,8 @@ public class GetAllSupplier : IGetAllSupplier
     {
         _supplierRepository = supplierRepository;
     }
-    public List<Supplier> Execute()
+    public async Task<List<Supplier>> Execute()
     {
-        return _supplierRepository.GetAll();
+        return await _supplierRepository.GetAll();
     }
 }

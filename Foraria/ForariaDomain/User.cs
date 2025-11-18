@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Foraria.Application.UseCase;
 
 namespace ForariaDomain
 {
@@ -35,7 +34,7 @@ namespace ForariaDomain
 
         public ICollection<ClaimResponse> ClaimsResponse { get; set; }
 
-        public ICollection<Residence> Residences { get; set; }
+        public ICollection<Residence?> Residences { get; set; }
 
         public ICollection<Reserve> Reserves { get; set; }
 
@@ -56,6 +55,11 @@ namespace ForariaDomain
 
         public ICollection<PasswordResetToken> PasswordResetTokens { get; set; }
 
+        public ICollection<Notification> Notifications { get; set; }
+
+        public NotificationPreference? NotificationPreference { get; set; }
+
+        public ICollection<Consortium>? AdministeredConsortiums { get; set; }
 
     }
 }

@@ -43,5 +43,5 @@ public class SupplierContract
     public int SupplierId { get; set; }
     public Supplier Supplier { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

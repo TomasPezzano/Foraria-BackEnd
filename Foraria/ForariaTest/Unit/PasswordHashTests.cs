@@ -1,5 +1,5 @@
-﻿using Xunit;
-using Foraria.Application.UseCase;
+﻿
+using ForariaDomain.Application.UseCase;
 
 namespace ForariaTest;
 
@@ -9,7 +9,7 @@ public class PasswordHashTests
 
     public PasswordHashTests()
     {
-        _passwordHashUseCase = new PasswordHash();
+        _passwordHashUseCase = new HashPassword();
     }
 
 
@@ -20,8 +20,8 @@ public class PasswordHashTests
         var password = "MySecurePassword123!";
 
         // ACT
-        var hash1 = _passwordHashUseCase.HashPassword(password);
-        var hash2 = _passwordHashUseCase.HashPassword(password);
+        var hash1 = _passwordHashUseCase.Execute(password);
+        var hash2 = _passwordHashUseCase.Execute(password);
 
         // ASSERT
         Assert.NotEqual(hash1, hash2); 
@@ -34,7 +34,7 @@ public class PasswordHashTests
     public void VerifyPassword_CorrectPassword_ShouldReturnTrue()
     {
         var password = "MySecurePassword123!";
-        var hash = _passwordHashUseCase.HashPassword(password);
+        var hash = _passwordHashUseCase.Execute(password);
 
         var result = _passwordHashUseCase.VerifyPassword(password, hash);
 
@@ -47,7 +47,7 @@ public class PasswordHashTests
     {
         var correctPassword = "MySecurePassword123!";
         var wrongPassword = "WrongPassword456!";
-        var hash = _passwordHashUseCase.HashPassword(correctPassword);
+        var hash = _passwordHashUseCase.Execute(correctPassword);
 
         var result = _passwordHashUseCase.VerifyPassword(wrongPassword, hash);
 
@@ -60,7 +60,7 @@ public class PasswordHashTests
     {
         var password = "";
 
-        var hash = _passwordHashUseCase.HashPassword(password);
+        var hash = _passwordHashUseCase.Execute(password);
 
         Assert.NotNull(hash);
         Assert.NotEmpty(hash);

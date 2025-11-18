@@ -16,7 +16,7 @@ public class ContractExpirationService : IContractExpirationService
 {
     public void CheckAndUpdateExpiration(SupplierContract contract)
     {
-        if (contract.Active && contract.EndDate < DateTime.UtcNow)
+        if (contract.Active && contract.EndDate < DateTime.Now)
         {
             contract.Active = false;
         }

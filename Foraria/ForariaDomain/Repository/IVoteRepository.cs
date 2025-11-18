@@ -1,6 +1,5 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Contracts.DTOs;
-using ForariaDomain;
+﻿using ForariaDomain;
+using ForariaDomain.Models;
 
 namespace Foraria.Domain.Repository
 {
@@ -9,7 +8,7 @@ namespace Foraria.Domain.Repository
         Task AddAsync(Vote vote);
         Task<Vote?> GetByUserAndPollAsync(int userId, int pollId);
 
-        Task<IEnumerable<PollResultDto>> GetPollResultsAsync(int pollId);
+        Task<IEnumerable<PollResult>> GetPollResultsAsync(int pollId);
 
     }
 }

@@ -139,10 +139,6 @@ namespace Foraria.Migrations
                 table: "invoice");
 
             migrationBuilder.DropColumn(
-                name: "HasPermission",
-                table: "user");
-
-            migrationBuilder.DropColumn(
                 name: "Coeficient",
                 table: "residence");
 

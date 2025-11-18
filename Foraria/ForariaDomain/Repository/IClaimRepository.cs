@@ -11,6 +11,6 @@ public interface IClaimRepository
     Task Update(Claim claim);
 
     Task<Claim?> GetById(int id);
-    Task<int> GetPendingCountAsync(int? consortiumId = null);
-    Task<Claim?> GetLatestPendingAsync(int? consortiumId = null);
+    Task<int> GetPendingCountAsync();
+    Task<Claim?> GetLatestPendingAsync();
 }

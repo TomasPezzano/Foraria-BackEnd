@@ -80,7 +80,7 @@ public class ForgotPasswordUseCaseTests
             UserId = 1,
             Token = "old-token-1",
             IsUsed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10)
+            ExpiresAt = DateTime.Now.AddMinutes(10)
         };
 
         var oldToken2 = new PasswordResetToken
@@ -89,7 +89,7 @@ public class ForgotPasswordUseCaseTests
             UserId = 1,
             Token = "old-token-2",
             IsUsed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(5)
+            ExpiresAt = DateTime.Now.AddMinutes(5)
         };
 
         var activeTokens = new List<PasswordResetToken> { oldToken1, oldToken2 };
@@ -178,7 +178,7 @@ public class ForgotPasswordUseCaseTests
         Assert.Equal(ipAddress, capturedToken.CreatedByIp);
 
         // Verify expiration is approximately 15 minutes
-        var expectedExpiration = DateTime.UtcNow.AddMinutes(15);
+        var expectedExpiration = DateTime.Now.AddMinutes(15);
         Assert.True(Math.Abs((capturedToken.ExpiresAt - expectedExpiration).TotalSeconds) < 5);
     }
 

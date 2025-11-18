@@ -36,5 +36,9 @@ namespace ForariaDomain
 
         public ICollection<Claim> Claims { get; set; }
 
+        public ICollection<Expense> Expenses { get; set; }
+
+        public ICollection<Invoice> Invoices{ get; set; }
+
     }
 }

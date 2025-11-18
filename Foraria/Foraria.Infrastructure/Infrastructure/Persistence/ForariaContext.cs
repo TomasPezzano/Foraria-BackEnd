@@ -1,5 +1,6 @@
 ﻿using Foraria.Domain.Model;
 using ForariaDomain;
+using ForariaDomain.Services;
 using Microsoft.EntityFrameworkCore;
 using Thread = ForariaDomain.Thread;
 
@@ -7,9 +8,13 @@ namespace Foraria.Infrastructure.Persistence
 {
     public class ForariaContext : DbContext
     {
-        public ForariaContext(DbContextOptions<ForariaContext> options) : base(options)
-        {
+        private readonly ITenantContext? _tenantContext;
+        private readonly bool _isDesignTime;
 
+        public ForariaContext(DbContextOptions<ForariaContext> options, ITenantContext? tenantContext) : base(options)
+        {
+            _tenantContext = tenantContext;
+            _isDesignTime = tenantContext == null;
         }
 
         public DbSet<User> Users { get; set; }
@@ -67,11 +72,18 @@ namespace Foraria.Infrastructure.Persistence
 
         public DbSet<Invoice> Invoices { get; set; }
 
-        public DbSet<InvoiceItem> InvoiceItems { get; set; }
+        public DbSet<ForariaDomain.InvoiceItem> InvoiceItems { get; set; }
 
         public DbSet<ExpenseDetailByResidence> ExpenseDetailByResidences { get; set; }
 
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<Call> Calls { get; set; }
+        public DbSet<CallParticipant> CallParticipants { get; set; }
+        public DbSet<CallTranscript> CallTranscripts { get; set; }
+        public DbSet<CallMessage> CallMessages { get; set; }
+        public DbSet<CallRecording> CallRecordings { get; set; }
+        public DbSet<NotificationPreference> NotificationPreferences { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -103,10 +115,49 @@ namespace Foraria.Infrastructure.Persistence
             modelBuilder.Entity<Supplier>().ToTable("supplier");
             modelBuilder.Entity<SupplierContract>().ToTable("supplierContract");
             modelBuilder.Entity<Invoice>().ToTable("invoice");
-            modelBuilder.Entity<InvoiceItem>().ToTable("invoiceItem");
+            modelBuilder.Entity<ForariaDomain.InvoiceItem>().ToTable("invoiceItem");
             modelBuilder.Entity<ExpenseDetailByResidence>().ToTable("ExpenseDetailByResidences");
             modelBuilder.Entity<PasswordResetToken>().ToTable("passwordResetToken");
+            modelBuilder.Entity<Notification>().ToTable("notification");
+            modelBuilder.Entity<NotificationPreference>().ToTable("notificationPreference");
 
+
+            if (!_isDesignTime && _tenantContext != null)
+            {
+                modelBuilder.Entity<Supplier>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
+
+                modelBuilder.Entity<SupplierContract>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.Supplier.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
+
+
+                modelBuilder.Entity<Expense>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
+
+
+                modelBuilder.Entity<Invoice>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
+
+                modelBuilder.Entity<UserDocument>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.Consortium_id == _tenantContext.GetCurrentConsortiumIdOrNull());
+
+                modelBuilder.Entity<Residence>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
+
+                modelBuilder.Entity<Reserve>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
+
+                modelBuilder.Entity<Claim>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
+            }
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
@@ -290,12 +341,6 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(e => e.ResidenceId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<ExpenseDetailByResidence>()
-                .HasOne(e => e.Expense)
-                .WithMany(r => r.ExpenseDetailsByResidence)
-                .HasForeignKey(e => e.ExpenseId)
-                .OnDelete(DeleteBehavior.NoAction);
-
             modelBuilder.Entity<Expense>()
                 .HasOne(e => e.Consortium)
                 .WithMany(c => c.Expenses)
@@ -303,11 +348,32 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Expense>()
-                .HasMany(e => e.Invoices)
-                .WithOne(d => d.Expense)
-                .HasForeignKey(d => d.ExpenseId)
-                .OnDelete(DeleteBehavior.Cascade);
+                 .HasMany(u => u.Invoices)
+                 .WithMany(r => r.Expenses)
+                 .UsingEntity<Dictionary<string, object>>(
+                     "ExpenseInvoice",
+                     j => j.HasOne<Invoice>().WithMany().HasForeignKey("InvoicesId"),
+                     j => j.HasOne<Expense>().WithMany().HasForeignKey("ExpenseId")
+                 );
 
+
+            modelBuilder.Entity<Expense>()
+                 .HasMany(u => u.Residences)
+                 .WithMany(r => r.Expenses)
+                 .UsingEntity<Dictionary<string, object>>(
+                     "ExpenseResidence",
+                     j => j.HasOne<Residence>().WithMany().HasForeignKey("ResidenceId"),
+                     j => j.HasOne<Expense>().WithMany().HasForeignKey("ExpenseId")
+                 );
+
+            modelBuilder.Entity<Expense>()
+                 .HasMany(u => u.ExpenseDetailsByResidence)
+                 .WithMany(r => r.Expenses)
+                 .UsingEntity<Dictionary<string, object>>(
+                     "ExpenseAndExpenseDetail",
+                     j => j.HasOne<ExpenseDetailByResidence>().WithMany().HasForeignKey("ExpenseDetailByResidenceId"),
+                     j => j.HasOne<Expense>().WithMany().HasForeignKey("ExpenseId")
+                 );
 
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Residence)
@@ -360,7 +426,7 @@ namespace Foraria.Infrastructure.Persistence
             .Property(p => p.Amount)
             .HasPrecision(18, 2);
 
-            modelBuilder.Entity<InvoiceItem>()
+            modelBuilder.Entity<ForariaDomain.InvoiceItem>()
                 .HasOne(ii => ii.Invoice)
                 .WithMany(i => i.Items)
                 .HasForeignKey(ii => ii.InvoiceId)
@@ -373,13 +439,105 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(d => d.ConsortiumId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Residence>()
+                .HasMany(e => e.Invoices)
+                .WithOne(d => d.Residence)
+                .HasForeignKey(d => d.ResidenceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Consortium>()
+                .HasMany(e => e.Reserves)
+                .WithOne(d => d.Consortium)
+                .HasForeignKey(d => d.ConsortiumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Consortium>()
+                .HasMany(e => e.Claims)
+                .WithOne(d => d.Consortium)
+                .HasForeignKey(d => d.ConsortiumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<PasswordResetToken>()
-               .HasOne (u => u.User)
+               .HasOne(u => u.User)
                .WithMany(i => i.PasswordResetTokens)
                .HasForeignKey(u => u.UserId)
                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Call>()
+                .HasKey(c => c.Id);
+
+            modelBuilder.Entity<Call>()
+                .Property(c => c.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<CallParticipant>()
+                .HasKey(cp => cp.Id);
+
+            modelBuilder.Entity<CallParticipant>()
+                .HasOne<Call>()
+                .WithMany()
+                .HasForeignKey(cp => cp.CallId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CallTranscript>()
+                .HasKey(ct => ct.Id);
+
+            modelBuilder.Entity<CallTranscript>()
+                .HasOne<Call>()
+                .WithOne()
+                .HasForeignKey<CallTranscript>(ct => ct.CallId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CallTranscript>()
+                .Property(ct => ct.TranscriptPath)
+                .HasMaxLength(300)
+                .IsRequired();
+
+            modelBuilder.Entity<CallTranscript>()
+                .Property(ct => ct.TranscriptHash)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<CallTranscript>()
+                .Property(ct => ct.AudioHash)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany(u => u.Notifications)
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<NotificationPreference>()
+                .HasOne(np => np.User)
+                .WithOne(u => u.NotificationPreference)
+                .HasForeignKey<NotificationPreference>(np => np.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => n.UserId);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => n.Status);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => n.CreatedAt);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => new { n.UserId, n.Status });
+
+            modelBuilder.Entity<NotificationPreference>()
+                .HasIndex(np => np.UserId).IsUnique();
+
+            modelBuilder.Entity<Consortium>()
+                .HasOne(c => c.Administrator)
+                .WithMany(u => u.AdministeredConsortiums)
+                .HasForeignKey(c => c.AdministratorId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
 
 
+            // Índice para búsquedas por administrador
+            modelBuilder.Entity<Consortium>()
+                .HasIndex(c => c.AdministratorId);
 
             foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {

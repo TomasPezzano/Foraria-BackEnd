@@ -1,21 +1,20 @@
 ﻿using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetActivePollCount
 {
-    public class GetActivePollCount
+    private readonly IPollRepository _repository;
+
+    public GetActivePollCount(IPollRepository repository)
     {
-        private readonly IPollRepository _repository;
+        _repository = repository;
+    }
 
-        public GetActivePollCount(IPollRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<int> ExecuteAsync(int consortiumId, DateTime? dateTime = null)
-        {
-            var now = dateTime ?? DateTime.UtcNow;
-            var activePolls = await _repository.GetActivePolls(consortiumId, now);
-            return activePolls.Count();
-        }
+    public async Task<int> ExecuteAsync(int consortiumId, DateTime? dateTime = null)
+    {
+        var now = dateTime ?? DateTime.Now;
+        var activePolls = await _repository.GetActivePolls(consortiumId, now);
+        return activePolls.Count();
     }
 }

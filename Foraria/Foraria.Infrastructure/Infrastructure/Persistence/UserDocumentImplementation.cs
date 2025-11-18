@@ -1,6 +1,6 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
 using ForariaDomain;
+using ForariaDomain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Foraria.Infrastructure.Persistence
@@ -67,7 +67,7 @@ namespace Foraria.Infrastructure.Persistence
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<UserDocumentStatsDto> GetStatsAsync(int? userId = null)
+        public async Task<UserDocumentStatsResult> GetStatsAsync(int? userId = null)
         {
             var query = _context.UserDocuments
                 .Include(d => d.User)
@@ -91,7 +91,7 @@ namespace Foraria.Infrastructure.Persistence
                 .OrderByDescending(d => d.CreatedAt)
                 .FirstOrDefault()?.CreatedAt;
 
-            return new UserDocumentStatsDto
+            return new UserDocumentStatsResult
             {
                 TotalUserDocuments = totalUserDocs,
                 TotalConsortiumDocuments = totalConsortiumDocs,

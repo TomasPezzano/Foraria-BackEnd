@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
-using Foraria.Domain.Repository;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
-using ForariaDomain.Services;
 using ForariaDomain;
 using Moq;
-using Foraria.Contracts.DTOs;
+using ForariaDomain.Services;
+using ForariaDomain.Models;
+
 
 namespace ForariaTest.Unit
 {
@@ -18,7 +18,7 @@ namespace ForariaTest.Unit
             var paymentRepo = new Mock<IPaymentRepository>();
             var expenseRepo = new Mock<IExpenseDetailRepository>();
             var paymentMethodRepo = new Mock<IPaymentMethodRepository>();
-            var gateway = new Mock<IPaymentGateway>();
+            var gateway = new Mock<IPaymentService>();
 
             var bodyJson = """
         {
@@ -30,7 +30,7 @@ namespace ForariaTest.Unit
 
             var body = JsonDocument.Parse(bodyJson).RootElement;
 
-            var mpPayment = new MercadoPagoPaymentDto
+            var mpPayment = new MercadoPagoPayment
             {
                 Id = 9999,
                 Status = "approved",
@@ -41,7 +41,7 @@ namespace ForariaTest.Unit
                 { "expense_id", 1 },
                 { "residence_id", 10 }
             },
-                Order = new MercadoPagoOrderDto { Id = 123 }
+                Order = new MercadoPagoOrder { Id = 123 }
             };
 
             gateway.Setup(g => g.GetPaymentAsync(9999)).ReturnsAsync(mpPayment);

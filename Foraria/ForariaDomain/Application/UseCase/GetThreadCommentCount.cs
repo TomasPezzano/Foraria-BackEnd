@@ -1,23 +1,22 @@
 ﻿using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetThreadCommentCount
 {
-    public class GetThreadCommentCount
+    private readonly IThreadRepository _repository;
+
+    public GetThreadCommentCount(IThreadRepository repository)
     {
-        private readonly IThreadRepository _repository;
+        _repository = repository;
+    }
 
-        public GetThreadCommentCount(IThreadRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task<int> Execute(int threadId)
+    {
+        var thread = await _repository.GetById(threadId);
+        if (thread == null)
+            throw new InvalidOperationException($"No se encontró el hilo con ID {threadId}");
 
-        public async Task<int> Execute(int threadId)
-        {
-            var thread = await _repository.GetById(threadId);
-            if (thread == null)
-                throw new InvalidOperationException($"No se encontró el hilo con ID {threadId}");
-
-            return thread.Messages?.Count ?? 0;
-        }
+        return thread.Messages?.Count ?? 0;
     }
 }

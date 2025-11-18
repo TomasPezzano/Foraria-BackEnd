@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ForariaDomain
 {
@@ -42,5 +38,7 @@ namespace ForariaDomain
         public int ResidenceId { get; set; }
         public Residence Residence { get; set; }
 
+        public int ConsortiumId { get; set; }
+        public Consortium Consortium { get; set; }
     }
 }

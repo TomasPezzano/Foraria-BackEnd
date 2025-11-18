@@ -1,37 +1,35 @@
 ﻿using Foraria.Domain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class GetUpcomingReserves
 {
-    public class GetUpcomingReserves
+    private readonly IReserveRepository _repository;
+
+    public GetUpcomingReserves(IReserveRepository repository)
     {
-        private readonly IReserveRepository _repository;
+        _repository = repository;
+    }
 
-        public GetUpcomingReserves(IReserveRepository repository)
+    public async Task<object> ExecuteAsync(int limit = 5)
+    {
+        var now = DateTime.Now;
+
+        var reservations = await _repository.GetUpcomingReservationsAsync( now, limit);
+
+        var list = reservations.Select(r => new
         {
-            _repository = repository;
-        }
+            id = r.Id,
+            place = r.Place?.Name,
+            user = r.User != null ? $"{r.User.Name} {r.User.LastName}" : null,
+            date = r.Date.ToString("yyyy-MM-dd"),
+            time = r.Date.ToString("HH:mm")
+        });
 
-        public async Task<object> ExecuteAsync(int consortiumId, int limit = 5)
+        return new
         {
-            var now = DateTime.UtcNow;
-
-            var reservations = await _repository.GetUpcomingReservationsAsync(consortiumId, now, limit);
-
-            var list = reservations.Select(r => new
-            {
-                id = r.Id,
-                place = r.Place?.Name,
-                user = r.User != null ? $"{r.User.Name} {r.User.LastName}" : null,
-                date = r.Date.ToString("yyyy-MM-dd"),
-                time = r.Date.ToString("HH:mm")
-            });
-
-            return new
-            {
-                consortiumId,
-                generatedAt = now.ToString("yyyy-MM-dd HH:mm:ss"),
-                upcomingReservations = list
-            };
-        }
+            generatedAt = now.ToString("yyyy-MM-dd HH:mm:ss"),
+            upcomingReservations = list
+        };
     }
 }

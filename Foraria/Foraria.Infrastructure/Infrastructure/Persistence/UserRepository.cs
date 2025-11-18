@@ -1,17 +1,21 @@
 ﻿using Foraria.Domain.Repository;
 using ForariaDomain;
+using ForariaDomain.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Foraria.Infrastructure.Persistence;
 
 public class UserRepository : IUserRepository
 {
     private readonly ForariaContext _context;
-    public UserRepository(ForariaContext context)
+    private readonly ITenantContext _tenantContext;
+    public UserRepository(ForariaContext context, ITenantContext tenantContext)
     {
         _context = context;
+        _tenantContext = tenantContext;
     }
 
     public async Task<User?> GetByEmail(string email)
@@ -36,10 +40,13 @@ public class UserRepository : IUserRepository
 
     public Task<User?> GetById(int id)
     {
-        return _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        return _context.Users.Include(u => u.Role).Include(u => u.Residences).FirstOrDefaultAsync(u => u.Id == id);
     }
 
-
+    public async Task<User?> GetByIdAsync(int id)
+    {
+        return await _context.Users.Include(u => u.Role).Include(u => u.Residences).FirstOrDefaultAsync(u => u.Id == id);
+    }
 
     public async Task<User?> GetByEmailWithRole(string email)
     {
@@ -47,15 +54,16 @@ public class UserRepository : IUserRepository
             .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Mail == email);
     }
-    public async Task<int> GetTotalUsersAsync(int? consortiumId = null)
+    public async Task<int> GetTotalUsersAsync()
     {
         var query = _context.Users.AsQueryable();
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
 
-        if (consortiumId.HasValue)
+        if (consortiumId > 0)
         {
             query = query
                 .Include(u => u.Residences)
-                .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId.Value));
+                .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId));
         }
 
         return await query.CountAsync();
@@ -75,25 +83,34 @@ public class UserRepository : IUserRepository
 
     public async Task<int> GetAllInNumber()
     {
-        return await _context.Users.CountAsync();
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
+        return await _context.Users.Include(u => u.Residences)
+            .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId)).CountAsync();
     }
 
-    public async Task<int> GetTotalUsersByTenantIdAsync(int idConsortium)
+    public async Task<int> GetTotalUsersByTenantIdAsync()
     {
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
         return await _context.Users
-            .Where(u => u.Role.Description == "Inquilino" && u.Residences.Any(r => r.ConsortiumId == idConsortium))
+            .Where(u => u.Role.Description == "Inquilino" && u.Residences.Any(r => r.ConsortiumId == consortiumId))
             .CountAsync();
     }
 
-    public async Task<int> GetTotalOwnerUsersAsync(int idConsortium)
+    public async Task<int> GetTotalOwnerUsersAsync()
     {
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
         return await _context.Users
-            .Where(u => u.Role.Description == "Propietario" && u.Residences.Any(r => r.ConsortiumId == idConsortium))
+            .Where(u => u.Role.Description == "Propietario" && u.Residences.Any(r => r.ConsortiumId == consortiumId))
             .CountAsync();
     }
 
-    public async Task<List<User>> GetUsersByConsortiumIdAsync(int consortiumId)
+    public async Task<List<User>> GetUsersByConsortiumIdAsync()
     {
+        var consortiumId = _tenantContext.GetCurrentConsortiumId();
+
         return await _context.Users
             .Include(u => u.Role)
             .Include(u => u.Residences)
@@ -111,4 +128,58 @@ public class UserRepository : IUserRepository
                 u.Residences.Any(r => r.Id == residenceId));
     }
 
+    public List<int> GetConsortiumIdsByUserId(int userId)
+    {
+        var user = _context.Users
+            .Include(u => u.Residences)
+            .Include(u => u.Role)
+            .FirstOrDefault(u => u.Id == userId);
+
+        if (user == null)
+            return new List<int>();
+
+        var consortiumIds = new List<int>();
+
+        if (user.Role.Description == "Administrador")
+        {
+            var adminConsortiumIds = _context.Consortium
+                .Where(c => c.AdministratorId == userId)
+                .Select(c => c.Id)
+                .ToList(); 
+
+            if (adminConsortiumIds.Any())
+                consortiumIds.AddRange(adminConsortiumIds); 
+        }
+
+        if (user.Residences != null && user.Residences.Any())
+        {
+            consortiumIds.AddRange(
+                user.Residences
+                    .Where(r => r != null)
+                    .Select(r => r.ConsortiumId)
+            );
+        }
+
+        return consortiumIds.Distinct().ToList();
+    }
+
+    public async Task<User?> GetByEmailWithoutFilters(string email)
+    {
+        return await _context.Users
+            .IgnoreQueryFilters() 
+            .Include(u => u.Residences)
+                .ThenInclude(r => r.Consortium)
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Mail == email);
+    }
+
+    public async Task<User?> GetByIdWithoutFilters(int id)
+    {
+        return await _context.Users
+            .IgnoreQueryFilters()
+            .Include(u => u.Role)
+            .Include(u => u.Residences)
+                .ThenInclude(r => r.Consortium)
+            .FirstOrDefaultAsync(u => u.Id == id);
+    }
 }

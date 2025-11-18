@@ -1,10 +1,6 @@
 ﻿using ForariaDomain.Repository;
 using ForariaDomain.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ForariaDomain.Application.UseCase;
 
@@ -19,9 +15,9 @@ public class GetSupplierContractById
         _expirationService = expirationService;
     }
 
-    public SupplierContract? Execute(int contractId)
+    public async Task<SupplierContract?> Execute(int contractId)
     {
-        var contract = _contractRepository.GetById(contractId);
+        var contract = await _contractRepository.GetById(contractId);
 
         if (contract == null)
             return null;

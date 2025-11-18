@@ -1,12 +1,11 @@
 ﻿using Foraria.Domain.Repository;
-using ForariaDomain;
 using ForariaDomain.Repository;
 
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface IGetAllResidencesByConsortium
 {
-    Task<GetAllResidencesByConsortiumResult> ExecuteAsync(int consortiumId);
+    Task<GetAllResidencesByConsortiumResult> ExecuteAsync();
 }
 
 public class GetAllResidencesByConsortiumResult
@@ -19,36 +18,15 @@ public class GetAllResidencesByConsortiumResult
 public class GetAllResidencesByConsortium : IGetAllResidencesByConsortium
 {
     private readonly IResidenceRepository _residenceRepository;
-    private readonly IConsortiumRepository _consortiumRepository;
 
-    public GetAllResidencesByConsortium(IResidenceRepository residenceRepository, IConsortiumRepository consortiumRepository)
+    public GetAllResidencesByConsortium(IResidenceRepository residenceRepository)
     {
         _residenceRepository = residenceRepository;
-        _consortiumRepository = consortiumRepository;
     }
 
-    public async Task<GetAllResidencesByConsortiumResult> ExecuteAsync(int consortiumId)
+    public async Task<GetAllResidencesByConsortiumResult> ExecuteAsync()
     {
-        if (consortiumId <= 0)
-        {
-            return new GetAllResidencesByConsortiumResult
-            {
-                Success = false,
-                Message = "El ID del consorcio debe ser mayor a 0"
-            };
-        }
-
-        var consortiumExists = await _consortiumRepository.FindById(consortiumId);
-        if (consortiumExists == null)
-        {
-            return new GetAllResidencesByConsortiumResult
-            {
-                Success = false,
-                Message = $"El consorcio con ID {consortiumId} no existe"
-            };
-        }
-
-        var residences = await _residenceRepository.GetResidenceByConsortiumIdAsync(consortiumId);
+        var residences = await _residenceRepository.GetResidencesAsync();
 
         if (residences == null || !residences.Any())
         {

@@ -1,39 +1,30 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+using ForariaDomain.Exceptions;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class CloseThread
 {
-    public class CloseThread
+    private readonly IThreadRepository _repository;
+
+    public CloseThread(IThreadRepository repository)
     {
-        private readonly IThreadRepository _repository;
+        _repository = repository;
+    }
 
-        public CloseThread(IThreadRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task<ForariaDomain.Thread> ExecuteAsync(int id)
+    {
+        var thread = await _repository.GetById(id)
+                   ?? throw new NotFoundException($"No se encontró el hilo con ID {id}");
 
-        public async Task<ThreadDto> ExecuteAsync(int id)
-        {
-            var thread = await _repository.GetById(id);
-            if (thread == null)
-                throw new InvalidOperationException($"No se encontró el thread con ID {id}");
+        if (thread.State == "Closed")
+            throw new ThreadLockedException("El hilo ya se encuentra cerrado.");
 
-            if (thread.State == "Closed")
-                throw new InvalidOperationException("El thread ya se encuentra cerrado.");
+        thread.State = "Closed";
+        thread.UpdatedAt = DateTime.Now;
 
-            thread.State = "Closed";
-            await _repository.UpdateAsync(thread);
+        await _repository.UpdateAsync(thread);
 
-            return new ThreadDto
-            {
-                Id = thread.Id,
-                Theme = thread.Theme,
-                Description = thread.Description,
-                CreatedAt = thread.CreatedAt,
-                State = thread.State,
-                UserId = thread.UserId,
-                ForumId = thread.ForumId
-            };
-        }
+        return thread;
     }
 }

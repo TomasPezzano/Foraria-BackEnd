@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain.Repository;
+﻿using Foraria.Domain.Repository;
 
 namespace ForariaDomain.Application.UseCase;
-
 public interface ICreateReserve
 {
     Task<Reserve> Execute(Reserve reserve);
@@ -25,8 +17,16 @@ public class CreateReserve : ICreateReserve
     public async Task<Reserve> Execute(Reserve reserve)
     {
 
+        var obtainedReserve = await _reserveRepository.getReserveByPlaceAndCreatedAt(reserve.CreatedAt, reserve.Place_id);
+        if(obtainedReserve != null) {
+            if(reserve.CreatedAt == obtainedReserve.CreatedAt && reserve.Place_id == obtainedReserve.Place_id)
+            {
+                return null;
+            }
+        }
+
+        reserve.Date = DateTime.Now;
         reserve.DeletedAt = reserve.CreatedAt.AddHours(1);
-        reserve.Date = DateTime.UtcNow;
         await _reserveRepository.Add(reserve);
         return reserve;
     }

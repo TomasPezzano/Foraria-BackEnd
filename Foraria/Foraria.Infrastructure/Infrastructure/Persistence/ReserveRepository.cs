@@ -14,8 +14,7 @@ namespace Foraria.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Reserve>> GetUpcomingReservationsAsync(
-                    int consortiumId, DateTime fromDate, int limit = 5)
+        public async Task<IEnumerable<Reserve>> GetUpcomingReservationsAsync(DateTime fromDate, int limit = 5)
         {
             return await _context.Reserves
                 .Include(r => r.Residence)
@@ -23,7 +22,6 @@ namespace Foraria.Infrastructure.Repository
                 .Include(r => r.User)
                 .Include(r => r.Place)
                 .Where(r =>
-                    r.Residence.Consortium.Id == consortiumId &&
                     r.Date >= fromDate &&
                     r.State == "Confirmed") //open?
                 .OrderBy(r => r.Date)
@@ -39,7 +37,15 @@ namespace Foraria.Infrastructure.Repository
 
         public async Task<List<Reserve>> GetAll()
         {
-            return await _context.Reserves.ToListAsync();
+            return await _context.Reserves
+                .ToListAsync();
+        }
+
+        public async Task<List<Reserve>> GetAllInConsortium()
+        {
+            return await _context.Reserves
+                .Include(r => r.Place)
+                .ToListAsync();
         }
 
         public async Task UpdateRange(List<Reserve> reserves)
@@ -48,18 +54,21 @@ namespace Foraria.Infrastructure.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Reserve>> GetActiveReservationsAsync(int consortiumId, DateTime now)
+        public async Task<IEnumerable<Reserve>> GetActiveReservationsAsync(DateTime now)
         {
             return await _context.Reserves
                 .Include(r => r.Place)
                 .Include(r => r.User)
                 .Include(r => r.Residence)
-                .Where(r =>
-                    r.Residence.ConsortiumId == consortiumId &&
-                    r.State == "active" &&             // activa/Active(?)
+                .Where(r =>  r.State == "active" &&            
                     r.DeletedAt == null &&
                     r.Date >= now)
                 .ToListAsync();
+        }
+
+        public async Task<Reserve> getReserveByPlaceAndCreatedAt(DateTime createdAt, int place_id)
+        {
+            return await _context.Reserves.Where(r=> r.CreatedAt == createdAt && r.Place_id == place_id ).FirstOrDefaultAsync();
         }
     }
 }

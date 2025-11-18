@@ -1,15 +1,13 @@
 ﻿using Foraria.Domain.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ForariaDomain.Application.UseCase;
 
 public interface IGetUserByEmail
 {
     Task<User> Execute(string email);
+    Task<User?> ExecuteWithoutFilters(string email); 
+
 }
 
 public class GetUserByEmail : IGetUserByEmail
@@ -28,5 +26,9 @@ public class GetUserByEmail : IGetUserByEmail
         if (user is null)
             throw new InvalidOperationException($"User with email '{email}' not found.");
         return user;
+    }
+    public async Task<User?> ExecuteWithoutFilters(string email)
+    {
+        return await _userRepository.GetByEmailWithoutFilters(email);
     }
 }

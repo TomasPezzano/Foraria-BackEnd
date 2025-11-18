@@ -1,52 +1,31 @@
-﻿using Foraria.Contracts.DTOs;
-using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain.Repository;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ForariaDomain.Application.UseCase;
 
 public interface IGetUsersByConsortium
 {
-    Task<List<User>> ExecuteAsync(int consortiumId);
+    Task<List<User>> ExecuteAsync();
 }
 
 public class GetUsersByConsortium : IGetUsersByConsortium
 {
     private readonly IUserRepository _userRepository;
-    private readonly IConsortiumRepository _consortiumRepository;
 
-    public GetUsersByConsortium(
-        IUserRepository userRepository,
-        IConsortiumRepository consortiumRepository)
+    public GetUsersByConsortium(IUserRepository userRepository)
     {
         _userRepository = userRepository;
-        _consortiumRepository = consortiumRepository;
     }
 
-    public async Task<List<User>> ExecuteAsync(int consortiumId)
+    public async Task<List<User>> ExecuteAsync()
     {
-        if (consortiumId <= 0)
-        {
-            throw new ArgumentException("El ID del consorcio debe ser mayor a 0.", nameof(consortiumId));
-        }
-
-        var consortium = await _consortiumRepository.FindById(consortiumId);
-        if (consortium == null)
-        {
-            throw new KeyNotFoundException($"El consorcio con ID {consortiumId} no existe.");
-        }
-
-        var users = await _userRepository.GetUsersByConsortiumIdAsync(consortiumId);
+        var users = await _userRepository.GetUsersByConsortiumIdAsync();
 
         if (users.IsNullOrEmpty())
         {
-            throw new KeyNotFoundException($"El consorcio con ID {consortiumId} no tiene usuarios asignados");
+            return new List<User>(); 
         }
 
         return users;

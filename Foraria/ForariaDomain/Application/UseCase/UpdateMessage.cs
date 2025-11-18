@@ -1,55 +1,54 @@
 ﻿using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
 using ForariaDomain.Exceptions;
-using ForariaDomain.Repository;
 
-namespace Foraria.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class UpdateMessage
 {
-    public class UpdateMessage
+    private readonly IMessageRepository _messageRepository;
+    private readonly IUserRepository _userRepository;
+
+    public UpdateMessage(IMessageRepository messageRepository, IUserRepository userRepository)
     {
-        private readonly IMessageRepository _messageRepository;
-        private readonly IUserRepository _userRepository;
+        _messageRepository = messageRepository;
+        _userRepository = userRepository;
+    }
 
-        public UpdateMessage(IMessageRepository messageRepository, IUserRepository userRepository)
-        {
-            _messageRepository = messageRepository;
-            _userRepository = userRepository;
-        }
+    public async Task<Message> ExecuteAsync(Message editedMessage, int userId)
+    {
+        var user = await _userRepository.GetById(userId)
+              ?? throw new NotFoundException($"No se encontró el usuario con id {userId}");
 
-        public async Task<Message> ExecuteAsync(int messageId, UpdateMessageRequest request)
-        {
-            var user = await _userRepository.GetById(request.UserId)
-                ?? throw new NotFoundException($"No se encontró el usuario con id {request.UserId}");
+        var existingMessage = await _messageRepository.GetById(editedMessage.Id)
+            ?? throw new NotFoundException($"No se encontró el mensaje con id {editedMessage.Id}");
 
-            var message = await _messageRepository.GetById(messageId)
-                ?? throw new NotFoundException($"No se encontró el mensaje con id {messageId}");
+        if (existingMessage.IsDeleted)
+            throw new InvalidOperationException("No se puede editar un mensaje eliminado.");
 
-            if (message.IsDeleted)
-                throw new InvalidOperationException("No se puede editar un mensaje eliminado.");
+        var isOwner = existingMessage.User_id == user.Id;
+        var roleName = user.Role.Description.ToLower();
+        var isAdminOrConsortium = roleName == "admin" || roleName == "consorcio";
 
-            var isOwner = message.User_id == user.Id;
-            var roleName = user.Role.Description.ToLower();
-            var isAdminOrConsortium = roleName == "admin" || roleName == "consorcio";
+        var minutesSinceCreation = (DateTime.Now - existingMessage.CreatedAt).TotalMinutes;
 
-            var minutesSinceCreation = (DateTime.UtcNow - message.CreatedAt).TotalMinutes;
-            if (isOwner && !isAdminOrConsortium && minutesSinceCreation > 15)
-                throw new ForbiddenAccessException("Solo puedes editar tu mensaje dentro de los primeros 15 minutos.");
+        if (isOwner && !isAdminOrConsortium && minutesSinceCreation > 15)
+            throw new ForbiddenAccessException("Solo puedes editar tu mensaje dentro de los primeros 15 minutos.");
 
-            if (!isOwner && !isAdminOrConsortium)
-                throw new ForbiddenAccessException("No tienes permisos para editar este mensaje.");
+        if (!isOwner && !isAdminOrConsortium)
+            throw new ForbiddenAccessException("No tienes permisos para editar este mensaje.");
 
-            if (!string.IsNullOrWhiteSpace(request.Content))
-                message.Content = request.Content;
+ 
+        if (!string.IsNullOrWhiteSpace(editedMessage.Content))
+            existingMessage.Content = editedMessage.Content;
 
-            if (!string.IsNullOrEmpty(request.FilePathToUpdate))
-                message.optionalFile = request.FilePathToUpdate;
+        if (!string.IsNullOrEmpty(editedMessage.optionalFile))
+            existingMessage.optionalFile = editedMessage.optionalFile;
 
-            message.UpdatedAt = DateTime.UtcNow;
-            await _messageRepository.Update(message);
+        existingMessage.UpdatedAt = DateTime.Now;
 
-            return message;
-        }
+        await _messageRepository.Update(existingMessage);
+
+        return existingMessage;
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Foraria.Domain.Model;
 
-namespace Foraria.Domain.Repository
+public interface IBlockchainProofRepository
 {
-    public interface IBlockchainProofRepository
-    {
-        Task<BlockchainProof> AddAsync(BlockchainProof proof);
-        Task<BlockchainProof?> GetByPollIdAsync(int pollId);
-        Task<BlockchainProof?> GetByDocumentIdAsync(Guid documentId);
-        Task<BlockchainProof?> GetByHashAsync(string hashHex);
-    }
+    BlockchainProof Add(BlockchainProof proof);
+    Task<BlockchainProof?> GetByPollIdAsync(int pollId);
+    Task<BlockchainProof?> GetByDocumentIdAsync(Guid documentId);
+    Task<BlockchainProof?> GetByHashAsync(string hashHex);
+    Task<BlockchainProof?> GetByCallTranscriptIdAsync(int callTranscriptId);
+    Task<BlockchainProof?> GetByHashHexAsync(string hashHex);
+
 }

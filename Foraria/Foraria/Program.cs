@@ -1,5 +1,6 @@
 ﻿using foraria.application.usecase;
 using Foraria;
+using Foraria.Application.Services;
 using Foraria.Application.UseCase;
 using Foraria.Domain.Repository;
 using Foraria.Domain.Repository.Foraria.Domain.Repository;
@@ -7,14 +8,18 @@ using Foraria.Domain.Service;
 using Foraria.Hubs;
 using Foraria.Infrastructure.Blockchain;
 using Foraria.Infrastructure.Email;
+using Foraria.Infrastructure.Infrastructure.Notifications;
 using Foraria.Infrastructure.Infrastructure.Persistence;
+using Foraria.Infrastructure.Infrastructure.Persistence.Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Infrastructure.Services;
 using Foraria.Infrastructure.Persistence;
 using Foraria.Infrastructure.Repository;
 using Foraria.SignalRImplementation;
 using ForariaDomain.Aplication.Configuration;
 using ForariaDomain.Application.UseCase;
+using ForariaDomain.Application.UseCase.Foraria.Application.UseCase;
 using ForariaDomain.Repository;
+using ForariaDomain.Repository.ForariaDomain.Repository;
 using ForariaDomain.Services;
 using MercadoPago.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -35,17 +40,18 @@ builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
 // Add services to the container.
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
 builder.Services.AddScoped<IRegisterUser, RegisterUser>();
 builder.Services.AddScoped<IGeneratePassword, GeneratePassword>();
-builder.Services.AddScoped<IPasswordHash, PasswordHash>();
+builder.Services.AddScoped<IPasswordHash, HashPassword>();
 builder.Services.AddScoped<ISendEmail, SmtpEmailService>();
 builder.Services.AddScoped<ICreateResidence, CreateResidence>();
-builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<IJwtTokenGenerator, GenerateJwtToken>();
 builder.Services.AddScoped<ILoginUser, LoginUser>();
 builder.Services.AddScoped<ILogoutUser, LogoutUser>();
 builder.Services.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
@@ -131,9 +137,9 @@ builder.Services.AddScoped<IGetResponsibleSectorById, GetResponsibleSectorById>(
 builder.Services.AddScoped<IGetClaimById, GetClaimById>();
 builder.Services.AddScoped<GetForumWithCategory>();
 builder.Services.AddScoped<GetThreadCommentCount>();
-builder.Services.AddScoped<IOcrService, AzureOcrService>();
+builder.Services.AddScoped<IOcrService, OcrService>();
 builder.Services.AddScoped<IProcessInvoiceOcr, ProcessInvoiceOcr>();
-builder.Services.AddScoped<IFileProcessor, FileProcessor>();
+builder.Services.AddScoped<IFileProcessor, ProcessFile>();
 builder.Services.AddScoped<IGetPlaceById, GetPlaceById>();
 builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
 builder.Services.AddScoped<GetActiveReserveCount>();
@@ -144,7 +150,7 @@ builder.Services.AddScoped<IGetConsortiumById, GetConsortiumById>();
 builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IPaymentGateway, MercadoPagoService>();
+builder.Services.AddScoped<IPaymentService, MercadoPagoService>();
 builder.Services.AddScoped<CreatePreferenceMP>();
 builder.Services.AddScoped<ProcessWebHookMP>();
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
@@ -168,11 +174,44 @@ builder.Services.AddScoped<UpdatePoll>();
 builder.Services.AddScoped<ChangePollState>();
 builder.Services.AddScoped<GetUserDocumentsByCategory>();
 builder.Services.AddScoped<GetUserDocumentStats>();
-builder.Services.AddScoped<IPasswordResetTokenGenerator, PasswordResetTokenGenerator>();
+builder.Services.AddScoped<IPasswordResetTokenGenerator, ResetTokenGeneratorPassword>();
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IForgotPassword, ForgotPassword>();
 builder.Services.AddScoped<IResetPassword, ResetPassword>();
-
+builder.Services.AddScoped<ICallRepository, CallRepository>();
+builder.Services.AddScoped<ICallParticipantRepository, CallParticipantRepository>();
+builder.Services.AddScoped<ICallTranscriptRepository, CallTranscriptRepository>();
+builder.Services.AddScoped<CreateCall>();
+builder.Services.AddScoped<EndCall>();
+builder.Services.AddScoped<JoinCall>();
+builder.Services.AddScoped<FinalizeCallTranscriptionAndNotarize>();
+builder.Services.AddScoped<RegisterTranscriptionResult>();
+builder.Services.AddScoped<VerifyTranscriptIntegrity>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<GetCallDetails>();
+builder.Services.AddScoped<GetCallParticipants>();
+builder.Services.AddScoped<GetCallMessages>();
+builder.Services.AddScoped<ToggleMute>();
+builder.Services.AddScoped<ToggleCamera>();
+builder.Services.AddScoped<LeaveCall>();
+builder.Services.AddScoped<SaveCallMessage>();
+builder.Services.AddScoped<SaveCallRecording>();
+builder.Services.AddScoped<GetCallRecordings>();
+builder.Services.AddScoped<ICallMessageRepository, CallMessageRepository>();
+builder.Services.AddScoped<ICallRecordingRepository, CallRecordingRepository>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationPreferenceRepository, NotificationPreferenceRepository>();
+builder.Services.AddScoped<IFcmPushNotificationService, FcmPushNotificationService>();
+builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+builder.Services.AddScoped<ISendExpenseReminderNotification, SendExpenseReminderNotification>();
+builder.Services.AddScoped<IConfigureNotificationPreferences, ConfigureNotificationPreferences>();
+builder.Services.AddHostedService<ExpenseReminderBackgroundService>();
+builder.Services.AddScoped<IGetActiveContractsSupplierCount, GetActiveContractsSupplierCount>();
+builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
+builder.Services.AddScoped<ISelectConsortium, SelectConsortium>();
+builder.Services.AddScoped<IAssignConsortiumToAdmin, AssignConsortiumToAdmin>();
+builder.Services.AddScoped<IGetUserConsortiums, GetUserConsortiums>();
 
 builder.Services.AddCors(options =>
 {
@@ -267,6 +306,11 @@ builder.Services.AddAuthorization(options =>
         }));
 });
 
+builder.Services.AddHttpClient("TranscriptionService", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["TranscriptionService:BaseUrl"]);
+});
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -310,9 +354,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddDbContext<ForariaContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"))
-);
+builder.Services.AddDbContext<ForariaContext>((serviceProvider, options) =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ForariaConnection"));
+});
 
 builder.Services.AddScoped<IPollRepository, PollRepositoryImplementation>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -352,6 +399,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.MapHub<PollHub>("/pollHub");
+app.MapHub<CallHub>("/callHub");
 
 app.UseHttpsRedirection();
 

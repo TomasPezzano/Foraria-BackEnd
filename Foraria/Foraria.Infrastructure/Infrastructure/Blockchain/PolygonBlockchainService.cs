@@ -15,6 +15,7 @@ using Nethereum.JsonRpc.Client;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
+using ForariaDomain.Models;
 
 namespace Foraria.Infrastructure.Blockchain
 {
@@ -26,6 +27,7 @@ namespace Foraria.Infrastructure.Blockchain
         private readonly string _abi;
         private readonly Web3 _web3;
         private readonly Account _account;
+        public string ContractAddress => _contractAddress;
 
 
 
@@ -152,7 +154,7 @@ namespace Foraria.Infrastructure.Blockchain
 
             var hashBytes32 = hashHex.HexToByteArray();
 
-            var record = await getRecord.CallDeserializingToObjectAsync<RecordDto>(hashBytes32);
+            var record = await getRecord.CallDeserializingToObjectAsync<RecordResult>(hashBytes32);
 
             if (record == null || record.Timestamp == 0)
                 return false;

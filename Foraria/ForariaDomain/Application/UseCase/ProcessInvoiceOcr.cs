@@ -30,7 +30,7 @@ public class ProcessInvoiceOcr : IProcessInvoiceOcr
             file.Length
         );
 
-        var startTime = DateTime.UtcNow;
+        var startTime = DateTime.Now;
 
         try
         {
@@ -49,7 +49,7 @@ public class ProcessInvoiceOcr : IProcessInvoiceOcr
             using var stream = file.OpenReadStream();
             result.FilePath = await _fileStorageService.SaveInvoiceFileAsync(stream, file.FileName);
 
-            var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
+            var processingTime = (DateTime.Now - startTime).TotalMilliseconds;
 
             _logger.LogInformation(
                 "Factura procesada exitosamente en {ProcessingTime}ms. " +
@@ -68,7 +68,7 @@ public class ProcessInvoiceOcr : IProcessInvoiceOcr
         }
         catch (Exception ex)
         {
-            var processingTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
+            var processingTime = (DateTime.Now - startTime).TotalMilliseconds;
             _logger.LogError(
                 ex,
                 "Excepción al procesar factura {FileName} después de {ProcessingTime}ms",

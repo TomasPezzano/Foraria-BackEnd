@@ -1,5 +1,4 @@
-﻿using Foraria.Application.UseCase;
-using Foraria.Domain.Repository;
+﻿using Foraria.Domain.Repository;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
@@ -70,7 +69,7 @@ public class ResetPasswordUseCaseTests
             Token = token,
             UserId = 1,
             IsUsed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(-1), // Expired 1 minute ago
+            ExpiresAt = DateTime.Now.AddMinutes(-1), // Expired 1 minute ago
             User = new User
             {
                 Id = 1,
@@ -109,8 +108,8 @@ public class ResetPasswordUseCaseTests
             Token = token,
             UserId = 1,
             IsUsed = true,
-            UsedAt = DateTime.UtcNow.AddMinutes(-5),
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10), // Still valid time-wise
+            UsedAt = DateTime.Now.AddMinutes(-5),
+            ExpiresAt = DateTime.Now.AddMinutes(10), // Still valid time-wise
             User = new User
             {
                 Id = 1,
@@ -151,7 +150,7 @@ public class ResetPasswordUseCaseTests
             Token = token,
             UserId = 1,
             IsUsed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            ExpiresAt = DateTime.Now.AddMinutes(10),
             User = new User
             {
                 Id = 1,
@@ -204,7 +203,7 @@ public class ResetPasswordUseCaseTests
             Token = token,
             UserId = 1,
             IsUsed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            ExpiresAt = DateTime.Now.AddMinutes(10),
             User = user
         };
 
@@ -213,7 +212,7 @@ public class ResetPasswordUseCaseTests
             .ReturnsAsync(resetToken);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(validPassword))
+            .Setup(x => x.Execute(validPassword))
             .Returns(hashedPassword);
 
         // Act
@@ -252,7 +251,7 @@ public class ResetPasswordUseCaseTests
             Token = token,
             UserId = 1,
             IsUsed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            ExpiresAt = DateTime.Now.AddMinutes(10),
             User = user
         };
 
@@ -261,7 +260,7 @@ public class ResetPasswordUseCaseTests
             .ReturnsAsync(resetToken);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(newPassword))
+            .Setup(x => x.Execute(newPassword))
             .Returns("hashed-password");
 
         // Act
@@ -303,7 +302,7 @@ public class ResetPasswordUseCaseTests
             Token = token,
             UserId = 1,
             IsUsed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            ExpiresAt = DateTime.Now.AddMinutes(10),
             User = user
         };
 
@@ -312,7 +311,7 @@ public class ResetPasswordUseCaseTests
             .ReturnsAsync(resetToken);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(newPassword))
+            .Setup(x => x.Execute(newPassword))
             .Returns("hashed-password");
 
         // Act
@@ -348,7 +347,7 @@ public class ResetPasswordUseCaseTests
             Token = token,
             UserId = 1,
             IsUsed = false,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            ExpiresAt = DateTime.Now.AddMinutes(10),
             User = user
         };
 
@@ -357,7 +356,7 @@ public class ResetPasswordUseCaseTests
             .ReturnsAsync(resetToken);
 
         _passwordHashMock
-            .Setup(x => x.HashPassword(newPassword))
+            .Setup(x => x.Execute(newPassword))
             .Returns("hashed-password");
 
         _userRepositoryMock

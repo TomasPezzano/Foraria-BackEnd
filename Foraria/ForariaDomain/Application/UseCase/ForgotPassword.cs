@@ -53,7 +53,7 @@ public class ForgotPassword : IForgotPassword
         foreach (var token in activeTokens)
         {
             token.IsUsed = true;
-            token.UsedAt = DateTime.UtcNow;
+            token.UsedAt = DateTime.Now;
             await _passwordResetTokenRepository.Update(token);
         }
 
@@ -63,8 +63,8 @@ public class ForgotPassword : IForgotPassword
         {
             UserId = user.Id,
             Token = resetToken,
-            CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            CreatedAt = DateTime.Now,
+            ExpiresAt = DateTime.Now.AddMinutes(15),
             IsUsed = false,
             CreatedByIp = ipAddress
         };

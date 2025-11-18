@@ -1,9 +1,6 @@
 ﻿using Foraria.Domain.Repository;
-using Foraria.Interface.DTOs;
-using ForariaDomain;
 
-
-namespace Foraria.Application.UseCase;
+namespace ForariaDomain.Application.UseCase;
 
 public interface IUpdateUserFirstTime
 {
@@ -81,7 +78,7 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
         }
 
 
-        user.Password = _passwordHash.HashPassword(newPassword);
+        user.Password = _passwordHash.Execute(newPassword);
         user.RequiresPasswordChange = false;
 
         await _userRepository.Update(user);
@@ -111,8 +108,8 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
         {
             UserId = user.Id,
             Token = refreshToken,
-            CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            CreatedAt = DateTime.Now,
+            ExpiresAt = DateTime.Now.AddDays(7),
             CreatedByIp = ipAddress,
             IsRevoked = false
         };

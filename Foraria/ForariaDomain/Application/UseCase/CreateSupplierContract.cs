@@ -1,15 +1,13 @@
 ﻿using ForariaDomain.Repository;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ForariaDomain.Application.UseCase;
 
 public interface ICreateSupplierContract
 {
-    SupplierContract Execute(SupplierContract contract);
+    Task<SupplierContract> Execute(SupplierContract contract);
 }
 public class CreateSupplierContract : ICreateSupplierContract
 {
@@ -24,9 +22,9 @@ public class CreateSupplierContract : ICreateSupplierContract
         _supplierRepository = supplierRepository;
     }
 
-    public SupplierContract Execute(SupplierContract contract)
+    public async Task<SupplierContract> Execute(SupplierContract contract)
     {
-        var supplier = _supplierRepository.GetById(contract.SupplierId);
+        var supplier = await _supplierRepository.GetById(contract.SupplierId);
         if (supplier == null)
         {
             throw new ArgumentException($"El proveedor con ID {contract.SupplierId} no existe.");
@@ -42,12 +40,12 @@ public class CreateSupplierContract : ICreateSupplierContract
             throw new ArgumentException("La fecha de vencimiento debe ser posterior a la fecha de inicio.");
         }
 
-        if (contract.StartDate < DateTime.UtcNow.AddYears(-10))
+        if (contract.StartDate < DateTime.Now.AddYears(-10))
         {
             throw new ArgumentException("La fecha de inicio no puede ser mayor a 10 años en el pasado.");
         }
 
-        if (contract.EndDate < DateTime.UtcNow)
+        if (contract.EndDate < DateTime.Now)
         {
             throw new ArgumentException("No se puede crear un contrato con fecha de vencimiento en el pasado.");
         }
@@ -57,15 +55,16 @@ public class CreateSupplierContract : ICreateSupplierContract
             throw new ArgumentException("El monto mensual debe ser mayor a 0.");
         }
 
-        var existingContracts = _contractRepository.GetBySupplierId(contract.SupplierId);
+        var existingContracts = await _contractRepository.GetBySupplierId(contract.SupplierId);
         if (existingContracts.Any(c => c.Name.Equals(contract.Name, StringComparison.OrdinalIgnoreCase) && c.Active))
         {
             throw new InvalidOperationException($"Ya existe un contrato activo con el nombre '{contract.Name}' para este proveedor.");
         }
 
         contract.Active = true;
-        contract.CreatedAt = DateTime.UtcNow;
+        contract.CreatedAt = DateTime.Now;
 
-        return _contractRepository.Create(contract);
+        var created = await _contractRepository.Create(contract);
+        return created;
     }
 }

@@ -34,7 +34,7 @@ public class ExpenseDatailRepository : IExpenseDetailRepository
 
     public async Task<ICollection<ExpenseDetailByResidence>> GetExpenseDetailByResidence(int id)
     {
-        return await _context.ExpenseDetailByResidences.Where(ed => ed.ResidenceId == id).Include(e => e.Expense).ThenInclude(ex => ex.Invoices).ToListAsync();
+        return await _context.ExpenseDetailByResidences.Where(ed => ed.ResidenceId == id).Include(e => e.Expenses).ThenInclude(ex => ex.Invoices).ToListAsync();
         
     }
 
@@ -57,7 +57,7 @@ public class ExpenseDatailRepository : IExpenseDetailRepository
     public async Task<IEnumerable<ExpenseDetailByResidence>> GetUserExpenses(int userId)
     {
         return await _context.ExpenseDetailByResidences
-            .Include(e => e.Expense)
+            .Include(e => e.Expenses)
                 .ThenInclude(ex => ex.Invoices)
             .Include(e => e.Residence)
                 .ThenInclude(r => r.Users)

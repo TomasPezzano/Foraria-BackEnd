@@ -1,55 +1,53 @@
-﻿using Foraria.Contracts.DTOs;
-using Foraria.Domain.Repository;
+﻿using ForariaDomain.Models;
 using ForariaDomain.Repository;
 using ForariaDomain.Services;
 
-namespace ForariaDomain.Application.UseCase
+namespace ForariaDomain.Application.UseCase;
+
+public class CreatePreferenceMP
 {
-    public class CreatePreferenceMP
+    //private readonly IExpenseRepository _expenseRepository;
+    private readonly IExpenseDetailRepository _expenseDetailRepository;
+    private readonly IPaymentRepository _paymentRepository;
+    private readonly IPaymentService _paymentGateway;
+
+    public CreatePreferenceMP(
+       // IExpenseRepository expenseRepository,
+        IPaymentRepository paymentRepository,
+        IPaymentService paymentGateway,
+        IExpenseDetailRepository expenseDetailRepository)
     {
-        //private readonly IExpenseRepository _expenseRepository;
-        private readonly IExpenseDetailRepository _expenseDetailRepository;
-        private readonly IPaymentRepository _paymentRepository;
-        private readonly IPaymentGateway _paymentGateway;
+        //_expenseRepository = expenseRepository;
+        _paymentRepository = paymentRepository;
+        _paymentGateway = paymentGateway;
+        _expenseDetailRepository = expenseDetailRepository;
+    }
 
-        public CreatePreferenceMP(
-           // IExpenseRepository expenseRepository,
-            IPaymentRepository paymentRepository,
-            IPaymentGateway paymentGateway,
-            IExpenseDetailRepository expenseDetailRepository)
+    public async Task<CreatePreferenceResponse> ExecuteAsync(int expenseId, int residenceId)
+    {
+        var expense = await _expenseDetailRepository.GetExpenseDetailById(expenseId);
+
+        if (expense == null)
+            throw new Exception("Expense no encontrada.");
+
+        var amount = expense.TotalAmount;
+
+        var (preferenceId, initPoint) =
+            await _paymentGateway.CreatePreferenceAsync((decimal)amount, expenseId, residenceId);
+
+        var payment = new Payment
         {
-            //_expenseRepository = expenseRepository;
-            _paymentRepository = paymentRepository;
-            _paymentGateway = paymentGateway;
-            _expenseDetailRepository = expenseDetailRepository;
-        }
+            PreferenceId = preferenceId,
+            Date = DateTime.Now,
+            ExpenseDetailByResidenceId = expenseId,
+            ResidenceId = residenceId,
+            Status = "pending",
+            Amount = (decimal)amount
+        };
 
-        public async Task<CreatePreferenceResponse> ExecuteAsync(int expenseId, int residenceId)
-        {
-            var expense = await _expenseDetailRepository.GetExpenseDetailById(expenseId);
+        await _paymentRepository.AddAsync(payment);
+        await _paymentRepository.SaveChangesAsync();
 
-            if (expense == null)
-                throw new Exception("Expense no encontrada.");
-
-            var amount = expense.TotalAmount;
-
-            var (preferenceId, initPoint) =
-                await _paymentGateway.CreatePreferenceAsync((decimal)amount, expenseId, residenceId);
-
-            var payment = new Payment
-            {
-                PreferenceId = preferenceId,
-                Date = DateTime.UtcNow,
-                ExpenseDetailByResidenceId = expenseId,
-                ResidenceId = residenceId,
-                Status = "pending",
-                Amount = (decimal)amount
-            };
-
-            await _paymentRepository.AddAsync(payment);
-            await _paymentRepository.SaveChangesAsync();
-
-            return new CreatePreferenceResponse(preferenceId, initPoint);
-        }
+        return new CreatePreferenceResponse(preferenceId, initPoint);
     }
 }

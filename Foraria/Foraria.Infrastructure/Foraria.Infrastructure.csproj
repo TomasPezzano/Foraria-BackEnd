@@ -1,12 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <UserSecretsId>d76d1a7d-c729-4804-85f7-ad5da32e0a2a</UserSecretsId>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UserSecretsId>d76d1a7d-c729-4804-85f7-ad5da32e0a2a</UserSecretsId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Infrastructure\Storage\**" />
+		<EmbeddedResource Remove="Infrastructure\Storage\**" />
+		<None Remove="Infrastructure\Storage\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="Infrastructure\Blockchain\ForariaNotary.abi.json">
@@ -15,21 +21,17 @@
 		</Content>
 	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Infrastructure\Storage\ForumFiles\" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Azure.AI.DocumentIntelligence" Version="1.0.0" />
+		<PackageReference Include="FirebaseAdmin" Version="3.4.0" />
+		<PackageReference Include="Nethereum.Contracts" Version="5.0.0" />
+		<PackageReference Include="Nethereum.Hex" Version="5.0.0" />
+		<PackageReference Include="Nethereum.RPC" Version="5.0.0" />
+		<PackageReference Include="Nethereum.Web3" Version="5.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Azure.AI.DocumentIntelligence" Version="1.0.0" />
-    <PackageReference Include="Nethereum.Contracts" Version="5.0.0" />
-    <PackageReference Include="Nethereum.Hex" Version="5.0.0" />
-    <PackageReference Include="Nethereum.RPC" Version="5.0.0" />
-    <PackageReference Include="Nethereum.Web3" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Foraria.Contracts\Foraria.Contracts.csproj" />
-    <ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
-  </ItemGroup>
+	<ItemGroup> 
+		<ProjectReference Include="..\ForariaDomain\ForariaDomain.csproj" />
+	</ItemGroup>
 
 </Project>

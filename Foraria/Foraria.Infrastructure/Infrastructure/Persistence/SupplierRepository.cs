@@ -27,11 +27,11 @@ public class SupplierRepository : ISupplierRepository
         return supplier;
     }
 
-    public Supplier? GetById(int supplierId)
+    public async Task<Supplier?> GetById(int supplierId)
     {
-        return _context.Suppliers
+        return await _context.Suppliers
      .Include(s => s.Contracts)
-     .FirstOrDefault(s => s.Id == supplierId);
+     .FirstOrDefaultAsync(s => s.Id == supplierId);
     }
 
     public void Delete(int supplierId)
@@ -44,8 +44,8 @@ public class SupplierRepository : ISupplierRepository
         }
     }
 
-    public List<Supplier> GetAll()
+    public async Task<List<Supplier>> GetAll()
     {
-        return _context.Suppliers.ToList();
+        return await _context.Suppliers.ToListAsync();
     }
 }

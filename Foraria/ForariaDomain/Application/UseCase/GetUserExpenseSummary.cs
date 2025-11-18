@@ -13,10 +13,8 @@ namespace Foraria.Application.UseCase
 
         public async Task<object> ExecuteAsync(int userId)
         {
-            var now = DateTime.UtcNow;
-            var yearStart = new DateTime(now.Year, 1, 1);
+            var now = DateTime.Now;
 
-            // Trae todos los ExpenseDetails del usuario, con Expense incluido
             var userExpenses = await _repository.GetUserExpenses(userId);
 
             if (userExpenses == null || !userExpenses.Any())
@@ -29,21 +27,36 @@ namespace Foraria.Application.UseCase
                 };
             }
 
-            // 🟡 Total pendiente: suma de los ExpenseDetails con estado "Pending"
             var pendingExpenses = userExpenses
                 .Where(e => e.State == "Pending")
                 .ToList();
 
             var totalPending = pendingExpenses.Sum(e => e.TotalAmount);
 
-            // 🔴 Facturas vencidas: expensas pendientes cuya expensa general está vencida
-            var overdueInvoices = pendingExpenses
-                .Count(e => e.Expense != null && e.Expense.ExpirationDate < now);
+            var lastExpensesByMonth = userExpenses
+                .SelectMany(e => e.Expenses)               
+                .GroupBy(exp => new { exp.CreatedAt.Year, exp.CreatedAt.Month }) 
+                .Select(g => g.OrderByDescending(exp => exp.CreatedAt).First()) 
+                .OrderBy(exp => exp.CreatedAt)           
+                .ToList();
 
-            // 🟢 Total pagado este año: suma de expensas pagadas con Expense del año actual
+
+            var overdueInvoices = userExpenses
+                .Where(detail =>
+                    detail.State == "Pending" &&
+                    detail.Expenses.Any(exp =>
+                    lastExpensesByMonth.Contains(exp) &&
+                    exp.ExpirationDate < now))
+                .Count();
+
+
             var totalPaidThisYear = userExpenses
-                .Where(e => e.State == "Paid" && e.Expense.CreatedAt >= yearStart)
-                .Sum(e => e.TotalAmount);
+                .Where(detail =>
+                    detail.State == "Paid" &&
+                    detail.Expenses.Any(exp =>
+                    lastExpensesByMonth.Contains(exp) &&
+                    exp.CreatedAt.Year == now.Year)) 
+                .Sum(detail => detail.TotalAmount);
 
             return new
             {
