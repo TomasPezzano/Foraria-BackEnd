@@ -37,7 +37,7 @@ public class SendPollNotification : ISendPollNotification
             throw new KeyNotFoundException($"No se encontró la votación con ID {pollId}");
         }
 
-        var users = await _userRepository.GetUsersByConsortiumIdAsync();
+        var users = await _userRepository.GetUsersByConsortiumIdAsync(poll.ConsortiumId);
 
         var usersToNotify = users.Where(u =>
             u.Role.Description == "Propietario" ||
@@ -81,7 +81,7 @@ public class SendPollNotification : ISendPollNotification
             throw new KeyNotFoundException($"No se encontró la votación con ID {pollId}");
         }
 
-        var users = await _userRepository.GetUsersByConsortiumIdAsync();
+        var users = await _userRepository.GetUsersByConsortiumIdAsync(poll.ConsortiumId);
         var votes = await _voteRepository.GetVotesByPollIdAsync(pollId);
 
         var usersWhoVoted = votes.Select(v => v.User_id).ToHashSet();
@@ -132,7 +132,7 @@ public class SendPollNotification : ISendPollNotification
             throw new KeyNotFoundException($"No se encontró la votación con ID {pollId}");
         }
 
-        var users = await _userRepository.GetUsersByConsortiumIdAsync();
+        var users = await _userRepository.GetUsersByConsortiumIdAsync(poll.ConsortiumId);
 
         var usersToNotify = users.Where(u =>
             u.Role.Description == "Propietario" ||

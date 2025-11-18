@@ -159,6 +159,10 @@ namespace Foraria.Infrastructure.Persistence
                 modelBuilder.Entity<Claim>()
                     .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
                                          e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
+
+                modelBuilder.Entity<Call>()
+                   .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                        e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
             }
 
             modelBuilder.Entity<User>()
@@ -542,6 +546,17 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(c => c.ConsortiumId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Call>()
+                .HasOne(c => c.Consortium)
+                .WithMany(p => p.Calls)
+                .HasForeignKey(c => c.ConsortiumId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Thread>()
+                .HasOne(c => c.Consortium)
+                .WithMany(p => p.Threads)
+                .HasForeignKey(c => c.ConsortiumId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Índice para búsquedas por administrador
             modelBuilder.Entity<Consortium>()

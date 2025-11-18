@@ -21,4 +21,6 @@ public interface IUserRepository
     List<int> GetConsortiumIdsByUserId(int userId);
     Task<User?> GetByEmailWithoutFilters(string email);
     Task<User?> GetByIdWithoutFilters(int id);
+    Task<IEnumerable<User>> GetUsersByConsortiumIdAsync(int? consortiumId);
+
 }
