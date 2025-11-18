@@ -76,7 +76,7 @@ public class ClaimTests
             Archive = "claims/archivo.png",
             User_id = dto.User_id,
             ResidenceId = dto.ResidenceId,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.Now,
             State = "Nuevo",
             ConsortiumId = 9
         };

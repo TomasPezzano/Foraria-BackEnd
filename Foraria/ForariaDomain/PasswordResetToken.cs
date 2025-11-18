@@ -14,5 +14,5 @@ public class PasswordResetToken
 
     public User User { get; set; } = null!;
 
-    public bool IsValid => !IsUsed && DateTime.UtcNow < ExpiresAt;
+    public bool IsValid => !IsUsed && DateTime.Now < ExpiresAt;
 }

@@ -75,8 +75,8 @@ namespace Foraria.Controllers
                 Description = request.Description,
                 CategoryPoll_id = request.CategoryPollId,
                 User_id = request.UserId,
-                CreatedAt = DateTime.UtcNow,
-                DeletedAt = DateTime.UtcNow.AddDays(7),
+                CreatedAt = DateTime.Now,
+                DeletedAt = DateTime.Now.AddDays(7),
                 State = "Activa",
                 PollOptions = request.Options.Select(optionText => new PollOption
                 {
@@ -293,7 +293,7 @@ namespace Foraria.Controllers
             return Ok(new
             {
                 activePolls = count,
-                checkedAt = (dateTime ?? DateTime.UtcNow).ToString("yyyy-MM-dd HH:mm:ss")
+                checkedAt = (dateTime ?? DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")
             });
         }
 

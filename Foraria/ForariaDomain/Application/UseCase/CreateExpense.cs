@@ -87,7 +87,7 @@ public class CreateExpense : ICreateExpense
 
         foreach (var invoice in invoices)
         {
-            invoice.ExpenseId = expense.Id;
+            invoice.Expenses.Add(expense);
             await _invoiceRepository.UpdateInvoiceAsync(invoice);
         }
         

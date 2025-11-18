@@ -17,7 +17,7 @@ public class CreateCall
         var call = new Call
         {
             CreatedByUserId = userId,
-            StartedAt = DateTime.UtcNow
+            StartedAt = DateTime.Now
         };
 
         return _callRepo.Create(call);

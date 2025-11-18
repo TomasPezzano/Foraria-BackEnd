@@ -20,7 +20,7 @@ namespace ForariaTest.Unit.CallTests
             {
                 Id = callId,
                 CreatedByUserId = 1,
-                StartedAt = DateTime.UtcNow,
+                StartedAt = DateTime.Now,
                 Status = "Active"
             };
 
@@ -38,7 +38,7 @@ namespace ForariaTest.Unit.CallTests
             // Assert
             existingCall.Status.Should().Be("Ended");
             existingCall.EndedAt.Should().NotBeNull();
-            existingCall.EndedAt.Value.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
+            existingCall.EndedAt.Value.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(2));
 
             mockRepo.Verify(r => r.GetById(callId), Times.Once);
             mockRepo.Verify(r => r.Update(existingCall), Times.Once);

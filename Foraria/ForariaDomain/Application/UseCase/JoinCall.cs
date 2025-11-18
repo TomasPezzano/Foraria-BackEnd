@@ -27,7 +27,7 @@ public class JoinCall
         {
             CallId = callId,
             UserId = userId,
-            JoinedAt = DateTime.UtcNow
+            JoinedAt = DateTime.Now
         };
 
         _participantRepo.Add(participant);

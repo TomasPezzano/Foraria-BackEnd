@@ -30,7 +30,7 @@ public class UpdateMessage
         var roleName = user.Role.Description.ToLower();
         var isAdminOrConsortium = roleName == "admin" || roleName == "consorcio";
 
-        var minutesSinceCreation = (DateTime.UtcNow - existingMessage.CreatedAt).TotalMinutes;
+        var minutesSinceCreation = (DateTime.Now - existingMessage.CreatedAt).TotalMinutes;
 
         if (isOwner && !isAdminOrConsortium && minutesSinceCreation > 15)
             throw new ForbiddenAccessException("Solo puedes editar tu mensaje dentro de los primeros 15 minutos.");
@@ -45,7 +45,7 @@ public class UpdateMessage
         if (!string.IsNullOrEmpty(editedMessage.optionalFile))
             existingMessage.optionalFile = editedMessage.optionalFile;
 
-        existingMessage.UpdatedAt = DateTime.UtcNow;
+        existingMessage.UpdatedAt = DateTime.Now;
 
         await _messageRepository.Update(existingMessage);
 

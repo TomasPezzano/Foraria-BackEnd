@@ -42,8 +42,8 @@ namespace ForariaTest.Unit.Suppliers
                 ContractType = "Servicios",
                 Description = "Mantenimiento mensual",
                 MonthlyAmount = 15000,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddYears(1),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddYears(1),
                 SupplierId = 1
             };
 
@@ -79,8 +79,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Test",
                 MonthlyAmount = 10000,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddMonths(6),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMonths(6),
                 SupplierId = 999
             };
 
@@ -110,8 +110,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Test",
                 MonthlyAmount = 10000,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddMonths(6),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMonths(6),
                 SupplierId = 1
             };
 
@@ -136,8 +136,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Test",
                 MonthlyAmount = 10000,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddDays(-1),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(-1),
                 SupplierId = 1
             };
 
@@ -160,8 +160,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Test",
                 MonthlyAmount = 10000,
-                StartDate = DateTime.UtcNow.AddYears(-11),
-                EndDate = DateTime.UtcNow.AddYears(-10),
+                StartDate = DateTime.Now.AddYears(-11),
+                EndDate = DateTime.Now.AddYears(-10),
                 SupplierId = 1
             };
 
@@ -184,8 +184,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Test",
                 MonthlyAmount = -100,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddMonths(6),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMonths(6),
                 SupplierId = 1
             };
 
@@ -208,8 +208,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Test",
                 MonthlyAmount = 0,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddMonths(6),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMonths(6),
                 SupplierId = 1
             };
 
@@ -240,8 +240,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Duplicado",
                 MonthlyAmount = 10000,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddMonths(6),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMonths(6),
                 SupplierId = 1
             };
 
@@ -277,8 +277,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Duplicado",
                 MonthlyAmount = 10000,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddMonths(6),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMonths(6),
                 SupplierId = 1
             };
 
@@ -317,8 +317,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "CONTRATO TEST",
                 MonthlyAmount = 10000,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddMonths(6),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMonths(6),
                 SupplierId = 1
             };
 
@@ -349,8 +349,8 @@ namespace ForariaTest.Unit.Suppliers
             {
                 Name = "Contrato Test",
                 MonthlyAmount = 10000,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddMonths(6),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddMonths(6),
                 SupplierId = 1,
                 Active = false,
                 CreatedAt = DateTime.MinValue
@@ -371,8 +371,8 @@ namespace ForariaTest.Unit.Suppliers
             Assert.NotEqual(DateTime.MinValue, result.CreatedAt);
 
             // margen razonable
-            Assert.True(result.CreatedAt <= DateTime.UtcNow);
-            Assert.True(result.CreatedAt >= DateTime.UtcNow.AddSeconds(-10));
+            Assert.True(result.CreatedAt <= DateTime.Now);
+            Assert.True(result.CreatedAt >= DateTime.Now.AddSeconds(-10));
         }
     }
 }

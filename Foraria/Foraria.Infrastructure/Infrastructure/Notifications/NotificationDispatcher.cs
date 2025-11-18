@@ -74,7 +74,7 @@ public class NotificationDispatcher : INotificationDispatcher
                 Body = body,
                 Channel = NotificationChannel.Push,
                 Status = "Skipped",
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 RelatedEntityId = relatedEntityId,
                 RelatedEntityType = relatedEntityType,
                 MetadataJson = metadata != null
@@ -93,7 +93,7 @@ public class NotificationDispatcher : INotificationDispatcher
             Body = body,
             Channel = NotificationChannel.Push,
             Status = NotificationStatus.Pending,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.Now,
             RelatedEntityId = relatedEntityId,
             RelatedEntityType = relatedEntityType,
             MetadataJson = metadata != null

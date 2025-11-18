@@ -28,7 +28,7 @@ public class SendExpenseReminderNotification : ISendExpenseReminderNotification
         {
             throw new KeyNotFoundException($"No se encontró la expensa con ID {expenseId}");
         }
-        var daysUntilExpiration = (expense.ExpirationDate - DateTime.UtcNow).Days;
+        var daysUntilExpiration = (expense.ExpirationDate - DateTime.Now).Days;
         if (daysUntilExpiration < 0 || daysUntilExpiration > 1)
         {
             return;

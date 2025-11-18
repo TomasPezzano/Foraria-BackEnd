@@ -48,7 +48,7 @@ namespace ForariaTest.Unit.Messages
                 Content = message.Content,
                 Thread_id = message.Thread_id,
                 User_id = message.User_id,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 State = "active"
             };
 

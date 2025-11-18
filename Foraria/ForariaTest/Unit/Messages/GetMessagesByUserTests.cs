@@ -14,8 +14,8 @@ namespace ForariaTest.Unit.Messages
             int userId = 1;
             var messages = new List<global::ForariaDomain.Message>
             {
-                new global::ForariaDomain.Message { Id = 1, Content = "Hola", CreatedAt = DateTime.UtcNow, State = "active", User_id = userId },
-                new global::ForariaDomain.Message { Id = 2, Content = "Adiós", CreatedAt = DateTime.UtcNow, State = "active", User_id = userId }
+                new global::ForariaDomain.Message { Id = 1, Content = "Hola", CreatedAt = DateTime.Now, State = "active", User_id = userId },
+                new global::ForariaDomain.Message { Id = 2, Content = "Adiós", CreatedAt = DateTime.Now, State = "active", User_id = userId }
             };
 
             var mockRepo = new Mock<IMessageRepository>();

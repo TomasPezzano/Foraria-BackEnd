@@ -12,7 +12,7 @@ public class CallParticipant
     public int CallId { get; set; }
     public int UserId { get; set; }
 
-    public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
+    public DateTime JoinedAt { get; set; } = DateTime.Now;
     public DateTime? LeftAt { get; set; }
     public bool IsMuted { get; set; } = false;
     public bool IsCameraOn { get; set; } = true;

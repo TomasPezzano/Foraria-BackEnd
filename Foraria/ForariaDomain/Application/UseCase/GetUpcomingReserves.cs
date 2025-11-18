@@ -13,7 +13,7 @@ public class GetUpcomingReserves
 
     public async Task<object> ExecuteAsync(int limit = 5)
     {
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
 
         var reservations = await _repository.GetUpcomingReservationsAsync( now, limit);
 

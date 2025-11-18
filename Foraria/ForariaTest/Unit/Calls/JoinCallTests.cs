@@ -21,7 +21,7 @@ namespace ForariaTest.Unit.CallTests
             {
                 Id = callId,
                 CreatedByUserId = 1,
-                StartedAt = DateTime.UtcNow,
+                StartedAt = DateTime.Now,
                 Status = "Active"
             };
 
@@ -87,7 +87,7 @@ namespace ForariaTest.Unit.CallTests
                 Id = callId,
                 Status = "Ended", // cualquier valor != "Active"
                 CreatedByUserId = 1,
-                StartedAt = DateTime.UtcNow
+                StartedAt = DateTime.Now
             };
 
             var mockCallRepo = new Mock<ICallRepository>();

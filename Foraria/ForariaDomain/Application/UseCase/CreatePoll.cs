@@ -29,7 +29,7 @@ public class CreatePoll
         else
             poll.State = "Activa";
 
-        poll.CreatedAt = DateTime.UtcNow;
+        poll.CreatedAt = DateTime.Now;
 
         await _pollRepository.CreatePoll(poll);
         await _unitOfWork.SaveChangesAsync();

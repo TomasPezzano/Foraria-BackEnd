@@ -12,6 +12,6 @@ namespace ForariaDomain
         public int CallId { get; set; }
         public string FilePath { get; set; } = default!;
         public string ContentType { get; set; } = default!;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

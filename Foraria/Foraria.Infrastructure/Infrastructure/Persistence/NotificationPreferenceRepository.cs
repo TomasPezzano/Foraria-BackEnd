@@ -39,7 +39,7 @@ public class NotificationPreferenceRepository : INotificationPreferenceRepositor
             existing.ClaimNotificationsEnabled = preference.ClaimNotificationsEnabled;
             existing.FcmToken = preference.FcmToken;
             existing.IsConfigured = preference.IsConfigured;
-            existing.UpdatedAt = DateTime.UtcNow;
+            existing.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             return existing;
@@ -47,7 +47,7 @@ public class NotificationPreferenceRepository : INotificationPreferenceRepositor
         else
         {
             // Crear nuevo
-            preference.UpdatedAt = DateTime.UtcNow;
+            preference.UpdatedAt = DateTime.Now;
             _context.NotificationPreferences.Add(preference);
             await _context.SaveChangesAsync();
             return preference;
@@ -61,7 +61,7 @@ public class NotificationPreferenceRepository : INotificationPreferenceRepositor
         if (preference != null)
         {
             preference.FcmToken = fcmToken;
-            preference.UpdatedAt = DateTime.UtcNow;
+            preference.UpdatedAt = DateTime.Now;
             await _context.SaveChangesAsync();
         }
         else
@@ -72,7 +72,7 @@ public class NotificationPreferenceRepository : INotificationPreferenceRepositor
                 UserId = userId,
                 FcmToken = fcmToken,
                 PushEnabled = true,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.Now
             };
             _context.NotificationPreferences.Add(newPreference);
             await _context.SaveChangesAsync();

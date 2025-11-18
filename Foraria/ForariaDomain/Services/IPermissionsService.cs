@@ -58,7 +58,7 @@ namespace Foraria.Application.Services
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
                 "Users.ViewTotalOwners", "Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
-                "Users.RefreshToken",  "Users.ViewByConsortium",
+                "Users.RefreshToken",  "Users.ViewByConsortium", "Users.ViewCount",
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
@@ -113,7 +113,7 @@ namespace Foraria.Application.Services
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
                 "Users.ViewTotalOwners","Users.ViewTotalTenants" , "Users.ViewById", "Users.Logout",
-                "Users.RefreshToken", "Users.ViewByConsortium",
+                "Users.RefreshToken", "Users.ViewByConsortium", "Users.ViewCount",
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",

@@ -50,7 +50,7 @@ public class SendExpenseReminderNotificationTests
             ConsortiumId = 10,
             Description = "Expensa Test",
             TotalAmount = 12000,
-            ExpirationDate = DateTime.UtcNow.Date.AddDays(days)
+            ExpirationDate = DateTime.Now.Date.AddDays(days)
         };
 
         _expenseRepoMock.Setup(x => x.GetByIdAsync(1))
@@ -84,7 +84,7 @@ public class SendExpenseReminderNotificationTests
             ConsortiumId = 10,
             Description = "Expensa Test",
             TotalAmount = 5000,
-            ExpirationDate = DateTime.UtcNow.Date
+            ExpirationDate = DateTime.Now.Date
         };
 
         _expenseRepoMock.Setup(x => x.GetByIdAsync(1))
@@ -117,7 +117,7 @@ public class SendExpenseReminderNotificationTests
             ConsortiumId = 10,
             Description = "Prueba",
             TotalAmount = 2000,
-            ExpirationDate = DateTime.UtcNow.Date.AddDays(1)
+            ExpirationDate = DateTime.Now.Date.AddDays(1)
         };
 
         _expenseRepoMock.Setup(x => x.GetByIdAsync(1))
@@ -158,7 +158,7 @@ public class SendExpenseReminderNotificationTests
             ConsortiumId = 20,
             Description = "Agua",
             TotalAmount = 15000,
-            ExpirationDate = DateTime.UtcNow.Date
+            ExpirationDate = DateTime.Now.Date
         };
 
         _expenseRepoMock.Setup(x => x.GetByIdAsync(5))
@@ -194,7 +194,7 @@ public class SendExpenseReminderNotificationTests
             ConsortiumId = 50,
             Description = "Luz",
             TotalAmount = 8000,
-            ExpirationDate = DateTime.UtcNow.Date.AddDays(2)
+            ExpirationDate = DateTime.Now.Date.AddDays(2)
         };
 
         _expenseRepoMock.Setup(x => x.GetByIdAsync(7))
@@ -230,7 +230,7 @@ public class SendExpenseReminderNotificationTests
             ConsortiumId = 200,
             Description = "Test",
             TotalAmount = 9999,
-            ExpirationDate = DateTime.UtcNow.Date.AddDays(1)
+            ExpirationDate = DateTime.Now.Date.AddDays(1)
         };
 
         _expenseRepoMock.Setup(x => x.GetByIdAsync(100))

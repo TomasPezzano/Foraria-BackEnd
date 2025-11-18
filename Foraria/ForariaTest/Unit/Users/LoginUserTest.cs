@@ -192,7 +192,7 @@ public class LoginUserTests
                   rt.Token == "refresh" &&
                   rt.CreatedByIp == "127.0.0.1" &&
                   rt.IsRevoked == false &&
-                  rt.ExpiresAt > DateTime.UtcNow
+                  rt.ExpiresAt > DateTime.Now
         )), Times.Once);
     }
 }

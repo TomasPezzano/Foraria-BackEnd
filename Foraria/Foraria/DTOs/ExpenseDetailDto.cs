@@ -11,8 +11,7 @@ public class ExpenseDetailDto
     public int Id { get; set; }
     public double Total { get; set; }
     public string State { get; set; } = string.Empty;
-    public int ExpenseId { get; set; }
-    public ExpenseResponseDto? Expense { get; set; }
+    public ICollection<ExpenseResponseDto?> Expenses { get; set; }
     public int ResidenceId { get; set; }
 
     public ResidenceResponseDto? residenceResponseDtos { get; set; }

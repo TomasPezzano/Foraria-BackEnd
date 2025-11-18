@@ -39,8 +39,8 @@ namespace ForariaTest.Unit.Users
                 Id = 1,
                 Token = refreshToken,
                 IsRevoked = false,
-                CreatedAt = DateTime.UtcNow.AddMinutes(-10),
-                ExpiresAt = DateTime.UtcNow.AddHours(1),
+                CreatedAt = DateTime.Now.AddMinutes(-10),
+                ExpiresAt = DateTime.Now.AddHours(1),
                 CreatedByIp = "127.0.0.1"
             };
 
@@ -70,8 +70,8 @@ namespace ForariaTest.Unit.Users
                 Id = 2,
                 Token = refreshToken,
                 IsRevoked = true, 
-                CreatedAt = DateTime.UtcNow.AddHours(-2),
-                ExpiresAt = DateTime.UtcNow.AddHours(-1), 
+                CreatedAt = DateTime.Now.AddHours(-2),
+                ExpiresAt = DateTime.Now.AddHours(-1), 
                 CreatedByIp = "127.0.0.1"
             };
 

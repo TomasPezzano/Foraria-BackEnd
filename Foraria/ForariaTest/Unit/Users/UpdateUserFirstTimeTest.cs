@@ -196,12 +196,12 @@ public class UpdateUserFirstTimeTest
             .Setup(x => x.Add(It.IsAny<RefreshToken>()))
             .ReturnsAsync((RefreshToken rt) => rt);
 
-        var beforeTest = DateTime.UtcNow;
+        var beforeTest = DateTime.Now;
 
         // Act
         var result = await _updateUserFirstTime.Update(user, "OldPass123!", "NewPass123!", "192.168.1.1");
 
-        var afterTest = DateTime.UtcNow;
+        var afterTest = DateTime.Now;
 
         // Assert
         Assert.True(result.Success);

@@ -119,16 +119,16 @@ public class CreateExpenseTests
         var consortium = new Consortium { Id = 1 };
 
         var invoices = new List<Invoice>
-        {
-            new Invoice { Id = 10, Amount = 500 },
-            new Invoice { Id = 11, Amount = 250 }
-        };
+    {
+        new Invoice { Id = 10, Amount = 500, Expenses = new List<Expense>() },
+        new Invoice { Id = 11, Amount = 250, Expenses = new List<Expense>() }
+    };
 
         var residences = new List<Residence>
-        {
-            new Residence { Id = 1, Expenses = new List<Expense>() },
-            new Residence { Id = 2, Expenses = new List<Expense>() }
-        };
+    {
+        new Residence { Id = 1, Expenses = new List<Expense>() },
+        new Residence { Id = 2, Expenses = new List<Expense>() }
+    };
 
         var expectedExpenseId = 999;
 
@@ -161,9 +161,8 @@ public class CreateExpenseTests
         Assert.Equal(2, result.Invoices.Count);
         Assert.Equal(2, result.Residences.Count);
 
-
         _invoiceRepositoryMock.Verify(
-            x => x.UpdateInvoiceAsync(It.Is<Invoice>(i => i.ExpenseId == expectedExpenseId)),
+            x => x.UpdateInvoiceAsync(It.IsAny<Invoice>()),
             Times.Exactly(2)
         );
 

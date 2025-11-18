@@ -66,23 +66,23 @@ namespace Foraria.Controllers
                 Total = detail.TotalAmount,
                 State = detail.State,
                 ResidenceId = detail.ResidenceId,
-                ExpenseId = detail.ExpenseId,
-                Expense = new ExpenseResponseDto
+                Expenses = detail.Expenses
+                .Select(exp => new ExpenseResponseDto
                 {
-                    Id = expense.Id,
-                    Description = expense.Description,
-                    TotalAmount = expense.TotalAmount,
-                    CreatedAt = expense.CreatedAt,
-                    ExpirationDate = expense.ExpirationDate,
-                    ConsortiumId = expense.ConsortiumId,
-                    Invoices = expense.Invoices?.Select(i => new InvoiceResponseDto
+                    Id = exp.Id,
+                    Description = exp.Description,
+                    TotalAmount = exp.TotalAmount,
+                    CreatedAt = exp.CreatedAt,
+                    ExpirationDate = exp.ExpirationDate,
+                    ConsortiumId = exp.ConsortiumId,
+                    Invoices = exp.Invoices?.Select(i => new InvoiceResponseDto
                     {
-                        Id = i.Id,
-                        Category = i.Category,
-                        Description = i.Description,
-                        Amount = i.Amount
+                            Id = i.Id,
+                            Category = i.Category,
+                            Description = i.Description,
+                            Amount = i.Amount
                     }).ToList() ?? new List<InvoiceResponseDto>()
-                }
+                }).ToList()
             }).ToList();
 
             return Ok(result);
@@ -118,24 +118,25 @@ namespace Foraria.Controllers
                 Total = detail.TotalAmount,
                 State = detail.State,
                 ResidenceId = detail.ResidenceId,
-                ExpenseId = detail.ExpenseId,
-                Expense = detail.Expense == null ? null : new ExpenseResponseDto
+                Expenses = detail.Expenses?
+                .Select(exp => new ExpenseResponseDto
                 {
-                    Id = detail.Expense.Id,
-                    Description = detail.Expense.Description,
-                    TotalAmount = detail.Expense.TotalAmount,
-                    CreatedAt = detail.Expense.CreatedAt,
-                    ExpirationDate = detail.Expense.ExpirationDate,
-                    ConsortiumId = detail.Expense.ConsortiumId,
-                    Invoices = detail.Expense.Invoices?.Select(i => new InvoiceResponseDto
-                    {
-                        Id = i.Id,
-                        Category = i.Category,
-                        Description = i.Description,
-                        ProcessedAt = i.ProcessedAt,
-                        Amount = i.Amount
-                    }).ToList() ?? new List<InvoiceResponseDto>()
-                }
+                    Id = exp.Id,
+                    Description = exp.Description,
+                    TotalAmount = exp.TotalAmount,
+                    CreatedAt = exp.CreatedAt,
+                    ExpirationDate = exp.ExpirationDate,
+                    ConsortiumId = exp.ConsortiumId,
+                    Invoices = exp.Invoices?
+                        .Select(i => new InvoiceResponseDto
+                        {
+                            Id = i.Id,
+                            Category = i.Category,
+                            Description = i.Description,
+                            ProcessedAt = i.ProcessedAt,
+                            Amount = i.Amount
+                        }).ToList() ?? new List<InvoiceResponseDto>()
+                }).ToList()
             }).ToList();
 
             return Ok(result);

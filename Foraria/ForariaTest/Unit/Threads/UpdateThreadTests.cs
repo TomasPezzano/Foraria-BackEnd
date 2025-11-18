@@ -138,7 +138,7 @@ namespace ForariaTest.Unit.Threads
             // Assert
             result.Theme.Should().Be("Nuevo título");
             result.Description.Should().Be("Nueva descripción");
-            result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            result.UpdatedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
 
             mockThreadRepo.Verify(r => r.UpdateAsync(It.IsAny<ForariaDomain.Thread>()), Times.Once);
         }

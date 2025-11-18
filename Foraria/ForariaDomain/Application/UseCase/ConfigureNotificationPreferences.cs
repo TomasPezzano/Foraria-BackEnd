@@ -37,7 +37,7 @@ public class ConfigureNotificationPreferences : IConfigureNotificationPreference
 
         preferences.UserId = userId;
         preferences.IsConfigured = true;
-        preferences.UpdatedAt = DateTime.UtcNow;
+        preferences.UpdatedAt = DateTime.Now;
 
         return await _preferenceRepository.UpsertAsync(preferences);
     }

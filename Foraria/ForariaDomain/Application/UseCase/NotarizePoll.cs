@@ -42,7 +42,7 @@ public class NotarizePoll
             Contract = _blockchain.ContractAddress,
             Network = "polygon",
             ChainId = 80002,
-            CreatedAtUtc = DateTime.UtcNow
+            CreatedAtUtc = DateTime.Now
         };
 
         _proofRepo.Add(proof);

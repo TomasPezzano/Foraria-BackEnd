@@ -29,7 +29,7 @@ public class LogoutUser : ILogoutUser
         if (storedToken.IsActive)
         {
             storedToken.IsRevoked = true;
-            storedToken.RevokedAt = DateTime.UtcNow;
+            storedToken.RevokedAt = DateTime.Now;
             storedToken.RevokedByIp = ipAddress;
             await _refreshTokenRepository.Update(storedToken);
         }

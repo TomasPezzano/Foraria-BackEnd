@@ -14,7 +14,7 @@ namespace Foraria.Application.UseCase
 
         public async Task<double> ExecuteAsync(int consortiumId)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             var startOfMonth = new DateTime(now.Year, now.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 

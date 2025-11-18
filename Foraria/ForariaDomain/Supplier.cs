@@ -39,7 +39,7 @@ public class Supplier
 
     public bool Active { get; set; } = true;
 
-    public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
+    public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
     public DateTime? LastInteraction { get; set; }
 

@@ -52,14 +52,14 @@ public class RefreshTokenUseCase : IRefreshTokenUseCase
         {
             UserId = storedToken.UserId,
             Token = newRefreshToken,
-            CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            CreatedAt = DateTime.Now,
+            ExpiresAt = DateTime.Now.AddDays(7),
             CreatedByIp = ipAddress,
             IsRevoked = false
         };
 
         storedToken.IsRevoked = true;
-        storedToken.RevokedAt = DateTime.UtcNow;
+        storedToken.RevokedAt = DateTime.Now;
         storedToken.RevokedByIp = ipAddress;
         storedToken.ReplacedByToken = newRefreshToken;
 

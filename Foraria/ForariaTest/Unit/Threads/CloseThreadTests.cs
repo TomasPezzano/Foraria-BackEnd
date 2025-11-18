@@ -22,7 +22,7 @@ namespace ForariaTest.Unit.Threads
                 State = "Active",
                 UserId = 1,
                 ForumId = 2,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
 
             var mockRepo = new Mock<IThreadRepository>();

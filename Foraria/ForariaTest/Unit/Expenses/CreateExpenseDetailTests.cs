@@ -64,7 +64,7 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         _getResidencesMock.Setup(x => x.ExecuteAsync())
@@ -83,7 +83,7 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         _getResidencesMock.Setup(x => x.ExecuteAsync())
@@ -102,7 +102,7 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         var residences = new List<Residence>
@@ -125,7 +125,7 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         var residences = new List<Residence>
@@ -156,27 +156,30 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = new DateTime(2025, 10, 1, 0, 0, 0, DateTimeKind.Utc)
+
         };
 
         var residences = new List<Residence>
-        {
-            new Residence { Id = 1, Coeficient = 0.5 },
-            new Residence { Id = 2, Coeficient = 0.5 }
-        };
+    {
+        new Residence { Id = 1, Coeficient = 0.5, Expenses = new List<Expense>() },
+        new Residence { Id = 2, Coeficient = 0.5, Expenses = new List<Expense>() }
+    };
 
         _getResidencesMock.Setup(x => x.ExecuteAsync())
             .ReturnsAsync(residences);
 
         _residenceRepositoryMock
-            .Setup(x => x.GetInvoicesByResidenceIdAsync(It.IsAny<int>(), expense.CreatedAt))
+            .Setup(x => x.GetInvoicesByResidenceIdAsync(It.IsAny<int>(), It.IsAny<DateTime>()))
             .ReturnsAsync(new List<Invoice>());
 
+        
         _expenseDetailRepositoryMock
             .Setup(x => x.AddExpenseDetailAsync(It.IsAny<ExpenseDetailByResidence>()))
             .ReturnsAsync((ExpenseDetailByResidence detail) =>
             {
                 detail.Id = 99;
+                detail.Expenses ??= new List<Expense>(); 
                 return detail;
             });
 

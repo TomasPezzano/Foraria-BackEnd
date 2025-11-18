@@ -40,7 +40,7 @@ public class DeleteMessage
             return;
 
         message.IsDeleted = true;
-        message.DeletedAt = DateTime.UtcNow;
+        message.DeletedAt = DateTime.Now;
 
         await _messageRepository.Update(message);
     }

@@ -64,11 +64,13 @@ public class CreateExpenseDetail : ICreateExpenseDetail
 
                 var expenseDetail = new ExpenseDetailByResidence
                 {
-                    ExpenseId = expense.Id,
                     ResidenceId = residence.Id,
                     TotalAmount = residenceShare,
-                    State = "Pending"
+                    State = "Pending",
+                    Expenses = new List<Expense>()
                 };
+
+                expenseDetail.Expenses.Add(expense);
 
                 var createdDetail = await _expenseDetailRepository.AddExpenseDetailAsync(expenseDetail);
 

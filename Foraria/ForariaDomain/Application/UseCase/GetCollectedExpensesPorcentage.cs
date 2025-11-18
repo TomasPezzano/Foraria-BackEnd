@@ -15,7 +15,7 @@ namespace foraria.application.usecase
 
         public async Task<object> ExecuteAsync(DateTime? date = null)
         {
-            var now = date ?? DateTime.UtcNow;
+            var now = date ?? DateTime.Now;
             var monthstart = new DateTime(now.Year, now.Month, 1);
             var monthend = monthstart.AddMonths(1);
 

@@ -118,7 +118,7 @@ public class ProcessWebHookMP
         existing.Status = mpPayment.Status;
         existing.StatusDetail = mpPayment.StatusDetail;
         existing.Amount = mpPayment.TransactionAmount ?? existing.Amount;
-        existing.Date = mpPayment.DateApproved ?? mpPayment.DateCreated ?? DateTime.UtcNow;
+        existing.Date = mpPayment.DateApproved ?? mpPayment.DateCreated ?? DateTime.Now;
         existing.Installments = mpPayment.Installments;
         existing.InstallmentAmount = mpPayment.TransactionDetails?.InstallmentAmount;
 

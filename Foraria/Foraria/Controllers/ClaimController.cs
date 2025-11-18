@@ -133,7 +133,7 @@ public class ClaimController : ControllerBase
             Archive = filePath,
             User_id = claimDto.User_id,
             ResidenceId = claimDto.ResidenceId,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.Now,
             ConsortiumId = claimDto.ConsortiumId,
             State = "Nuevo"
         };

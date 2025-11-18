@@ -38,7 +38,7 @@ public class CreatePreferenceMP
         var payment = new Payment
         {
             PreferenceId = preferenceId,
-            Date = DateTime.UtcNow,
+            Date = DateTime.Now,
             ExpenseDetailByResidenceId = expenseId,
             ResidenceId = residenceId,
             Status = "pending",

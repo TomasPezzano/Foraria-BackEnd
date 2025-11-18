@@ -15,7 +15,7 @@ namespace Foraria.Application.UseCase
         public async Task<IEnumerable<object>> ExecuteAsync(int consortiumId)
         {
         
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
 
             var pending = await _repository.GetPendingExpenses();
 

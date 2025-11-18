@@ -73,7 +73,7 @@ public class JwtTokenGeneratorTests
         Assert.Equal("TestAudience", jwt.Audiences.First());
 
         // Validate expiration time
-        Assert.True(jwt.ValidTo > DateTime.UtcNow);
+        Assert.True(jwt.ValidTo > DateTime.Now);
     }
 
     [Fact]

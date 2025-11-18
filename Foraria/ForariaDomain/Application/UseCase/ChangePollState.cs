@@ -36,7 +36,7 @@ public class ChangePollState
 
         poll.State = newState;
         poll.ApprovedByUserId = user.Id;
-        poll.ApprovedAt = DateTime.UtcNow;
+        poll.ApprovedAt = DateTime.Now;
 
         _pollRepository.UpdatePoll(poll);
         await _unitOfWork.SaveChangesAsync();
