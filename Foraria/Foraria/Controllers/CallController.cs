@@ -20,6 +20,7 @@ namespace Foraria.Controllers
         private readonly GetCallParticipants _getCallParticipants;
         private readonly GetCallMessages _getCallMessages;
         private readonly SaveCallRecording _saveCallRecording;
+        private readonly SendCallMessage _sendCallMessage;
 
         public CallController(
             CreateCall createCall,
@@ -28,7 +29,8 @@ namespace Foraria.Controllers
             GetCallDetails getCallDetails,
             GetCallParticipants getCallParticipants,
             GetCallMessages getCallMessages,
-            SaveCallRecording saveCallRecording)
+            SaveCallRecording saveCallRecording,
+            SendCallMessage sendCallMessage)
         {
             _createCall = createCall;
             _joinCall = joinCall;
@@ -37,6 +39,7 @@ namespace Foraria.Controllers
             _getCallParticipants = getCallParticipants;
             _getCallMessages = getCallMessages;
             _saveCallRecording = saveCallRecording;
+            _sendCallMessage = sendCallMessage;
         }
 
         [HttpPost]
@@ -141,5 +144,28 @@ namespace Foraria.Controllers
 
             return Ok(new { message = "Grabación subida correctamente." });
         }
+
+        [HttpPost("{callId}/messages")]
+        [Authorize(Policy = "All")]
+        [SwaggerOperation(Summary = "Envía un mensaje dentro de la llamada.")]
+        [ProducesResponseType(typeof(ChatMessageDto), StatusCodes.Status200OK)]
+        public IActionResult SendMessage(
+            int callId,
+            [FromBody] SendCallMessageDto request)
+        {
+            if (callId <= 0 || request.UserId <= 0)
+                throw new DomainValidationException("Datos inválidos.");
+
+            var result = _sendCallMessage.Execute(callId, request.UserId, request.Message);
+
+            return Ok(new ChatMessageDto
+            {
+                UserId = result.UserId,
+                Message = result.Message,
+                SentAt = result.SentAt
+            });
+        }
+
+
     }
 }
