@@ -52,8 +52,8 @@ public class ExpenseReminderBackgroundService : BackgroundService
         var expenseRepository = scope.ServiceProvider.GetRequiredService<IExpenseRepository>();
         var sendReminder = scope.ServiceProvider.GetRequiredService<ISendExpenseReminderNotification>();
 
-        var tomorrow = DateTime.UtcNow.Date.AddDays(1);
-        var today = DateTime.UtcNow.Date;
+        var tomorrow = DateTime.Now.Date.AddDays(1);
+        var today = DateTime.Now.Date;
 
         // Obtener expensas que vencen hoy o mañana
         var expiringExpenses = await expenseRepository.GetExpensesExpiringBetweenAsync(today, tomorrow.AddDays(1));

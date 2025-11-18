@@ -74,8 +74,8 @@ public class LoginUser : ILoginUser
         {
             UserId = usuarioLogueado.Id,
             Token = refreshToken,
-            CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
+            CreatedAt = DateTime.Now,
+            ExpiresAt = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpirationDays),
             CreatedByIp = ipAddress,
             IsRevoked = false
         };

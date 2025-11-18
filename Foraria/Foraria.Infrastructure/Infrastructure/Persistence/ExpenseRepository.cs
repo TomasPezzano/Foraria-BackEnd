@@ -78,7 +78,7 @@ namespace Foraria.Infrastructure.Repository
             return await _context.Expenses
                 .Include(e => e.ExpenseDetailsByResidence)
                 .Where(e => e.ExpenseDetailsByResidence.Any(d => d.State == "Pending") &&
-                            e.ExpirationDate >= DateTime.UtcNow)
+                            e.ExpirationDate >= DateTime.Now)
                 .OrderBy(e => e.ExpirationDate)
                 .ToListAsync();
         }

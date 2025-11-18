@@ -65,7 +65,7 @@ namespace Foraria.Controllers
             {
                 consortiumId,
                 totalAmount = total,
-                month = DateTime.UtcNow.ToString("MMMM yyyy")
+                month = DateTime.Now.ToString("MMMM yyyy")
             });
         }
 
@@ -90,7 +90,7 @@ namespace Foraria.Controllers
             return Ok(new
             {
                 consortiumId,
-                generatedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                generatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 pendingExpenses = result
             });
         }
@@ -115,7 +115,7 @@ namespace Foraria.Controllers
             return Ok(new
             {
                 userId,
-                generatedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                generatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 data = result
             });
         }
@@ -172,7 +172,7 @@ namespace Foraria.Controllers
             {
                 consortiumId,
                 activePolls = count,
-                generatedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
+                generatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             });
         }
 
@@ -231,7 +231,7 @@ namespace Foraria.Controllers
             {
                 consortiumId,
                 activeReservations = count,
-                generatedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
+                generatedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             });
         }
     }

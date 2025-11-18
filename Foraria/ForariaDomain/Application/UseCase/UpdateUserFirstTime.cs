@@ -108,8 +108,8 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
         {
             UserId = user.Id,
             Token = refreshToken,
-            CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            CreatedAt = DateTime.Now,
+            ExpiresAt = DateTime.Now.AddDays(7),
             CreatedByIp = ipAddress,
             IsRevoked = false
         };

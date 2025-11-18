@@ -18,7 +18,7 @@ public class EndCall
             ?? throw new NotFoundException("Llamada no encontrada");
 
         call.Status = "Ended";
-        call.EndedAt = DateTime.UtcNow;
+        call.EndedAt = DateTime.Now;
 
         _callRepo.Update(call);
     }

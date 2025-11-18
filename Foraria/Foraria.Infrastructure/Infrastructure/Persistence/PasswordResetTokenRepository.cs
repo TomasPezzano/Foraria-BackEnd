@@ -38,7 +38,7 @@ public class PasswordResetTokenRepository : IPasswordResetTokenRepository
     public async Task<List<PasswordResetToken>> GetActiveTokensByUserId(int userId)
     {
         return await _context.PasswordResetTokens
-            .Where(t => t.UserId == userId && !t.IsUsed && t.ExpiresAt > DateTime.UtcNow)
+            .Where(t => t.UserId == userId && !t.IsUsed && t.ExpiresAt > DateTime.Now)
             .ToListAsync();
     }
 }

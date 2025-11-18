@@ -96,7 +96,7 @@ public class UpdateMessageTests
             Id = 10,
             User_id = 1,
             Content = "Viejo",
-            CreatedAt = DateTime.UtcNow.AddMinutes(-5),
+            CreatedAt = DateTime.Now.AddMinutes(-5),
             IsDeleted = false
         };
 
@@ -111,7 +111,7 @@ public class UpdateMessageTests
 
         // Assert
         result.Content.Should().Be("Nuevo contenido");
-        result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        result.UpdatedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
 
         mockMsgRepo.Verify(r => r.Update(It.IsAny<ForariaDomain.Message>()), Times.Once);
     }
@@ -134,7 +134,7 @@ public class UpdateMessageTests
             Id = 10,
             User_id = 1,
             Content = "Viejo",
-            CreatedAt = DateTime.UtcNow.AddMinutes(-30),
+            CreatedAt = DateTime.Now.AddMinutes(-30),
             IsDeleted = false
         };
 
@@ -170,7 +170,7 @@ public class UpdateMessageTests
             Id = 10,
             User_id = 1,
             Content = "Mensaje original",
-            CreatedAt = DateTime.UtcNow.AddMinutes(-5),
+            CreatedAt = DateTime.Now.AddMinutes(-5),
             IsDeleted = false
         };
 
@@ -208,7 +208,7 @@ public class UpdateMessageTests
             Id = 10,
             User_id = 1,
             Content = "Original",
-            CreatedAt = DateTime.UtcNow.AddMinutes(-30),
+            CreatedAt = DateTime.Now.AddMinutes(-30),
             IsDeleted = false
         };
 

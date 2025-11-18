@@ -20,7 +20,7 @@ namespace ForariaTest.Unit.Calls
             {
                 Id = 1,
                 CreatedByUserId = userId,
-                StartedAt = DateTime.UtcNow,
+                StartedAt = DateTime.Now,
                 Status = "Active"
             };
 
@@ -41,7 +41,7 @@ namespace ForariaTest.Unit.Calls
             result.CreatedByUserId.Should().Be(userId);
             result.Status.Should().Be("Active");
 
-            result.StartedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
+            result.StartedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(2));
 
             mockRepo.Verify(r => r.Create(It.IsAny<Call>()), Times.Once);
         }

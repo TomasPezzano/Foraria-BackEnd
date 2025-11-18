@@ -67,7 +67,7 @@ namespace ForariaTest.Tests.UserDocuments
             // Assert
             result.Should().NotBeNull();
             result.IsValid.Should().BeTrue();
-            result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            result.CreatedAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
             result.Title.Should().Be("Contrato de alquiler");
             _userDocRepoMock.Verify(r => r.Add(It.IsAny<global::ForariaDomain.UserDocument>()), Times.Once);
             _unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);

@@ -55,7 +55,7 @@ public class UpdateThread
             thread.State = target;
         }
 
-        thread.UpdatedAt = DateTime.UtcNow;
+        thread.UpdatedAt = DateTime.Now;
         await _threadRepository.UpdateAsync(thread);
         return thread;
     }

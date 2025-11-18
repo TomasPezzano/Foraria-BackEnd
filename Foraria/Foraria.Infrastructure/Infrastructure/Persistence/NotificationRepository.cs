@@ -52,7 +52,7 @@ public class NotificationRepository : INotificationRepository
         if (notification != null)
         {
             notification.Status = NotificationStatus.Sent;
-            notification.SentAt = DateTime.UtcNow;
+            notification.SentAt = DateTime.Now;
             await _context.SaveChangesAsync();
         }
     }
@@ -62,7 +62,7 @@ public class NotificationRepository : INotificationRepository
         if (notification != null)
         {
             notification.Status = NotificationStatus.Read;
-            notification.ReadAt = DateTime.UtcNow;
+            notification.ReadAt = DateTime.Now;
             await _context.SaveChangesAsync();
         }
     }

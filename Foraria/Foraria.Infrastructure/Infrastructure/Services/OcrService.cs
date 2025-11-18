@@ -127,7 +127,7 @@ public class OcrService : IOcrService
 
                 Items = ExtractItems(invoice.Fields),
                 ConfidenceScore = invoice.Confidence,
-                ProcessedAt = DateTime.UtcNow
+                ProcessedAt = DateTime.Now
             };
 
             if (!string.IsNullOrEmpty(ocrResult.Cuit) && !IsValidCuit(ocrResult.Cuit))

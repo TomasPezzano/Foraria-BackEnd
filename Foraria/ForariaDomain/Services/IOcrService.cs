@@ -30,7 +30,7 @@ public class InvoiceOcrResult
     public float ConfidenceScore { get; set; }
 
   
-    public DateTime ProcessedAt { get; set; } = DateTime.UtcNow;
+    public DateTime ProcessedAt { get; set; } = DateTime.Now;
 }
 
 public class InvoiceItem

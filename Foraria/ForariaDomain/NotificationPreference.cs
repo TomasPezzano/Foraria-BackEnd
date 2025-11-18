@@ -27,6 +27,6 @@ public class NotificationPreference
     public bool ClaimNotificationsEnabled { get; set; } = true;
     [MaxLength(500)]
     public string? FcmToken { get; set; }
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
     public bool IsConfigured { get; set; } = false;
 }

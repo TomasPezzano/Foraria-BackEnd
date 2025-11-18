@@ -13,7 +13,7 @@ public class GetActivePollCount
 
     public async Task<int> ExecuteAsync(int consortiumId, DateTime? dateTime = null)
     {
-        var now = dateTime ?? DateTime.UtcNow;
+        var now = dateTime ?? DateTime.Now;
         var activePolls = await _repository.GetActivePolls(consortiumId, now);
         return activePolls.Count();
     }

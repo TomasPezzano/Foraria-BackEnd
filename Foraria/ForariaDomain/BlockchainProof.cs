@@ -25,6 +25,6 @@ namespace Foraria.Domain.Model
         public string Contract { get; set; } = null!;
         public string Network { get; set; } = "polygon";
         public int ChainId { get; set; } = 80002; // testnet Amoy
-        public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAtUtc { get; set; } = DateTime.Now;
     }
 }

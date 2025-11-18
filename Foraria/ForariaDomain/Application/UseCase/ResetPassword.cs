@@ -62,7 +62,7 @@ public class ResetPassword : IResetPassword
 
         // Marcar token como usado
         resetToken.IsUsed = true;
-        resetToken.UsedAt = DateTime.UtcNow;
+        resetToken.UsedAt = DateTime.Now;
         resetToken.UsedByIp = ipAddress;
         await _passwordResetTokenRepository.Update(resetToken);
 

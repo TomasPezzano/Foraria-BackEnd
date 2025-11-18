@@ -78,7 +78,7 @@ namespace Foraria.Controllers
                 Content = request.Content.Trim(),
                 Thread_id = request.Thread_id,
                 User_id = request.User_id,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 State = "active",
                 optionalFile = filePath
             };

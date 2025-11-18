@@ -77,7 +77,7 @@ namespace Foraria.Infrastructure.Persistence
                 throw new NotFoundException("El participante no existe en esta llamada.");
 
             participant.IsConnected = false;
-            participant.LeftAt = DateTime.UtcNow;
+            participant.LeftAt = DateTime.Now;
 
             _context.SaveChanges();
         }

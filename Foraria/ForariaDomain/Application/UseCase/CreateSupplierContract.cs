@@ -40,12 +40,12 @@ public class CreateSupplierContract : ICreateSupplierContract
             throw new ArgumentException("La fecha de vencimiento debe ser posterior a la fecha de inicio.");
         }
 
-        if (contract.StartDate < DateTime.UtcNow.AddYears(-10))
+        if (contract.StartDate < DateTime.Now.AddYears(-10))
         {
             throw new ArgumentException("La fecha de inicio no puede ser mayor a 10 años en el pasado.");
         }
 
-        if (contract.EndDate < DateTime.UtcNow)
+        if (contract.EndDate < DateTime.Now)
         {
             throw new ArgumentException("No se puede crear un contrato con fecha de vencimiento en el pasado.");
         }
@@ -62,7 +62,7 @@ public class CreateSupplierContract : ICreateSupplierContract
         }
 
         contract.Active = true;
-        contract.CreatedAt = DateTime.UtcNow;
+        contract.CreatedAt = DateTime.Now;
 
         var created = await _contractRepository.Create(contract);
         return created;

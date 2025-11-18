@@ -39,7 +39,7 @@ public class CreateUserDocument : ICreateUserDocument
 
         ValidateDocument(document);
 
-        document.CreatedAt = DateTime.UtcNow;
+        document.CreatedAt = DateTime.Now;
         document.IsValid = true;
 
         await _userDocumentRepository.Add(document);

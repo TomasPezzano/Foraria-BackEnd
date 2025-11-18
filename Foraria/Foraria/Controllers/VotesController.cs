@@ -48,7 +48,7 @@ namespace Foraria.Controllers
                 User_id = request.User_Id,
                 Poll_id = request.Poll_Id,
                 PollOption_id = request.PollOption_Id,
-                VotedDate = DateTime.UtcNow
+                VotedDate = DateTime.Now
             };
 
             await _createVoteUseCase.ExecuteAsync(vote);

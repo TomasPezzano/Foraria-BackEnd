@@ -112,7 +112,7 @@ public class CallHub : Hub
         {
             userId,
             message,
-            sentAt = DateTime.UtcNow
+            sentAt = DateTime.Now
         });
     }
 

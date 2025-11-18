@@ -64,7 +64,7 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         _getResidencesMock.Setup(x => x.ExecuteAsync())
@@ -83,7 +83,7 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         _getResidencesMock.Setup(x => x.ExecuteAsync())
@@ -102,7 +102,7 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         var residences = new List<Residence>
@@ -125,7 +125,7 @@ public class CreateExpenseDetailTests
             Id = 1,
             ConsortiumId = 1,
             TotalAmount = 1000,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         var residences = new List<Residence>

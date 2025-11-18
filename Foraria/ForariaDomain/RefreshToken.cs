@@ -21,6 +21,6 @@ public class RefreshToken
 
     public User User { get; set; }
 
-    public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
+    public bool IsExpired => DateTime.Now >= ExpiresAt;
     public bool IsActive => !IsRevoked && !IsExpired;
 }

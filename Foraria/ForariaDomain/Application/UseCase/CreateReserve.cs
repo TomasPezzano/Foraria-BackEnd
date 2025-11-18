@@ -24,8 +24,9 @@ public class CreateReserve : ICreateReserve
                 return null;
             }
         }
-        reserve.DeletedAt = reserve.CreatedAt.AddHours(1);
+
         reserve.Date = DateTime.Now;
+        reserve.DeletedAt = reserve.CreatedAt.AddHours(1);
         await _reserveRepository.Add(reserve);
         return reserve;
     }

@@ -18,7 +18,7 @@ public class CreateReserveTests
         // Arrange
         var reserve = new ForariaDomain.Reserve
         {
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.Now
         };
 
         _reserveRepositoryMock

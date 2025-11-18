@@ -21,7 +21,7 @@ public class CloseThread
             throw new ThreadLockedException("El hilo ya se encuentra cerrado.");
 
         thread.State = "Closed";
-        thread.UpdatedAt = DateTime.UtcNow;
+        thread.UpdatedAt = DateTime.Now;
 
         await _repository.UpdateAsync(thread);
 

@@ -20,7 +20,7 @@ namespace ForariaTest.Unit.CallTests
             {
                 Id = callId,
                 CreatedByUserId = 5,
-                StartedAt = DateTime.UtcNow,
+                StartedAt = DateTime.Now,
                 Status = "Active"
             };
 

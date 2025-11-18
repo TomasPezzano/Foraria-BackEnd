@@ -25,7 +25,7 @@ public class LocalFileStorageService : ILocalFileStorageService
     {
         try
         {
-            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var safeFileName = Path.GetFileNameWithoutExtension(fileName)
                 .Replace(" ", "_")
                 .Replace("-", "_");

@@ -12,7 +12,7 @@ namespace ForariaDomain
         public int CallId { get; set; }
         public int UserId { get; set; }
         public string Message { get; set; } = default!;
-        public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public DateTime SentAt { get; set; } = DateTime.Now;
     }
 
 }

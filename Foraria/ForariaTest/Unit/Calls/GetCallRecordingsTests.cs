@@ -21,7 +21,7 @@ namespace ForariaTest.Unit.CallTests
             {
                 Id = callId,
                 CreatedByUserId = 10,
-                StartedAt = DateTime.UtcNow
+                StartedAt = DateTime.Now
             };
 
             var recordings = new List<CallRecording>

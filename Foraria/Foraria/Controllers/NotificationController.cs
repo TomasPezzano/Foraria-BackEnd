@@ -176,7 +176,7 @@ public class NotificationController : ControllerBase
             new Dictionary<string, string>
             {
                 { "test", "true" },
-                { "timestamp", DateTime.UtcNow.ToString("o") }
+                { "timestamp", DateTime.Now.ToString("o") }
             }
         );
 
@@ -229,12 +229,12 @@ public class NotificationController : ControllerBase
             await _configurePreferences.UpdateFcmTokenAsync(userId, request.FcmToken);
 
             // 3. Crear expensa de prueba que vence mañana
-            var tomorrow = DateTime.UtcNow.AddDays(1);
+            var tomorrow = DateTime.Now.AddDays(1);
 
             var testExpense = new Expense
             {
-                Description = $"[TEST] Expensa de prueba - {DateTime.UtcNow:HH:mm:ss}",
-                CreatedAt = DateTime.UtcNow,
+                Description = $"[TEST] Expensa de prueba - {DateTime.Now:HH:mm:ss}",
+                CreatedAt = DateTime.Now,
                 ExpirationDate = tomorrow,
                 TotalAmount = 12345.67,
                 ConsortiumId = request.ConsortiumId
@@ -275,8 +275,8 @@ public class NotificationController : ControllerBase
         [FromServices] IExpenseRepository expenseRepository,
         [FromServices] ISendExpenseReminderNotification sendReminder)
     {
-        var tomorrow = DateTime.UtcNow.AddDays(1);
-        var today = DateTime.UtcNow;
+        var tomorrow = DateTime.Now.AddDays(1);
+        var today = DateTime.Now;
 
         var expiringExpenses = await expenseRepository.GetExpensesExpiringBetweenAsync(today, tomorrow);
 
@@ -311,7 +311,7 @@ public class NotificationController : ControllerBase
 
         return Ok(new
         {
-            timestamp = DateTime.UtcNow,
+            timestamp = DateTime.Now,
             expensesFound = expiringExpenses.Count(),
             results
         });

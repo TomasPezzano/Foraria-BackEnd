@@ -27,7 +27,7 @@ namespace ForariaDomain.Application.UseCase
                 CallId = callId,
                 UserId = userId,
                 Message = message,
-                SentAt = DateTime.UtcNow
+                SentAt = DateTime.Now
             };
 
             _messageRepository.Save(msg);
