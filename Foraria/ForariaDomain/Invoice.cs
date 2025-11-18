@@ -73,9 +73,7 @@ public class Invoice
 
     public ICollection<InvoiceItem> Items { get; set; } = new List<InvoiceItem>();
 
-    public int? ExpenseId { get; set; }
-
-    public Expense? Expense { get; set; }
+    public ICollection<Expense?> Expenses { get; set; }
 
     public int? ConsortiumId { get; set; }
 

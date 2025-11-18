@@ -60,9 +60,10 @@ namespace Foraria.Infrastructure.Repository
             int mesNumero = int.Parse(partes[1]);
 
             return await _context.Expenses
-                .Where(e => e.CreatedAt.Year == anio &&
+                    .Where(e => e.CreatedAt.Year == anio &&
                             e.CreatedAt.Month == mesNumero)
-                .FirstOrDefaultAsync();
+                    .OrderByDescending(e => e.CreatedAt)   
+                    .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Expense>> GetExpensesByDateRange(DateTime startDate, DateTime endDate)

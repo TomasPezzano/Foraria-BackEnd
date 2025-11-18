@@ -336,12 +336,6 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(e => e.ResidenceId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<ExpenseDetailByResidence>()
-                .HasOne(e => e.Expense)
-                .WithMany(r => r.ExpenseDetailsByResidence)
-                .HasForeignKey(e => e.ExpenseId)
-                .OnDelete(DeleteBehavior.NoAction);
-
             modelBuilder.Entity<Expense>()
                 .HasOne(e => e.Consortium)
                 .WithMany(c => c.Expenses)
@@ -349,10 +343,14 @@ namespace Foraria.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Expense>()
-                .HasMany(e => e.Invoices)
-                .WithOne(d => d.Expense)
-                .HasForeignKey(d => d.ExpenseId)
-                .OnDelete(DeleteBehavior.Cascade);
+                 .HasMany(u => u.Invoices)
+                 .WithMany(r => r.Expenses)
+                 .UsingEntity<Dictionary<string, object>>(
+                     "ExpenseInvoice",
+                     j => j.HasOne<Invoice>().WithMany().HasForeignKey("InvoicesId"),
+                     j => j.HasOne<Expense>().WithMany().HasForeignKey("ExpenseId")
+                 );
+
 
             modelBuilder.Entity<Expense>()
                  .HasMany(u => u.Residences)
@@ -363,6 +361,14 @@ namespace Foraria.Infrastructure.Persistence
                      j => j.HasOne<Expense>().WithMany().HasForeignKey("ExpenseId")
                  );
 
+            modelBuilder.Entity<Expense>()
+                 .HasMany(u => u.ExpenseDetailsByResidence)
+                 .WithMany(r => r.Expenses)
+                 .UsingEntity<Dictionary<string, object>>(
+                     "ExpenseAndExpenseDetail",
+                     j => j.HasOne<ExpenseDetailByResidence>().WithMany().HasForeignKey("ExpenseDetailByResidenceId"),
+                     j => j.HasOne<Expense>().WithMany().HasForeignKey("ExpenseId")
+                 );
 
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Residence)
