@@ -17,7 +17,7 @@ namespace Foraria.Application.UseCase
         
             var now = DateTime.UtcNow;
 
-            var pending = await _repository.GetPendingExpenses(consortiumId);
+            var pending = await _repository.GetPendingExpenses();
 
             // traduce el día al español
             var culture = new CultureInfo("es-AR");

@@ -56,7 +56,7 @@ public class CreateResidence : ICreateResidence
             };
         }
 
-        var existingResidences = await _residenceRepository.GetResidenceByConsortiumIdAsync(consortiumId);
+        var existingResidences = await _residenceRepository.GetResidencesAsync();
         if (existingResidences.Any(r =>
             r.Number == number &&
             r.Floor == floor &&
@@ -77,7 +77,7 @@ public class CreateResidence : ICreateResidence
             ConsortiumId = consortiumId
         };
 
-        var createdResidence = await _residenceRepository.Create(residence, consortiumId);
+        var createdResidence = await _residenceRepository.Create(residence);
 
         return new CreateResidenceResult
         {

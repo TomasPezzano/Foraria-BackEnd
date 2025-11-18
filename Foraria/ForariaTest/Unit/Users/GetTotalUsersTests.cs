@@ -16,15 +16,15 @@ namespace ForariaTest.Unit.Users
             int expectedTotalUsers = 5;
 
             mockRepository
-                .Setup(r => r.GetTotalUsersAsync(consortiumId))
+                .Setup(r => r.GetTotalUsersAsync())
                 .ReturnsAsync(expectedTotalUsers);
 
             var useCase = new GetTotalUsers(mockRepository.Object);
 
-            var result = await useCase.ExecuteAsync(consortiumId);
+            var result = await useCase.ExecuteAsync();
 
             Assert.Equal(expectedTotalUsers, result);
-            mockRepository.Verify(r => r.GetTotalUsersAsync(consortiumId), Times.Once);
+            mockRepository.Verify(r => r.GetTotalUsersAsync(), Times.Once);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace ForariaTest.Unit.Users
             int expectedTotalUsers = 10;
 
             mockRepository
-                .Setup(r => r.GetTotalUsersAsync(null))
+                .Setup(r => r.GetTotalUsersAsync())
                 .ReturnsAsync(expectedTotalUsers);
 
             var useCase = new GetTotalUsers(mockRepository.Object);
@@ -42,7 +42,7 @@ namespace ForariaTest.Unit.Users
             var result = await useCase.ExecuteAsync();
 
             Assert.Equal(expectedTotalUsers, result);
-            mockRepository.Verify(r => r.GetTotalUsersAsync(null), Times.Once);
+            mockRepository.Verify(r => r.GetTotalUsersAsync(), Times.Once);
         }
     }
 }

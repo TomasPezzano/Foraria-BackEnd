@@ -47,7 +47,7 @@ public class ReserveController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll(int idConsortium)
     {
-        var reserves = await _getAllReserve.Execute(idConsortium);
+        var reserves = await _getAllReserve.Execute();
 
         var reservesDto = new List<ReserveResponseDto>();
 

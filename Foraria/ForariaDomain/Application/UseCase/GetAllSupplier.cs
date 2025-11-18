@@ -4,7 +4,7 @@ namespace ForariaDomain.Application.UseCase;
 
 public interface IGetAllSupplier
 {
-    Task<List<Supplier>> Execute(int consortiumId);
+    Task<List<Supplier>> Execute();
 }
 
 public class GetAllSupplier : IGetAllSupplier
@@ -14,8 +14,8 @@ public class GetAllSupplier : IGetAllSupplier
     {
         _supplierRepository = supplierRepository;
     }
-    public async Task<List<Supplier>> Execute(int consortiumId)
+    public async Task<List<Supplier>> Execute()
     {
-        return await _supplierRepository.GetAll(consortiumId);
+        return await _supplierRepository.GetAll();
     }
 }

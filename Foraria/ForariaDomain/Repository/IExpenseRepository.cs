@@ -6,8 +6,8 @@ namespace Foraria.Domain.Repository
     {
         
         Task<IEnumerable<Expense>> GetExpensesByDateRange(DateTime startDate, DateTime endDate);      
-        Task<IEnumerable<Expense>> GetPendingExpenses(int consortiumId);
-        Task<(int totalCount, int paidCount, double totalPaidAmount, double totalUnpaidAmount)> GetMonthlyCollectionStatsAsync(int consortiumId, DateTime monthStart, DateTime monthEnd);
+        Task<IEnumerable<Expense>> GetPendingExpenses();
+        Task<(int totalCount, int paidCount, double totalPaidAmount, double totalUnpaidAmount)> GetMonthlyCollectionStatsAsync(DateTime monthStart, DateTime monthEnd);
         Task<Expense> AddExpenseAsync(Expense newExpense);
         Task<IEnumerable<Expense>> GetAllExpenses();
         Task<Expense?> GetExpenseByConsortiumAndMonthAsync(string month);

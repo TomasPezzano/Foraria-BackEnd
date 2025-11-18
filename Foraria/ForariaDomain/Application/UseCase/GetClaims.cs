@@ -4,7 +4,7 @@ using ForariaDomain;
 namespace ForariaDomain.Application.UseCase;
 public interface IGetClaims
 {
-    Task<List<Claim>> Execute(int consortiumId);
+    Task<List<Claim>> Execute();
 }
 public class GetClaims : IGetClaims
 {
@@ -15,9 +15,9 @@ public class GetClaims : IGetClaims
     {
         _claimRepository = claimRepository;
     }
-    public async Task<List<Claim>> Execute(int consortiumId)
+    public async Task<List<Claim>> Execute()
     {
-        return await _claimRepository.GetAll(consortiumId);
+        return await _claimRepository.GetAll();
     }
 
 }

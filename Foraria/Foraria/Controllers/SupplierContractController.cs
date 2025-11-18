@@ -221,7 +221,7 @@ public class SupplierContractController : ControllerBase
         if (ConsortiumId <= 0)
             return BadRequest("ConsortiumId inválido.");
 
-        var count = await _getActiveContractsSupplierCount.ExecuteAsync(ConsortiumId);
+        var count = await _getActiveContractsSupplierCount.ExecuteAsync();
 
         return Ok(count);
     }

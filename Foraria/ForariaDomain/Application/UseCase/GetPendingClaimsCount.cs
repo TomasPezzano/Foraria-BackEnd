@@ -11,8 +11,8 @@ public class GetPendingClaimsCount
         _repository = repository;
     }
 
-    public async Task<int> ExecuteAsync(int? consortiumId = null)
+    public async Task<int> ExecuteAsync()
     {
-        return await _repository.GetPendingCountAsync(consortiumId);
+        return await _repository.GetPendingCountAsync();
     }
 }

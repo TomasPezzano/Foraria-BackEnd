@@ -73,23 +73,21 @@ namespace Foraria.Infrastructure.Repository
                         e.CreatedAt < endDate)
             .ToListAsync();
         }
-        public async Task<IEnumerable<Expense>> GetPendingExpenses(int consortiumId)
+        public async Task<IEnumerable<Expense>> GetPendingExpenses()
         {
             return await _context.Expenses
                 .Include(e => e.ExpenseDetailsByResidence)
-                .Where(e => e.ConsortiumId == consortiumId &&
-                            e.ExpenseDetailsByResidence.Any(d => d.State == "Pending") &&
+                .Where(e => e.ExpenseDetailsByResidence.Any(d => d.State == "Pending") &&
                             e.ExpirationDate >= DateTime.UtcNow)
                 .OrderBy(e => e.ExpirationDate)
                 .ToListAsync();
         }
 
-        public async Task<(int totalCount, int paidCount, double totalPaidAmount, double totalUnpaidAmount)> GetMonthlyCollectionStatsAsync(int consortiumId, DateTime monthStart, DateTime monthEnd)
+        public async Task<(int totalCount, int paidCount, double totalPaidAmount, double totalUnpaidAmount)> GetMonthlyCollectionStatsAsync(DateTime monthStart, DateTime monthEnd)
         {
             var expenses = await _context.Expenses
                 .Include(e => e.ExpenseDetailsByResidence)
-                .Where(e => e.ConsortiumId == consortiumId &&
-                            e.CreatedAt >= monthStart &&
+                .Where(e => e.CreatedAt >= monthStart &&
                             e.CreatedAt < monthEnd)
                 .ToListAsync();
 

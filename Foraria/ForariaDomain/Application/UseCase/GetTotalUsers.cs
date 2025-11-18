@@ -11,8 +11,8 @@ public class GetTotalUsers
         _repository = repository;
     }
 
-    public async Task<int> ExecuteAsync(int? consortiumId = null)
+    public async Task<int> ExecuteAsync()
     {
-        return await _repository.GetTotalUsersAsync(consortiumId);
+        return await _repository.GetTotalUsersAsync();
     }
 }

@@ -192,7 +192,7 @@ namespace Foraria.Controllers
             if (consortiumId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de consorcio válido.");
 
-            var result = await _getUpcomingReserves.ExecuteAsync(consortiumId, limit);
+            var result = await _getUpcomingReserves.ExecuteAsync(limit);
 
             var reservationsProperty = result.GetType().GetProperty("upcomingReservations");
             var upcomingReservations = reservationsProperty?.GetValue(result) as IEnumerable<object>;
@@ -219,7 +219,7 @@ namespace Foraria.Controllers
             if (consortiumId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de consorcio válido.");
 
-            var count = await _getActiveReserveCount.ExecuteAsync(consortiumId);
+            var count = await _getActiveReserveCount.ExecuteAsync();
 
             if (count < 0)
                 throw new BusinessException("El número de reservas activas no puede ser negativo.");

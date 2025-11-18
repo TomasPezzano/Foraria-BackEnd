@@ -115,14 +115,11 @@ public class ResidenceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllResidencesByConsortium(int idConsortium)
+    public async Task<IActionResult> GetAllResidencesByConsortium()
     {
         await _permissionService.EnsurePermissionAsync(User, "Residences.ViewAllByConsortium");
 
-        if (idConsortium <= 0)
-            throw new DomainValidationException("Debe especificar un ID de consorcio válido.");
-
-        var result = await _getAllResidencesByConsortium.ExecuteAsync(idConsortium);
+        var result = await _getAllResidencesByConsortium.ExecuteAsync();
 
         if (!result.Success)
             throw new NotFoundException(result.Message);

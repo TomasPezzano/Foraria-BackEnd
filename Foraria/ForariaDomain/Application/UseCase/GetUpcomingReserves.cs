@@ -11,11 +11,11 @@ public class GetUpcomingReserves
         _repository = repository;
     }
 
-    public async Task<object> ExecuteAsync(int consortiumId, int limit = 5)
+    public async Task<object> ExecuteAsync(int limit = 5)
     {
         var now = DateTime.UtcNow;
 
-        var reservations = await _repository.GetUpcomingReservationsAsync(consortiumId, now, limit);
+        var reservations = await _repository.GetUpcomingReservationsAsync( now, limit);
 
         var list = reservations.Select(r => new
         {
@@ -28,7 +28,6 @@ public class GetUpcomingReserves
 
         return new
         {
-            consortiumId,
             generatedAt = now.ToString("yyyy-MM-dd HH:mm:ss"),
             upcomingReservations = list
         };

@@ -58,12 +58,11 @@ public class SupplierContractRepository : ISupplierContractRepository
         return contract;
     }
 
-    public async Task<int> GetActiveContractsCount(int consortiumId)
+    public async Task<int> GetActiveContractsCount()
     {
         return await _context.SupplierContracts
             .Where(c => c.Active &&
-                        c.EndDate >= DateTime.UtcNow &&     
-                        c.Supplier.ConsortiumId == consortiumId)
+                        c.EndDate >= DateTime.Now)
             .CountAsync();
     }
 }

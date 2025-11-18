@@ -13,13 +13,13 @@ namespace foraria.application.usecase
             _repository = repository;
         }
 
-        public async Task<object> ExecuteAsync(int consortiumid, DateTime? date = null)
+        public async Task<object> ExecuteAsync(DateTime? date = null)
         {
             var now = date ?? DateTime.UtcNow;
             var monthstart = new DateTime(now.Year, now.Month, 1);
             var monthend = monthstart.AddMonths(1);
 
-            var stats = await _repository.GetMonthlyCollectionStatsAsync(consortiumid, monthstart, monthend);
+            var stats = await _repository.GetMonthlyCollectionStatsAsync(monthstart, monthend);
 
             double percentage = stats.totalCount == 0
                 ? 0
@@ -30,7 +30,6 @@ namespace foraria.application.usecase
             
             return new
             {
-                consortiumid,
                 month = $"{monthname} {now.Year}",
                 collectedpercentage = percentage,
                 paidcount = stats.paidCount,

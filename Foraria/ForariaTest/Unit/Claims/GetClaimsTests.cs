@@ -32,18 +32,18 @@ namespace ForariaTest.Unit.Claims
             };
 
             _mockRepo
-                .Setup(repo => repo.GetAll(consortiumId))
+                .Setup(repo => repo.GetAll())
                 .ReturnsAsync(claimsMock);
 
             
-            var result = await _useCase.Execute(consortiumId);
+            var result = await _useCase.Execute();
 
          
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.Equal("Claim A", result[0].Title);
 
-            _mockRepo.Verify(repo => repo.GetAll(consortiumId), Times.Once);
+            _mockRepo.Verify(repo => repo.GetAll(), Times.Once);
         }
 
         [Fact]
@@ -53,17 +53,17 @@ namespace ForariaTest.Unit.Claims
             int consortiumId = 3;
 
             _mockRepo
-                .Setup(repo => repo.GetAll(consortiumId))
+                .Setup(repo => repo.GetAll())
                 .ReturnsAsync(new List<Claim>());
 
        
-            var result = await _useCase.Execute(consortiumId);
+            var result = await _useCase.Execute();
 
 
             Assert.NotNull(result);
             Assert.Empty(result);
 
-            _mockRepo.Verify(repo => repo.GetAll(consortiumId), Times.Once);
+            _mockRepo.Verify(repo => repo.GetAll(), Times.Once);
         }
     }
 }

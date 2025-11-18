@@ -5,7 +5,7 @@ namespace ForariaDomain.Application.UseCase;
 
 public interface IGetAllReserve
 {
-    Task<List<Reserve>> Execute(int idConsortium);
+    Task<List<Reserve>> Execute();
 }
 public class GetAllReserve : IGetAllReserve
 {
@@ -14,9 +14,9 @@ public class GetAllReserve : IGetAllReserve
     {
         _reserveRepository = reserveRepository;
     }
-    public async Task<List<Reserve>> Execute(int idConsortium)
+    public async Task<List<Reserve>> Execute()
     {
-       return await _reserveRepository.GetAllInConsortium(idConsortium);
+       return await _reserveRepository.GetAllInConsortium();
     }
 }
 

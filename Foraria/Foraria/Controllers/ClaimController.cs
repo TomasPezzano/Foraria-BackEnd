@@ -48,7 +48,7 @@ public class ClaimController : ControllerBase
     public async Task<IActionResult> GetAll(int consortiumId)
     {
         await _permissionService.EnsurePermissionAsync(User, "Claims.View");
-        var claims = await _getClaims.Execute(consortiumId);
+        var claims = await _getClaims.Execute();
 
         if (claims == null || !claims.Any())
             throw new NotFoundException("No se encontraron reclamos registrados.");
