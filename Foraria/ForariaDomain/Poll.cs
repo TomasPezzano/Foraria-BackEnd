@@ -48,4 +48,8 @@ public class Poll
     public int? ApprovedByUserId { get; set; }
     public User? ApprovedByUser { get; set; }
     public DateTime? ApprovedAt { get; set; }
+
+    public int ConsortiumId { get; set; }
+
+    public Consortium consortium { get; set; }
 }

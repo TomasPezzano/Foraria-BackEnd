@@ -132,11 +132,13 @@ namespace Foraria.Infrastructure.Persistence
                     .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
                                          e.Supplier.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
 
-
                 modelBuilder.Entity<Expense>()
                     .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
                                          e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
 
+                modelBuilder.Entity<Poll>()
+                    .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
+                                         e.ConsortiumId == _tenantContext.GetCurrentConsortiumIdOrNull());
 
                 modelBuilder.Entity<Invoice>()
                     .HasQueryFilter(e => _tenantContext.GetCurrentConsortiumIdOrNull() == null ||
@@ -533,6 +535,12 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(c => c.AdministratorId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired(false);
+
+            modelBuilder.Entity<Poll>()
+                .HasOne(c => c.consortium)
+                .WithMany(p => p.Polls)
+                .HasForeignKey(c => c.ConsortiumId)
+                .OnDelete(DeleteBehavior.Restrict);
 
 
             // Índice para búsquedas por administrador
