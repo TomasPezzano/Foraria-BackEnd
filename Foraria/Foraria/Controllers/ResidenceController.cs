@@ -2,6 +2,7 @@
 using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -29,7 +30,7 @@ public class ResidenceController : ControllerBase
     }
 
     [HttpPost("create")]
-    //[Authorize(Policy = "OnlyConsortium")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     [SwaggerOperation(
         Summary = "Crea una nueva residencia.",
         Description = "Permite registrar una residencia dentro de un consorcio existente."
@@ -72,7 +73,7 @@ public class ResidenceController : ControllerBase
     }
 
     [HttpGet("getById/{id}")]
-    //[Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     [SwaggerOperation(
         Summary = "Obtiene una residencia por su ID.",
         Description = "Devuelve los detalles de una residencia específica si existe."
@@ -106,7 +107,7 @@ public class ResidenceController : ControllerBase
     }
 
     [HttpGet("getAllResidencesByConsortium")]
-    //[Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "ConsortiumAndAdmin")]
     [SwaggerOperation(
         Summary = "Obtiene todas las residencias de un consorcio.",
         Description = "Devuelve la lista completa de residencias pertenecientes al consorcio indicado."

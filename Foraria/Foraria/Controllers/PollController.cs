@@ -60,6 +60,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] PollDto request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.Create");
+
             if (request == null)
                 throw new DomainValidationException("El cuerpo de la solicitud no puede estar vacío.");
 
@@ -98,7 +100,7 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll()
         {
-            await _permissionService.EnsurePermissionAsync(User, "Polls.Create");
+            await _permissionService.EnsurePermissionAsync(User, "Polls.View");
 
             var polls = await _polls.ExecuteAsync();
 
