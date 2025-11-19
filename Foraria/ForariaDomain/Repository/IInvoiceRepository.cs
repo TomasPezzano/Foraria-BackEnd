@@ -12,4 +12,5 @@ public interface IInvoiceRepository
     Task<IEnumerable<Invoice>> GetAllInvoices();
     Task<IEnumerable<Invoice>> GetAllInvoicesByMonthAndConsortium(DateTime date);
     Task UpdateInvoiceAsync(Invoice invoice);
+    Task<IEnumerable<Invoice>> GetExtraordinaryInvoicesByResidenceIdAsync(int residenceId);
 }
