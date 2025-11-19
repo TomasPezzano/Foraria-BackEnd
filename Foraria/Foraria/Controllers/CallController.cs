@@ -3,6 +3,7 @@ using Foraria.DTOs;
 using ForariaDomain;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Exceptions;
+using Foraria.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -13,6 +14,8 @@ namespace Foraria.Controllers
     [Route("api/calls")]
     public class CallController : ControllerBase
     {
+        private readonly IPermissionService _permissionService;
+
         private readonly CreateCall _createCall;
         private readonly JoinCall _joinCall;
         private readonly EndCall _endCall;
@@ -23,6 +26,7 @@ namespace Foraria.Controllers
         private readonly SendCallMessage _sendCallMessage;
 
         public CallController(
+            IPermissionService permissionService,
             CreateCall createCall,
             JoinCall joinCall,
             EndCall endCall,
@@ -32,6 +36,8 @@ namespace Foraria.Controllers
             SaveCallRecording saveCallRecording,
             SendCallMessage sendCallMessage)
         {
+            _permissionService = permissionService;
+
             _createCall = createCall;
             _joinCall = joinCall;
             _endCall = endCall;
@@ -46,8 +52,10 @@ namespace Foraria.Controllers
         [Authorize(Policy = "All")]
         [SwaggerOperation(Summary = "Crea una videollamada.")]
         [ProducesResponseType(typeof(CallDto), StatusCodes.Status200OK)]
-        public IActionResult Create([FromBody] CallCreateDto request)
+        public async Task<IActionResult> Create([FromBody] CallCreateDto request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.Create");
+
             if (request == null || request.UserId <= 0)
                 throw new DomainValidationException("Datos inválidos.");
 
@@ -62,12 +70,13 @@ namespace Foraria.Controllers
             });
         }
 
-
         [HttpPost("{callId}/join")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(Summary = "Unirse a una videollamada.")]
-        public IActionResult Join(int callId, [FromBody] CallJoinDto request)
+        public async Task<IActionResult> Join(int callId, [FromBody] CallJoinDto request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.Join");
+
             if (callId <= 0 || request.UserId <= 0)
                 throw new DomainValidationException("Datos inválidos.");
 
@@ -76,12 +85,13 @@ namespace Foraria.Controllers
             return Ok(new { message = "Usuario unido a la llamada." });
         }
 
-
         [HttpPost("{callId}/end")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(Summary = "Finaliza una videollamada.")]
-        public IActionResult End(int callId)
+        public async Task<IActionResult> End(int callId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.End");
+
             if (callId <= 0)
                 throw new DomainValidationException("ID inválido.");
 
@@ -90,33 +100,36 @@ namespace Foraria.Controllers
             return Ok(new { message = "Llamada finalizada." });
         }
 
-
         [HttpGet("{callId}")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(Summary = "Obtiene datos de una llamada.")]
-        public IActionResult GetCall(int callId)
+        public async Task<IActionResult> GetCall(int callId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.ViewDetails");
+
             if (callId <= 0)
                 throw new DomainValidationException("ID inválido.");
 
             return Ok(_getCallDetails.Execute(callId));
         }
 
-
         [HttpGet("{callId}/participants")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(Summary = "Obtiene los participantes.")]
-        public IActionResult GetParticipants(int callId)
+        public async Task<IActionResult> GetParticipants(int callId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.ViewParticipants");
+
             return Ok(_getCallParticipants.Execute(callId));
         }
-
 
         [HttpGet("{callId}/state")]
         [Authorize(Policy = "All")]
         [SwaggerOperation(Summary = "Estado completo de la llamada.")]
-        public IActionResult GetCallState(int callId)
+        public async Task<IActionResult> GetCallState(int callId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.ViewState");
+
             return Ok(new
             {
                 participants = _getCallParticipants.Execute(callId),
@@ -129,6 +142,8 @@ namespace Foraria.Controllers
         [SwaggerOperation(Summary = "Sube una grabación de la llamada.")]
         public async Task<IActionResult> UploadRecording(int callId, IFormFile file)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.UploadRecording");
+
             if (callId <= 0)
                 throw new DomainValidationException("ID inválido.");
 
@@ -149,10 +164,10 @@ namespace Foraria.Controllers
         [Authorize(Policy = "All")]
         [SwaggerOperation(Summary = "Envía un mensaje dentro de la llamada.")]
         [ProducesResponseType(typeof(ChatMessageDto), StatusCodes.Status200OK)]
-        public IActionResult SendMessage(
-            int callId,
-            [FromBody] SendCallMessageDto request)
+        public async Task<IActionResult> SendMessage(int callId, [FromBody] SendCallMessageDto request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.SendMessage");
+
             if (callId <= 0 || request.UserId <= 0)
                 throw new DomainValidationException("Datos inválidos.");
 
@@ -165,7 +180,5 @@ namespace Foraria.Controllers
                 SentAt = result.SentAt
             });
         }
-
-
     }
 }
