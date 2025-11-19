@@ -35,5 +35,9 @@ public class Thread
     public ICollection<Message> Messages { get; set; }
     public ICollection<Reaction> Reactions { get; set; } = new List<Reaction>();
 
+    public Consortium? Consortium { get; set; }
+
+    public int? ConsortiumId { get; set; }
+
 
 }

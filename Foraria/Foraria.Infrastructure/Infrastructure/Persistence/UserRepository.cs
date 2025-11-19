@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Foraria.Infrastructure.Persistence;
 
@@ -181,5 +182,13 @@ public class UserRepository : IUserRepository
             .Include(u => u.Residences)
                 .ThenInclude(r => r.Consortium)
             .FirstOrDefaultAsync(u => u.Id == id);
+    }
+    public async Task<IEnumerable<User>> GetUsersByConsortiumIdAsync(int? consortiumId)
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .Include(u => u.Residences)
+            .Where(u => u.Residences.Any(r => r.ConsortiumId == consortiumId))
+            .ToListAsync();
     }
 }

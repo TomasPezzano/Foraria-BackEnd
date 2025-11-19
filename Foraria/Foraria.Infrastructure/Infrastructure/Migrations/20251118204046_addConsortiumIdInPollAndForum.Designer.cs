@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251118204046_addConsortiumIdInPollAndForum")]
+    partial class addConsortiumIdInPollAndForum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -529,15 +532,10 @@ namespace Foraria.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ConsortiumId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
 
                     b.ToTable("forum", (string)null);
                 });
@@ -1768,16 +1766,6 @@ namespace Foraria.Migrations
                     b.Navigation("Residence");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Forum", b =>
-                {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("Forums")
-                        .HasForeignKey("ConsortiumId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Consortium");
-                });
-
             modelBuilder.Entity("ForariaDomain.Invoice", b =>
                 {
                     b.HasOne("ForariaDomain.Consortium", "Consortium")
@@ -2170,8 +2158,6 @@ namespace Foraria.Migrations
                     b.Navigation("Claims");
 
                     b.Navigation("Expenses");
-
-                    b.Navigation("Forums");
 
                     b.Navigation("Invoices");
 

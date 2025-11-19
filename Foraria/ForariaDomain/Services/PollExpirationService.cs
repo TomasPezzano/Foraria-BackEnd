@@ -27,9 +27,9 @@ namespace ForariaDomain.Services
 
                     foreach (var poll in polls)
                     {
-                        if (poll.State == "Activa" && poll.DeletedAt <= DateTime.Now)
+                        if (poll.State == "Active" && poll.EndDate <= DateTime.Now)
                         {
-                            poll.State = "Finalizada";
+                            poll.State = "Closed";
                             await pollRepository.UpdatePoll(poll);
                         }
                     }
