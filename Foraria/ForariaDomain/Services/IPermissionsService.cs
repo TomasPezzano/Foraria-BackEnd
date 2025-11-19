@@ -16,6 +16,11 @@ namespace Foraria.Application.Services
             {
                 "Blockchain.Notarize", "Blockchain.Verify",
 
+                "Calls.Create", "Calls.Join", "Calls.End",
+                "Calls.ViewDetails", "Calls.ViewParticipants",
+                "Calls.ViewState", "Calls.UploadRecording",
+                "Calls.SendMessage",
+
                 "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
 
                 "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
@@ -60,6 +65,9 @@ namespace Foraria.Application.Services
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
+
                 "Users.ViewTotalOwners", "Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
                 "Users.RefreshToken",  "Users.ViewByConsortium", "Users.ViewCount",
 
@@ -72,6 +80,11 @@ namespace Foraria.Application.Services
             ["Consorcio"] = new()
             {
                 "Blockchain.Notarize", "Blockchain.Verify",
+
+                "Calls.Create", "Calls.Join", "Calls.End",
+                "Calls.ViewDetails", "Calls.ViewParticipants",
+                "Calls.ViewState", "Calls.UploadRecording",
+                "Calls.SendMessage",
 
                 "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
 
@@ -118,6 +131,9 @@ namespace Foraria.Application.Services
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
+
                 "Users.ViewTotalOwners","Users.ViewTotalTenants" , "Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.ViewByConsortium", "Users.ViewCount",
 
@@ -130,6 +146,9 @@ namespace Foraria.Application.Services
             ["Propietario"] = new()
             {
                 "Blockchain.Verify",
+
+                "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
+                "Calls.ViewState", "Calls.SendMessage",
 
                 "Claims.Create", "Claims.View",
 
@@ -166,6 +185,9 @@ namespace Foraria.Application.Services
                 "Threads.Create", "Threads.Update", "Threads.View", "Threads.ViewAll",
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
+
                 "Users.ViewTotalOwners","Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
 
@@ -178,6 +200,9 @@ namespace Foraria.Application.Services
             ["Inquilino"] = new()
             {
                 "Blockchain.Verify",
+
+                "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
+                "Calls.ViewState", "Calls.SendMessage",
 
                 "Claims.Create", "Claims.View",
 
@@ -210,6 +235,9 @@ namespace Foraria.Application.Services
 
                 "Threads.Create", "Threads.Update", "Threads.View", "Threads.ViewAll",
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",
+
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
 
                 "Users.ViewTotalOwners","Users.ViewTotalTenants", "Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
