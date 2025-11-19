@@ -558,6 +558,12 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(c => c.ConsortiumId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Forum>()
+                .HasOne(c => c.Consortium)
+                .WithMany(p => p.Forums)
+                .HasForeignKey(c => c.ConsortiumId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Índice para búsquedas por administrador
             modelBuilder.Entity<Consortium>()
                 .HasIndex(c => c.AdministratorId);

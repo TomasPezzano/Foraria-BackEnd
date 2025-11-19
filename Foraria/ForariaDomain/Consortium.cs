@@ -40,4 +40,6 @@ public class Consortium
     public ICollection<Call?> Calls { get; set; }
 
     public ICollection<Thread?> Threads { get; set; }
+
+    public ICollection<Forum?> Forums { get; set; }
 }

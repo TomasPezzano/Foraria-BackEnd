@@ -15,5 +15,7 @@ public class Forum
 
     public ICollection<Thread> Threads { get; set; } = new List<Thread>();
 
+    public int? ConsortiumId { get; set; }
 
+    public Consortium? Consortium { get; set; }
 }

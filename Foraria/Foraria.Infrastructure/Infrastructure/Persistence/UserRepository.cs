@@ -183,7 +183,7 @@ public class UserRepository : IUserRepository
                 .ThenInclude(r => r.Consortium)
             .FirstOrDefaultAsync(u => u.Id == id);
     }
-    public async Task<IEnumerable<User>> GetUsersByConsortiumIdAsync(int consortiumId)
+    public async Task<IEnumerable<User>> GetUsersByConsortiumIdAsync(int? consortiumId)
     {
         return await _context.Users
             .Include(u => u.Role)

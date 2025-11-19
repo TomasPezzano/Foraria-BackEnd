@@ -218,6 +218,8 @@ builder.Services.AddHostedService<CallReminderBackgroundService>();
 builder.Services.AddHostedService<PollExpirationService>();
 builder.Services.AddHostedService<OldReserveBackgroundService>();
 builder.Services.AddHostedService<ExpenseReminderBackgroundService>();
+builder.Services.AddHostedService<ClaimStatusMonitorService>();
+builder.Services.AddHostedService<ForumActivityCleanupService>();
 
 
 builder.Services.AddCors(options =>
