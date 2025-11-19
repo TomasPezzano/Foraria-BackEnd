@@ -53,6 +53,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetMonthlyExpenseTotal([FromQuery] int consortiumId)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewMonthlyExpenseTotal");
+
             if (consortiumId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de consorcio válido.");
 
@@ -79,6 +81,8 @@ namespace Foraria.Controllers
         )]
         public async Task<IActionResult> GetPendingExpenses([FromQuery] int consortiumId)
         {
+
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewPendingExpenses");
             if (consortiumId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de consorcio válido.");
 
@@ -104,6 +108,8 @@ namespace Foraria.Controllers
         )]
         public async Task<IActionResult> GetUserExpenseSummary([FromQuery] int userId)
         {
+
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewUserExpenseSummary");
             if (userId <= 0)
                 throw new ValidationException("Debe proporcionar un ID de usuario válido.");
 
@@ -130,6 +136,7 @@ namespace Foraria.Controllers
             [FromQuery] int userId,
             [FromQuery] int? year = null)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewUserMonthlyExpenseHistory");
             if (userId < 0)
                 throw new ValidationException("Debe proporcionar un ID de usuario válido.");
 

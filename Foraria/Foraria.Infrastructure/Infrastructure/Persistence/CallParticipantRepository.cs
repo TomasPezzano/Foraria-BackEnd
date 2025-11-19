@@ -81,5 +81,10 @@ namespace Foraria.Infrastructure.Persistence
 
             _context.SaveChanges();
         }
+        public bool IsUserInCall(int callId, int userId)
+        {
+            return _context.CallParticipants
+                .Any(p => p.CallId == callId && p.UserId == userId);
+        }
     }
 }

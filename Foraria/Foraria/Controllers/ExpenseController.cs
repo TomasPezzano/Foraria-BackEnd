@@ -98,7 +98,7 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllExpenses()
     {
-        await _permissionService.EnsurePermissionAsync(User, "Expenses.ViewAll"); //admin y consorcio. asumo que si trae TODAS las expensas de la base de datos debe ser para los admins
+        await _permissionService.EnsurePermissionAsync(User, "Expenses.ViewAll");
 
         var expenses = await _getAllExpenses.Execute();
 

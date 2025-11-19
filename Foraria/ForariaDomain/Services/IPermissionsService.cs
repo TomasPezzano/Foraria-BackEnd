@@ -18,10 +18,13 @@ namespace Foraria.Application.Services
 
                 "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
 
+                "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
+
                 "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations",
                 "Dashboard.ViewLatestClaim", "Dashboard.ViewPendingClaims",
                 "Dashboard.ViewReservationsCount", "Dashboard.ViewUpcomingReservations",
-                "Dashboard.ViewUsersCount",
+                "Dashboard.ViewUsersCount", "Dashboard.ViewCollectedExpensesPercentage",
+                "Dashboard.ViewMonthlyExpenseTotal", "Dashboard.ViewPendingExpenses",
 
                 "ExpenseDetails.Generate", "ExpenseDetails.ViewByResidence",
 
@@ -52,7 +55,7 @@ namespace Foraria.Application.Services
 
                 "SupplierContracts.Create", "SupplierContracts.View", "SupplierContracts.ViewBySupplier", "SupplierContracts.ViewActiveContractsCount",
 
-                "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll",
+                "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
@@ -72,10 +75,13 @@ namespace Foraria.Application.Services
 
                 "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
 
+                "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
+
                 "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations",
                 "Dashboard.ViewLatestClaim", "Dashboard.ViewPendingClaims",
                 "Dashboard.ViewReservationsCount", "Dashboard.ViewUpcomingReservations",
-                "Dashboard.ViewUsersCount",
+                "Dashboard.ViewUsersCount", "Dashboard.ViewCollectedExpensesPercentage",
+                "Dashboard.ViewMonthlyExpenseTotal", "Dashboard.ViewPendingExpenses",
 
                 "ExpenseDetails.Generate", "ExpenseDetails.ViewByResidence",
 
@@ -107,7 +113,7 @@ namespace Foraria.Application.Services
 
                 "SupplierContracts.Create", "SupplierContracts.View", "SupplierContracts.ViewBySupplier",  "SupplierContracts.ViewActiveContractsCount",
 
-                "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll",
+                "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
@@ -117,7 +123,6 @@ namespace Foraria.Application.Services
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
-                "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
                 "Votes.Cast"
             },
@@ -128,7 +133,12 @@ namespace Foraria.Application.Services
 
                 "Claims.Create", "Claims.View",
 
-                "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", "Dashboard.ViewReservationsCount",
+                "Consortium.ViewAvailable", 
+
+                "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", 
+                "Dashboard.ViewReservationsCount", "Dashboard.ViewMonthlyExpenseTotal",
+                "Dashboard.ViewPendingExpenses","Dashboard.ViewUserExpenseSummary",
+                "Dashboard.ViewUserMonthlyExpenseHistory", 
 
                 "Expenses.ViewAll",
 
@@ -151,7 +161,7 @@ namespace Foraria.Application.Services
 
                 "Reserves.Create", "Reserves.ViewAll",
 
-                "Suppliers.View", "Suppliers.ViewAll",
+                "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
                 "Threads.Create", "Threads.Update", "Threads.View", "Threads.ViewAll",
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",
@@ -161,8 +171,8 @@ namespace Foraria.Application.Services
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
-                "Votes.Cast",
-                "Users.ViewById"
+
+                "Votes.Cast"
             },
 
             ["Inquilino"] = new()
@@ -171,7 +181,12 @@ namespace Foraria.Application.Services
 
                 "Claims.Create", "Claims.View",
 
-                "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", "Dashboard.ViewReservationsCount",
+                "Consortium.ViewAvailable",
+
+                "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations",
+                "Dashboard.ViewReservationsCount", "Dashboard.ViewMonthlyExpenseTotal",
+                "Dashboard.ViewPendingExpenses","Dashboard.ViewUserExpenseSummary",
+                "Dashboard.ViewUserMonthlyExpenseHistory", 
 
                 "Expenses.ViewAll",
 
@@ -191,7 +206,7 @@ namespace Foraria.Application.Services
 
                 "Reserves.Create", "Reserves.ViewAll",
 
-                "Suppliers.View", "Suppliers.ViewAll",
+                "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
                 "Threads.Create", "Threads.Update", "Threads.View", "Threads.ViewAll",
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",

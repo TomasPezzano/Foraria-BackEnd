@@ -47,6 +47,7 @@ public class ReserveController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll(int idConsortium)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Reserves.ViewAll");
         var reserves = await _getAllReserve.Execute();
 
         var reservesDto = new List<ReserveResponseDto>();
@@ -70,7 +71,6 @@ public class ReserveController : ControllerBase
 
             reservesDto.Add(reserveDto);
         }
-        await _permissionService.EnsurePermissionAsync(User, "Reserves.ViewAll");
 
 
         if (reserves == null || !reserves.Any())

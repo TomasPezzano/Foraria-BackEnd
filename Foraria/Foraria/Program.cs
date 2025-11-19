@@ -221,6 +221,8 @@ builder.Services.AddHostedService<ExpenseReminderBackgroundService>();
 builder.Services.AddHostedService<ClaimStatusMonitorService>();
 builder.Services.AddHostedService<ForumActivityCleanupService>();
 
+builder.Services.AddScoped<IGetExtraordinaryInvoicesByResidence, GetExtraordinaryInvoicesByResidence>();
+builder.Services.AddScoped<SendCallMessage>();
 
 builder.Services.AddCors(options =>
 {

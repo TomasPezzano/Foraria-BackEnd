@@ -30,7 +30,7 @@ namespace Foraria.Controllers
 
 
         [HttpPost("toggle")]
-        [Authorize(Policy = "OwnerAndTenant")]
+        [Authorize(Policy = "All")]
         [SwaggerOperation(
             Summary = "Agrega o quita una reacción (like/dislike).",
             Description = "Permite alternar una reacción en un mensaje o hilo específico. Si la reacción ya existe, se elimina; si no, se crea."
