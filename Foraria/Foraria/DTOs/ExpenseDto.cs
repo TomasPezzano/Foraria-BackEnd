@@ -29,4 +29,5 @@ public class ExpenseResponseDto
     public ICollection<ResidenceResponseDto> Residences { get; set; }
 
     public ICollection<ExpenseDetailDto> expenseDetailDtos { get; set; }
+    public List<InvoiceResponseDto>? ExtraordinaryInvoices { get; internal set; }
 }

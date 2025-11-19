@@ -15,17 +15,20 @@ namespace Foraria.Controllers
         private readonly IGetExpenseWithDto _getExpenseWithDto;
         private readonly IGetExpenseDetailByResidence _getExpenseDetailByResidence;
         private readonly IPermissionService _permissionService;
+        private readonly IGetExtraordinaryInvoicesByResidence _getExtraordinaryInvoicesByResidence;
 
         public ExpenseDetailController(
             ICreateExpenseDetail createExpenseDetail,
             IGetExpenseWithDto getExpenseWithDto,
             IGetExpenseDetailByResidence getExpenseDetailByResidence,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            IGetExtraordinaryInvoicesByResidence getExtraordinaryInvoicesByResidence)
         {
             _createExpenseDetail = createExpenseDetail;
             _getExpenseWithDto = getExpenseWithDto;
             _getExpenseDetailByResidence = getExpenseDetailByResidence;
             _permissionService = permissionService;
+            _getExtraordinaryInvoicesByResidence = getExtraordinaryInvoicesByResidence;
         }
 
 
@@ -108,9 +111,11 @@ namespace Foraria.Controllers
 
             if (expenseDetailByResidences == null)
                 throw new NotFoundException($"No se encontró información de expensas para la residencia con ID {id}.");
-
+            
             if (!expenseDetailByResidences.Any())
                 throw new NotFoundException($"No existen detalles de expensa asociados a la residencia con ID {id}.");
+
+            var extraordinaryInvoices = await _getExtraordinaryInvoicesByResidence.ExecuteAsync(id);
 
             var result = expenseDetailByResidences.Select(detail => new ExpenseDetailDto
             {
@@ -135,6 +140,17 @@ namespace Foraria.Controllers
                             Description = i.Description,
                             ProcessedAt = i.ProcessedAt,
                             Amount = i.Amount
+                        }).ToList() ?? new List<InvoiceResponseDto>(),
+
+                    ExtraordinaryInvoices = detail.Residence.Invoices?
+                        .Where(inv => inv.ResidenceId != null)
+                        .Select(inv => new InvoiceResponseDto
+                            {
+                                Id = inv.Id,
+                                Category = inv.Category,
+                                Description = inv.Description,
+                                ProcessedAt = inv.ProcessedAt,
+                                Amount = inv.Amount
                         }).ToList() ?? new List<InvoiceResponseDto>()
                 }).ToList()
             }).ToList();

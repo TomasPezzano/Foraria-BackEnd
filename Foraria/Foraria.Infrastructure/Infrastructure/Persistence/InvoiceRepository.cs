@@ -41,6 +41,18 @@ public class InvoiceRepository : IInvoiceRepository
         return await _context.Invoices.Where(i => i.CreatedAt >= inicio && i.CreatedAt <= fin && i.ResidenceId == null).Include(i => i.Items).ToListAsync();
     }
 
+    public async Task<IEnumerable<Invoice>> GetExtraordinaryInvoicesByResidenceIdAsync(int residenceId)
+    {
+        var invoices = await _context.Invoices
+           .Include(i => i.Items)
+           .Include(i => i.Expenses)
+           .Where(i => i.ResidenceId == residenceId)
+           .OrderByDescending(i => i.CreatedAt)
+           .ToListAsync();
+
+        return invoices;
+    }
+
     public Task UpdateInvoiceAsync(Invoice invoice)
     {
         _context.Invoices.Update(invoice);

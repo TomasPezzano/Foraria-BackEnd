@@ -212,8 +212,8 @@ builder.Services.AddScoped<IConsortiumRepository, ConsortiumRepository>();
 builder.Services.AddScoped<ISelectConsortium, SelectConsortium>();
 builder.Services.AddScoped<IAssignConsortiumToAdmin, AssignConsortiumToAdmin>();
 builder.Services.AddScoped<IGetUserConsortiums, GetUserConsortiums>();
+builder.Services.AddScoped<IGetExtraordinaryInvoicesByResidence, GetExtraordinaryInvoicesByResidence>();
 builder.Services.AddScoped<SendCallMessage>();
-
 
 builder.Services.AddCors(options =>
 {
