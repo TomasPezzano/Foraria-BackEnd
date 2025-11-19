@@ -131,6 +131,9 @@ namespace Foraria.Application.Services
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
 
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
+
                 "Users.ViewTotalOwners","Users.ViewTotalTenants" , "Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.ViewByConsortium", "Users.ViewCount",
 
