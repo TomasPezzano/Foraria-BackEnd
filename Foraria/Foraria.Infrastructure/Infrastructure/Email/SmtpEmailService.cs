@@ -29,6 +29,31 @@ namespace Foraria.Infrastructure.Email
             await SendEmailAsync(toEmail, subject, body);
         }
 
+        public async Task SendExpenseEmail(string toEmail, string fullName, double totalAmount, string month)
+        {
+            var subject = $"Nueva Expensa Generada - {month}";
+            var body = BuildExpenseEmailBody(fullName, totalAmount, month);
+            await SendEmailAsync(toEmail, subject, body);
+        }
+
+        private string BuildExpenseEmailBody(string fullName, double totalAmount, string month)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<body style='font-family: Arial;'>
+<h2>Expensa del mes {month}</h2>
+<p>Hola <strong>{fullName}</strong>,</p>
+<p>Se ha generado una nueva expensa correspondiente al mes {month}.</p>
+<p><strong>Monto total:</strong> ${totalAmount}</p>
+<p>Puedes ver más detalles iniciando sesión en Foraria.</p>
+<br/>
+<p>Saludos,<br/>Equipo Foraria</p>
+</body>
+</html>";
+        }
+
+
         private string BuildPasswordResetEmailBody(string email, string firstName, string resetToken)
         {
             var resetLink = $"http://localhost:3000/reset-password?token={resetToken}";

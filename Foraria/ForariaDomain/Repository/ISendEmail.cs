@@ -5,5 +5,6 @@
         Task SendWelcomeEmail(string toEmail, string firstName, string lastName, string temporaryPassword);
         Task SendPasswordResetEmail(string toEmail, string firstName, string resetToken);
 
+        Task SendExpenseEmail(string toEmail, string fullName, double amount, string month);
     }
 }
