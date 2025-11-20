@@ -10,5 +10,6 @@
         void SetCamera(int callId, int userId, bool isCameraOn);
         void SetDisconnected(int callId, int userId);
         bool IsUserInCall(int callId, int userId);
+        int CountByCallId(int callId);
     }
 }

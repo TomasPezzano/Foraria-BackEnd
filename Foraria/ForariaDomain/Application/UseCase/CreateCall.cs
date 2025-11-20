@@ -1,25 +1,23 @@
 ﻿using ForariaDomain;
 using ForariaDomain.Repository;
 
-namespace Foraria.Application.UseCase;
-
-public class CreateCall
+namespace ForariaDomain.Application.UseCase
 {
-    private readonly ICallRepository _callRepo;
-
-    public CreateCall(ICallRepository callRepo)
+    public class CreateCall
     {
-        _callRepo = callRepo;
-    }
+        private readonly ICallRepository _callRepo;
 
-    public Call Execute(int userId)
-    {
-        var call = new Call
+        public CreateCall(ICallRepository callRepo)
         {
-            CreatedByUserId = userId,
-            StartedAt = DateTime.Now
-        };
+            _callRepo = callRepo;
+        }
 
-        return _callRepo.Create(call);
+        public Call Execute(Call call)
+        {
+            call.StartedAt = DateTime.Now;
+            call.Status = "Active";
+
+            return _callRepo.Create(call);
+        }
     }
 }
