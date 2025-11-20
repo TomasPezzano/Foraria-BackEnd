@@ -96,23 +96,27 @@ public class SupplierController : ControllerBase
     [HttpDelete("{id}")]
     [Authorize(Policy = "ConsortiumAndAdmin")]
     [SwaggerOperation(
-        Summary = "Elimina un proveedor existente.",
-        Description = "Desactiva o elimina un proveedor por su ID."
-    )]
+     Summary = "Elimina un proveedor existente.",
+     Description = "Desactiva o elimina un proveedor por su ID."
+ )]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public  IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-         _permissionService.EnsurePermissionAsync(User, "Suppliers.Delete");
+        await _permissionService.EnsurePermissionAsync(User, "Suppliers.Delete");
 
         if (id <= 0)
             throw new DomainValidationException("Debe especificar un ID de proveedor válido.");
 
-        _deleteSupplier.ExecuteAsync(id);
+        var result = await _deleteSupplier.ExecuteAsync(id);  
+        if (!result)
+            throw new BusinessException("No se pudo eliminar el proveedor.");
+
         return NoContent();
     }
+
 
     [HttpGet("{id}")]
     [Authorize(Policy = "All")]

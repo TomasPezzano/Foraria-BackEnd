@@ -36,13 +36,19 @@ public class SupplierRepository : ISupplierRepository
 
     public void Delete(int supplierId)
     {
-        var supplier = _context.Suppliers.FirstOrDefault(s => s.Id == supplierId);
-        if (supplier != null)
+        var supplier = _context.Suppliers.FindAsync(supplierId).Result;  
+
+        if (supplier == null)
         {
-            _context.Suppliers.Remove(supplier);
-            _context.SaveChanges();
+            throw new KeyNotFoundException($"Proveedor con ID {supplierId} no encontrado.");
         }
+
+        _context.Suppliers.Remove(supplier);
+        _context.SaveChanges();
     }
+
+
+
 
     public async Task<List<Supplier>> GetAll()
     {
