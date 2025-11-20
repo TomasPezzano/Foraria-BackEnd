@@ -19,10 +19,13 @@ public class ClaimImplementation : IClaimRepository
 
     public async Task<List<Claim>> GetAll()
     {
-        return  await _context.Claims
-                   .Include(c => c.ClaimResponse)
-                   .Include(c => c.User)
-                   .ToListAsync();
+        return await _context.Claims
+            .Include(c => c.User)
+            .Include(c => c.ClaimResponse)
+                .ThenInclude(cr => cr.User)
+            .Include(c => c.ClaimResponse)
+                .ThenInclude(cr => cr.ResponsibleSector)
+            .ToListAsync();
     }
 
     public async Task Update(Claim claim)
