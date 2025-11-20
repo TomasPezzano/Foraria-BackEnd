@@ -49,7 +49,8 @@ public class ResidenceRepository : IResidenceRepository
     {
         return await _context.Residence
              .Include(r => r.Users).ThenInclude(u => u.Role)
-             .Where(r => r.Users.Count() > 0)
+             .Include(r => r.Users).ThenInclude(u => u.NotificationPreference)
+             .Where(r => r.Users.Any())
              .ToListAsync();
     }
 
