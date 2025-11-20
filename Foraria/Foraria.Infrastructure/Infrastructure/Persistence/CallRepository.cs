@@ -35,4 +35,13 @@ public class CallRepository : ICallRepository
     {
         return _context.Calls.Where(c => c.Status == "Active").ToList();
     }
+
+    public List<Call> GetByConsortium(int consortiumId)
+    {
+        return _context.Calls
+            .Where(c => c.ConsortiumId == consortiumId)
+            .OrderByDescending(c => c.StartedAt)
+            .ToList();
+    }
+
 }
