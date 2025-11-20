@@ -24,6 +24,7 @@ namespace Foraria.Controllers
         private readonly GetCallMessages _getCallMessages;
         private readonly SaveCallRecording _saveCallRecording;
         private readonly SendCallMessage _sendCallMessage;
+        private readonly GetCallsByConsortium _getCallsByConsortium;
 
         public CallController(
             IPermissionService permissionService,
@@ -34,7 +35,8 @@ namespace Foraria.Controllers
             GetCallParticipants getCallParticipants,
             GetCallMessages getCallMessages,
             SaveCallRecording saveCallRecording,
-            SendCallMessage sendCallMessage)
+            SendCallMessage sendCallMessage,
+            GetCallsByConsortium getCallsByConsortium)
         {
             _permissionService = permissionService;
 
@@ -46,11 +48,12 @@ namespace Foraria.Controllers
             _getCallMessages = getCallMessages;
             _saveCallRecording = saveCallRecording;
             _sendCallMessage = sendCallMessage;
+            _getCallsByConsortium = getCallsByConsortium;
         }
 
         [HttpPost]
         [Authorize(Policy = "All")]
-        [SwaggerOperation(Summary = "Crea una videollamada.")]
+        [SwaggerOperation(Summary = "Crea una videollamada o reunión.")]
         [ProducesResponseType(typeof(CallDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> Create([FromBody] CallCreateDto request)
         {
@@ -59,16 +62,29 @@ namespace Foraria.Controllers
             if (request == null || request.UserId <= 0)
                 throw new DomainValidationException("Datos inválidos.");
 
-            var call = _createCall.Execute(request.UserId);
+            var call = new Call
+            {
+                CreatedByUserId = request.UserId,
+                Title = request.Title,
+                Description = request.Description,
+                MeetingType = request.MeetingType,
+                ConsortiumId = request.ConsortiumId,
+            };
+
+            var created = _createCall.Execute(call);
 
             return Ok(new CallDto
             {
-                Id = call.Id,
-                CreatedByUserId = call.CreatedByUserId,
-                StartedAt = call.StartedAt,
-                Status = call.Status
+                Id = created.Id,
+                CreatedByUserId = created.CreatedByUserId,
+                Title = created.Title,
+                Description = created.Description,
+                MeetingType = created.MeetingType,
+                StartedAt = created.StartedAt,
+                Status = created.Status
             });
         }
+
 
         [HttpPost("{callId}/join")]
         [Authorize(Policy = "All")]
@@ -179,6 +195,53 @@ namespace Foraria.Controllers
                 Message = result.Message,
                 SentAt = result.SentAt
             });
+        }
+        [HttpGet("consortium/{consortiumId}")]
+        [Authorize(Policy = "All")]
+        [SwaggerOperation(Summary = "Obtiene la lista de reuniones de un consorcio con filtro.")]
+        public async Task<IActionResult> GetByConsortium(
+            int consortiumId,
+            [FromQuery] string? status)
+        {
+            await _permissionService.EnsurePermissionAsync(User, "Calls.View");
+
+            if (consortiumId <= 0)
+                throw new DomainValidationException("ConsortiumId inválido.");
+
+            var result = _getCallsByConsortium.Execute(consortiumId);
+
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                status = status.ToLower();
+
+                result = status switch
+                {
+                    "active" => result.Where(x => x.call.Status == "Active").ToList(),
+
+                    "finished" or "finalizada" =>
+                        result.Where(x => x.call.Status == "Finished" || x.call.EndedAt != null).ToList(),
+
+                    "scheduled" or "programada" =>
+                        result.Where(x => x.call.StartedAt > DateTime.Now).ToList(),
+
+                    _ => result
+                };
+            }
+
+            var dto = result.Select(x => new CallListItemDto
+            {
+                Id = x.call.Id,
+                Title = x.call.Title,
+                Description = x.call.Description,
+                MeetingType = x.call.MeetingType,
+                Status = x.call.Status,
+                StartedAt = x.call.StartedAt,
+                ParticipantsCount = x.participants,
+                Location = "Virtual"
+            }).ToList();
+
+            return Ok(dto);
         }
     }
 }

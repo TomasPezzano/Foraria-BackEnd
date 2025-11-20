@@ -86,5 +86,9 @@ namespace Foraria.Infrastructure.Persistence
             return _context.CallParticipants
                 .Any(p => p.CallId == callId && p.UserId == userId);
         }
+        public int CountByCallId(int callId)
+        {
+            return _context.CallParticipants.Count(p => p.CallId == callId);
+        }
     }
 }
