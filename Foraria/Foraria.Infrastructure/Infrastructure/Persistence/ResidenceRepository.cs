@@ -48,7 +48,7 @@ public class ResidenceRepository : IResidenceRepository
     public async Task<IEnumerable<Residence>> GetAllResidencesByConsortiumWithOwner()
     {
         return await _context.Residence
-             .Include(r => r.Users)
+             .Include(r => r.Users).ThenInclude(u => u.Role)
              .Where(r => r.Users.Count() > 0)
              .ToListAsync();
     }

@@ -1,4 +1,5 @@
 ﻿using Foraria.Domain.Repository;
+using Foraria.Domain.Service;
 using ForariaDomain.Repository;
 
 namespace ForariaDomain.Application.UseCase;
@@ -12,12 +13,15 @@ public class CreateExpenseDetail : ICreateExpenseDetail
     private readonly IExpenseDetailRepository _expenseDetailRepository;
     private readonly IResidenceRepository _residenceRepository;
     private readonly IGetAllResidencesByConsortiumWithOwner _getAllResidencesByConsortiumWithOwner;
+    private readonly ISendEmail _emailService;
 
-    public CreateExpenseDetail(IExpenseDetailRepository expenseDetailRepository, IGetAllResidencesByConsortiumWithOwner getAllResidencesByConsortiumWithOwner, IResidenceRepository residenceRepository)
+    public CreateExpenseDetail(IExpenseDetailRepository expenseDetailRepository, IGetAllResidencesByConsortiumWithOwner getAllResidencesByConsortiumWithOwner,
+        IResidenceRepository residenceRepository, ISendEmail sendEmail)
     {
         _expenseDetailRepository = expenseDetailRepository;
         _getAllResidencesByConsortiumWithOwner = getAllResidencesByConsortiumWithOwner;
         _residenceRepository = residenceRepository;
+        _emailService = sendEmail;
     }
     public async Task<ICollection<ExpenseDetailByResidence>> ExecuteAsync(Expense expense)
     {
@@ -76,6 +80,17 @@ public class CreateExpenseDetail : ICreateExpenseDetail
 
                 if (createdDetail == null)
                     throw new InvalidOperationException($"No se pudo crear el detalle de expensa para la residencia {residence.Id}.");
+
+                var owner = residence.Users?.Where(u => u.Role.Description.Equals("Propietario")).FirstOrDefault();
+                if (owner != null && !string.IsNullOrWhiteSpace(owner.Mail))
+                {
+                    await _emailService.SendExpenseEmail(
+                        owner.Mail,
+                        $"{owner.Name} {owner.LastName}",
+                        residenceShare,
+                        expense.CreatedAt.ToString("yyyy-MM")
+                    );
+                }
 
                 result.Add(createdDetail);
             }
