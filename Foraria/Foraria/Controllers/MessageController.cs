@@ -112,6 +112,8 @@ namespace Foraria.Controllers
                 State = message.State,
                 Thread_id = message.Thread_id,
                 User_id = message.User_id,
+                UserFirstName = message.User.Name,
+                UserLastName = message.User.LastName,
                 optionalFile = message.optionalFile
             };
             return Ok(response);
@@ -138,6 +140,8 @@ namespace Foraria.Controllers
                 State = m.State,
                 Thread_id = m.Thread_id,
                 User_id = m.User_id,
+                UserFirstName = m.User.Name ,
+                UserLastName = m.User.LastName ,
                 optionalFile = m.optionalFile
             });
 
