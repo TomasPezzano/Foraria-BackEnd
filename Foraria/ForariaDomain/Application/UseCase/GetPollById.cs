@@ -2,7 +2,12 @@
 
 namespace ForariaDomain.Application.UseCase;
 
-public class GetPollById
+public interface IGetPollById
+{
+    Task<Poll?> ExecuteAsync(int id);
+}
+
+public class GetPollById : IGetPollById
 {
     private readonly IPollRepository _repository;
 

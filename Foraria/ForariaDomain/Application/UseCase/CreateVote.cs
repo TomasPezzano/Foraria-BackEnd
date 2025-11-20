@@ -10,10 +10,10 @@ public class CreateVote
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserRepository _userRepository;
     private readonly ISignalRNotification _signalRNotification;
-    private readonly GetPollById _getPollById;
+    private readonly IGetPollById _getPollById;
 
 
-    public CreateVote(IVoteRepository voteRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, ISignalRNotification signalRNotification,GetPollById getPollById)
+    public CreateVote(IVoteRepository voteRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, ISignalRNotification signalRNotification,IGetPollById getPollById)
     {
         _voteRepository = voteRepository;
         _unitOfWork = unitOfWork;
