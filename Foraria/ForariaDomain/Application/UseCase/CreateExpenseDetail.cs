@@ -1,4 +1,6 @@
-﻿using Foraria.Domain.Repository;
+﻿using Foraria.Application.UseCase;
+using Foraria.Domain.Repository;
+using Foraria.Domain.Service;
 using ForariaDomain.Repository;
 
 namespace ForariaDomain.Application.UseCase;
@@ -12,12 +14,17 @@ public class CreateExpenseDetail : ICreateExpenseDetail
     private readonly IExpenseDetailRepository _expenseDetailRepository;
     private readonly IResidenceRepository _residenceRepository;
     private readonly IGetAllResidencesByConsortiumWithOwner _getAllResidencesByConsortiumWithOwner;
+    private readonly ISendEmail _emailService;
+    private readonly IConfigureNotificationPreferences _configurePreferences;
 
-    public CreateExpenseDetail(IExpenseDetailRepository expenseDetailRepository, IGetAllResidencesByConsortiumWithOwner getAllResidencesByConsortiumWithOwner, IResidenceRepository residenceRepository)
+    public CreateExpenseDetail(IExpenseDetailRepository expenseDetailRepository, IGetAllResidencesByConsortiumWithOwner getAllResidencesByConsortiumWithOwner,
+        IResidenceRepository residenceRepository, ISendEmail sendEmail, IConfigureNotificationPreferences configurePreferences)
     {
         _expenseDetailRepository = expenseDetailRepository;
         _getAllResidencesByConsortiumWithOwner = getAllResidencesByConsortiumWithOwner;
         _residenceRepository = residenceRepository;
+        _emailService = sendEmail;
+        _configurePreferences = configurePreferences;
     }
     public async Task<ICollection<ExpenseDetailByResidence>> ExecuteAsync(Expense expense)
     {
@@ -76,6 +83,25 @@ public class CreateExpenseDetail : ICreateExpenseDetail
 
                 if (createdDetail == null)
                     throw new InvalidOperationException($"No se pudo crear el detalle de expensa para la residencia {residence.Id}.");
+
+                var owner = residence.Users?.FirstOrDefault(u => u.Role.Description.Equals("Propietario"));
+
+                if (owner != null && !string.IsNullOrWhiteSpace(owner.Mail))
+                {
+                    var preferences = await _configurePreferences.GetPreferencesAsync(owner.Id);
+
+                    if (preferences != null &&
+                        preferences.EmailEnabled &&
+                        preferences.ExpenseNotificationsEnabled)
+                    {
+                        await _emailService.SendExpenseEmail(
+                            owner.Mail,
+                            $"{owner.Name} {owner.LastName}",
+                            residenceShare,
+                            expense.CreatedAt.ToString("yyyy-MM")
+                        );
+                    }
+                }
 
                 result.Add(createdDetail);
             }
