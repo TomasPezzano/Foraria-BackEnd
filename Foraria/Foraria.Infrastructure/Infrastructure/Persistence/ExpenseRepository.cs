@@ -62,7 +62,7 @@ namespace Foraria.Infrastructure.Repository
             return await _context.Expenses
                     .Where(e => e.CreatedAt.Year == anio &&
                             e.CreatedAt.Month == mesNumero)
-                    .OrderByDescending(e => e.CreatedAt)   
+                    .OrderByDescending(e => e.Id)   
                     .FirstOrDefaultAsync();
         }
 
