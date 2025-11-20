@@ -17,7 +17,7 @@ public class NotificationPreference
     public int UserId { get; set; }
     public User User { get; set; }
     public bool PushEnabled { get; set; } = true;
-    public bool EmailEnabled { get; set; } = false;
+    public bool EmailEnabled { get; set; } = true;
     public bool SmsEnabled { get; set; } = false;
     public bool ExpenseNotificationsEnabled { get; set; } = true;
     public bool MeetingNotificationsEnabled { get; set; } = true;

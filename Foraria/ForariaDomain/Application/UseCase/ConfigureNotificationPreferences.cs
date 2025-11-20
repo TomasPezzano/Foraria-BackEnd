@@ -70,7 +70,7 @@ public class ConfigureNotificationPreferences : IConfigureNotificationPreference
             {
                 UserId = userId,
                 PushEnabled = true,
-                EmailEnabled = false,
+                EmailEnabled = true,
                 SmsEnabled = false,
                 ExpenseNotificationsEnabled = true,
                 MeetingNotificationsEnabled = true,
