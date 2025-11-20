@@ -29,6 +29,11 @@ public class CreatePoll
         else
             poll.State = "Activa";
 
+        if(user.Role?.Description == "Propietario" || user.Role?.Description == "Inquilino")
+        {
+            throw new InvalidOperationException("no puede crear una votacion un propietario o inquilino");
+        }
+
         poll.CreatedAt = DateTime.Now;
 
         await _pollRepository.CreatePoll(poll);

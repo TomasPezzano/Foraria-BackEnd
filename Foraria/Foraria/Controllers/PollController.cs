@@ -17,7 +17,7 @@ namespace Foraria.Controllers
         private readonly CreatePoll _createPoll;
         private readonly GetPolls _polls;
         private readonly NotarizePoll _notarizePoll;
-        private readonly GetPollById _getPollById;
+        private readonly IGetPollById _getPollById;
         private readonly GetPollWithResults _getPollWithResults;
         private readonly GetAllPollsWithResults _getAllPollsWithResults;
         private readonly GetActivePollCount _getActivePollCount;
@@ -29,7 +29,7 @@ namespace Foraria.Controllers
         public PollController(
             CreatePoll poll,
             GetPolls polls,
-            GetPollById getPollById,
+            IGetPollById getPollById,
             NotarizePoll notarizePoll,
             GetPollWithResults getPollWithResults,
             GetAllPollsWithResults getAllPollsWithResults,
