@@ -10,5 +10,6 @@ namespace Foraria.Domain.Repository
 
         Task<IEnumerable<PollResult>> GetPollResultsAsync(int pollId);
 
+        Task<IEnumerable<Vote>> GetVotesByPollIdAsync(int pollId);
     }
 }

@@ -2,6 +2,7 @@
 using Foraria.DTOs;
 using ForariaDomain.Application.UseCase;
 using ForariaDomain.Repository;
+using Foraria.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,6 +20,7 @@ public class TranscriptionInternalController : ControllerBase
     private readonly IBlockchainProofRepository _proofRepo;
     private readonly IConfiguration _config;
     private readonly VerifyTranscriptIntegrity _verifyTranscriptIntegrity;
+    private readonly IPermissionService _permissionService;
 
     public TranscriptionInternalController(
         RegisterTranscriptionResult register,
@@ -27,7 +29,8 @@ public class TranscriptionInternalController : ControllerBase
         ICallTranscriptRepository transcriptRepo,
         IBlockchainProofRepository proofRepo,
         IConfiguration config,
-        VerifyTranscriptIntegrity verifyTranscriptIntegrity)
+        VerifyTranscriptIntegrity verifyTranscriptIntegrity,
+        IPermissionService permissionService)
     {
         _register = register;
         _finalize = finalize;
@@ -36,22 +39,20 @@ public class TranscriptionInternalController : ControllerBase
         _proofRepo = proofRepo;
         _config = config;
         _verifyTranscriptIntegrity = verifyTranscriptIntegrity;
+        _permissionService = permissionService;
     }
 
     [HttpPost("internal/{callId}/complete")]
+    [AllowAnonymous] //microservicio
     [SwaggerOperation(
         Summary = "Registra el resultado de la transcripción.",
         Description = "Endpoint llamado por el microservicio de transcripción."
     )]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [AllowAnonymous] // microservicio
     public async Task<IActionResult> Complete(int callId, [FromBody] CallTranscriptCompleteDto request)
     {
         var existingByHash = await _proofRepo.GetByHashHexAsync(request.TranscriptHash);
         if (existingByHash != null)
-            throw new InvalidOperationException(
-                "El archivo ya fue notarizado previamente. No se puede registrar nuevamente."
-            );
+            throw new InvalidOperationException("El archivo ya fue notarizado previamente.");
 
         var transcript = _register.Execute(
             callId,
@@ -73,10 +74,12 @@ public class TranscriptionInternalController : ControllerBase
     [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Obtiene información de la transcripción y enlaces relacionados.",
-        Description = "Devuelve hashes, transacción en blockchain y URLs para descargar audio / transcript."
+        Description = "Devuelve hashes, transacción en blockchain y URLs de descarga."
     )]
     public async Task<IActionResult> GetTranscriptInfo(int callId)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Transcriptions.ViewInfo");
+
         var transcript = _transcriptRepo.GetByCallId(callId);
         if (transcript == null)
             return NotFound(new { message = "No existe transcripción para ese callId." });
@@ -118,11 +121,13 @@ public class TranscriptionInternalController : ControllerBase
     [HttpGet("{callId}/verify")]
     [Authorize(Policy = "All")]
     [SwaggerOperation(
-        Summary = "Verifica integridad de la transcripción y su validez en blockchain.",
-        Description = "Recalcula hash, compara con DB y verifica contra la prueba en blockchain. Requiere de Microservicio Foraria.Calltranscript"
+        Summary = "Verifica integridad de la transcripción.",
+        Description = "Recalcula el hash y verifica contra blockchain."
     )]
     public async Task<IActionResult> Verify(int callId)
     {
+        await _permissionService.EnsurePermissionAsync(User, "Transcriptions.Verify");
+
         var (transcript, proof, hashMatches, isValidOnChain) =
             await _verifyTranscriptIntegrity.ExecuteAsync(callId);
 

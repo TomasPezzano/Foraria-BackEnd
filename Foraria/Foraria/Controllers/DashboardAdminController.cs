@@ -90,7 +90,7 @@ namespace Foraria.Controllers
         }
         
         [HttpGet("expenses/collected-percentage")]
-        //[Authorize(Policy = "ConsortiumAndAdmin")]
+        [Authorize(Policy = "ConsortiumAndAdmin")]
         [SwaggerOperation(
             Summary = "Obtiene el porcentaje de expensas recaudadas.",
             Description = "Calcula el porcentaje total de expensas cobradas frente al total emitido, para el consorcio indicado y la fecha (opcional)."
@@ -99,6 +99,7 @@ namespace Foraria.Controllers
             [FromQuery] int consortiumId,
             [FromQuery] DateTime? date = null)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.ViewCollectedExpensesPercentage");
             if (consortiumId <= 0)
                 throw new DomainValidationException("Debe especificar un ID de consorcio válido.");
 

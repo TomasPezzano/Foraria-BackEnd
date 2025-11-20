@@ -33,5 +33,13 @@ public class Consortium
 
     public ICollection<Reserve> Reserves { get; set; }
 
-    public ICollection<Claim> Claims { get; set; }
+    public ICollection<Claim?> Claims { get; set; }
+
+    public ICollection<Poll?> Polls { get; set; }
+
+    public ICollection<Call?> Calls { get; set; }
+
+    public ICollection<Thread?> Threads { get; set; }
+
+    public ICollection<Forum?> Forums { get; set; }
 }

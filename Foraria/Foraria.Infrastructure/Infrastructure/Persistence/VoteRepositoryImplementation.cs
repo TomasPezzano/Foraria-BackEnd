@@ -38,6 +38,14 @@ namespace Foraria.Infrastructure.Persistence
                 })
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Vote>> GetVotesByPollIdAsync(int pollId)
+        {
+            return await _context.Votes
+                .Include(v => v.User)
+                .Include(v => v.PollOption)
+                .Where(v => v.Poll_id == pollId)
+                .ToListAsync();
+        }
 
     }
 }

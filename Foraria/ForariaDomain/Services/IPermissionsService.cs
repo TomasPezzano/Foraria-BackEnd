@@ -16,12 +16,20 @@ namespace Foraria.Application.Services
             {
                 "Blockchain.Notarize", "Blockchain.Verify",
 
+                "Calls.Create", "Calls.Join", "Calls.End",
+                "Calls.ViewDetails", "Calls.ViewParticipants",
+                "Calls.ViewState", "Calls.UploadRecording",
+                "Calls.SendMessage",
+
                 "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
+
+                "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
                 "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations",
                 "Dashboard.ViewLatestClaim", "Dashboard.ViewPendingClaims",
                 "Dashboard.ViewReservationsCount", "Dashboard.ViewUpcomingReservations",
-                "Dashboard.ViewUsersCount",
+                "Dashboard.ViewUsersCount", "Dashboard.ViewCollectedExpensesPercentage",
+                "Dashboard.ViewMonthlyExpenseTotal", "Dashboard.ViewPendingExpenses",
 
                 "ExpenseDetails.Generate", "ExpenseDetails.ViewByResidence",
 
@@ -52,10 +60,13 @@ namespace Foraria.Application.Services
 
                 "SupplierContracts.Create", "SupplierContracts.View", "SupplierContracts.ViewBySupplier", "SupplierContracts.ViewActiveContractsCount",
 
-                "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll",
+                "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
+
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
 
                 "Users.ViewTotalOwners", "Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
                 "Users.RefreshToken",  "Users.ViewByConsortium", "Users.ViewCount",
@@ -70,12 +81,20 @@ namespace Foraria.Application.Services
             {
                 "Blockchain.Notarize", "Blockchain.Verify",
 
+                "Calls.Create", "Calls.Join", "Calls.End",
+                "Calls.ViewDetails", "Calls.ViewParticipants",
+                "Calls.ViewState", "Calls.UploadRecording",
+                "Calls.SendMessage",
+
                 "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
+
+                "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
                 "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations",
                 "Dashboard.ViewLatestClaim", "Dashboard.ViewPendingClaims",
                 "Dashboard.ViewReservationsCount", "Dashboard.ViewUpcomingReservations",
-                "Dashboard.ViewUsersCount",
+                "Dashboard.ViewUsersCount", "Dashboard.ViewCollectedExpensesPercentage",
+                "Dashboard.ViewMonthlyExpenseTotal", "Dashboard.ViewPendingExpenses",
 
                 "ExpenseDetails.Generate", "ExpenseDetails.ViewByResidence",
 
@@ -107,17 +126,19 @@ namespace Foraria.Application.Services
 
                 "SupplierContracts.Create", "SupplierContracts.View", "SupplierContracts.ViewBySupplier",  "SupplierContracts.ViewActiveContractsCount",
 
-                "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll",
+                "Suppliers.Create", "Suppliers.Delete", "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
                 "Threads.Close", "Threads.Create", "Threads.Delete", "Threads.Update",
                 "Threads.View", "Threads.ViewAll", "Threads.ViewCommentCount", "Threads.ViewWithMessages",
+
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
 
                 "Users.ViewTotalOwners","Users.ViewTotalTenants" , "Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.ViewByConsortium", "Users.ViewCount",
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
-                "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
                 "Votes.Cast"
             },
@@ -126,9 +147,17 @@ namespace Foraria.Application.Services
             {
                 "Blockchain.Verify",
 
+                "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
+                "Calls.ViewState", "Calls.SendMessage",
+
                 "Claims.Create", "Claims.View",
 
-                "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", "Dashboard.ViewReservationsCount",
+                "Consortium.ViewAvailable", 
+
+                "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", 
+                "Dashboard.ViewReservationsCount", "Dashboard.ViewMonthlyExpenseTotal",
+                "Dashboard.ViewPendingExpenses","Dashboard.ViewUserExpenseSummary",
+                "Dashboard.ViewUserMonthlyExpenseHistory", 
 
                 "Expenses.ViewAll",
 
@@ -151,27 +180,38 @@ namespace Foraria.Application.Services
 
                 "Reserves.Create", "Reserves.ViewAll",
 
-                "Suppliers.View", "Suppliers.ViewAll",
+                "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
                 "Threads.Create", "Threads.Update", "Threads.View", "Threads.ViewAll",
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",
+
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
 
                 "Users.ViewTotalOwners","Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
 
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
-                "Votes.Cast",
-                "Users.ViewById"
+
+                "Votes.Cast"
             },
 
             ["Inquilino"] = new()
             {
                 "Blockchain.Verify",
 
+                "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
+                "Calls.ViewState", "Calls.SendMessage",
+
                 "Claims.Create", "Claims.View",
 
-                "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", "Dashboard.ViewReservationsCount",
+                "Consortium.ViewAvailable",
+
+                "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations",
+                "Dashboard.ViewReservationsCount", "Dashboard.ViewMonthlyExpenseTotal",
+                "Dashboard.ViewPendingExpenses","Dashboard.ViewUserExpenseSummary",
+                "Dashboard.ViewUserMonthlyExpenseHistory", 
 
                 "Expenses.ViewAll",
 
@@ -191,10 +231,13 @@ namespace Foraria.Application.Services
 
                 "Reserves.Create", "Reserves.ViewAll",
 
-                "Suppliers.View", "Suppliers.ViewAll",
+                "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
                 "Threads.Create", "Threads.Update", "Threads.View", "Threads.ViewAll",
                 "Threads.ViewCommentCount", "Threads.ViewWithMessages",
+
+                "Transcriptions.ViewInfo",
+                "Transcriptions.Verify",
 
                 "Users.ViewTotalOwners","Users.ViewTotalTenants", "Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",

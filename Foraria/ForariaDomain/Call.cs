@@ -17,5 +17,9 @@ public class Call
     public DateTime? EndedAt { get; set; }
 
     public string Status { get; set; } = "Active";
+
+    public int? ConsortiumId { get; set; }
+
+    public Consortium? Consortium { get; set; }
     // Active, Ended, Cancelled
 }

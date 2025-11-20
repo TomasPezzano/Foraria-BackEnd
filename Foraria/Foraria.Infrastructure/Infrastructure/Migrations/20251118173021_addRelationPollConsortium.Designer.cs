@@ -4,6 +4,7 @@ using Foraria.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Foraria.Migrations
 {
     [DbContext(typeof(ForariaContext))]
-    partial class ForariaContextModelSnapshot : ModelSnapshot
+    [Migration("20251118173021_addRelationPollConsortium")]
+    partial class addRelationPollConsortium
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,9 +132,6 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ConsortiumId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CreatedByUserId")
                         .HasColumnType("int");
 
@@ -147,8 +147,6 @@ namespace Foraria.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
 
                     b.ToTable("Calls");
                 });
@@ -529,15 +527,10 @@ namespace Foraria.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ConsortiumId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
 
                     b.ToTable("forum", (string)null);
                 });
@@ -1403,9 +1396,6 @@ namespace Foraria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ConsortiumId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1431,8 +1421,6 @@ namespace Foraria.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ConsortiumId");
 
                     b.HasIndex("ForumId");
 
@@ -1656,16 +1644,6 @@ namespace Foraria.Migrations
                     b.Navigation("Poll");
                 });
 
-            modelBuilder.Entity("ForariaDomain.Call", b =>
-                {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("Calls")
-                        .HasForeignKey("ConsortiumId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Consortium");
-                });
-
             modelBuilder.Entity("ForariaDomain.CallParticipant", b =>
                 {
                     b.HasOne("ForariaDomain.Call", null)
@@ -1766,16 +1744,6 @@ namespace Foraria.Migrations
                         .IsRequired();
 
                     b.Navigation("Residence");
-                });
-
-            modelBuilder.Entity("ForariaDomain.Forum", b =>
-                {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("Forums")
-                        .HasForeignKey("ConsortiumId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Consortium");
                 });
 
             modelBuilder.Entity("ForariaDomain.Invoice", b =>
@@ -2041,11 +2009,6 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Thread", b =>
                 {
-                    b.HasOne("ForariaDomain.Consortium", "Consortium")
-                        .WithMany("Threads")
-                        .HasForeignKey("ConsortiumId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("ForariaDomain.Forum", "Forum")
                         .WithMany("Threads")
                         .HasForeignKey("ForumId")
@@ -2057,8 +2020,6 @@ namespace Foraria.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Consortium");
 
                     b.Navigation("Forum");
 
@@ -2165,13 +2126,9 @@ namespace Foraria.Migrations
 
             modelBuilder.Entity("ForariaDomain.Consortium", b =>
                 {
-                    b.Navigation("Calls");
-
                     b.Navigation("Claims");
 
                     b.Navigation("Expenses");
-
-                    b.Navigation("Forums");
 
                     b.Navigation("Invoices");
 
@@ -2182,8 +2139,6 @@ namespace Foraria.Migrations
                     b.Navigation("Residences");
 
                     b.Navigation("Suppliers");
-
-                    b.Navigation("Threads");
 
                     b.Navigation("UserDocuments");
                 });

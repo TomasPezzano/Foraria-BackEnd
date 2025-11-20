@@ -24,6 +24,7 @@ namespace Foraria.Controllers
         private readonly ChangePollState _changePollState;
         private readonly UpdatePoll _updatePoll;
         private readonly IPermissionService _permissionService;
+        private readonly ISendPollNotification _sendPollNotification;
 
         public PollController(
             CreatePoll poll,
@@ -35,7 +36,8 @@ namespace Foraria.Controllers
             GetActivePollCount getActivePollCount,
             ChangePollState changePollState,
             UpdatePoll updatePoll,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            ISendPollNotification sendPollNotification)
         {
             _createPoll = poll;
             _polls = polls;
@@ -47,6 +49,7 @@ namespace Foraria.Controllers
             _changePollState = changePollState;
             _updatePoll = updatePoll;
             _permissionService = permissionService;
+            _sendPollNotification = sendPollNotification;
         }
 
         [HttpPost]
@@ -60,6 +63,8 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] PollDto request)
         {
+            await _permissionService.EnsurePermissionAsync(User, "Polls.Create");
+
             if (request == null)
                 throw new DomainValidationException("El cuerpo de la solicitud no puede estar vacío.");
 
@@ -85,6 +90,7 @@ namespace Foraria.Controllers
             };
 
             var result = await _createPoll.ExecuteAsync(poll);
+            await _sendPollNotification.ExecuteForNewPollAsync(poll.Id);
             return Ok(result);
         }
 
@@ -98,7 +104,7 @@ namespace Foraria.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll()
         {
-            await _permissionService.EnsurePermissionAsync(User, "Polls.Create");
+            await _permissionService.EnsurePermissionAsync(User, "Polls.View");
 
             var polls = await _polls.ExecuteAsync();
 

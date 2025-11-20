@@ -52,6 +52,12 @@ public static class NotificationType
     public const string ClaimResponse = "ClaimResponse";
     public const string ForumActivity = "ForumActivity";
     public const string MaintenanceScheduled = "MaintenanceScheduled";
+    public const string MeetingCreated = "MeetingCreated";
+    public const string MeetingCancelled = "MeetingCancelled";
+    public const string ClaimStatusUpdate = "ClaimStatusUpdate";
+    public const string ClaimResolved = "ClaimResolved";
+    public const string ClaimCreated = "ClaimCreated";
+    public const string ForumNewThread = "ForumNewThread";
 }
 
 public static class NotificationStatus

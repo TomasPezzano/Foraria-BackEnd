@@ -36,6 +36,7 @@ namespace ForariaDomain.Services
                         poll.State = "Finalizada";
                         await pollRepository.UpdatePoll(poll);
 
+
                         var pollEntity = await getPollEntity.ExecuteAsync(poll.Id);
 
                         if (pollEntity == null)
