@@ -88,7 +88,7 @@ builder.Services.AddScoped<GetThreadById>();
 builder.Services.AddScoped<ToggleReaction>();
 builder.Services.AddScoped<DeleteMessage>();
 builder.Services.AddScoped<NotarizePoll>();
-builder.Services.AddScoped<GetPollById>();
+builder.Services.AddScoped<IGetPollById, GetPollById>();
 builder.Services.AddScoped<ISignalRNotification, SignalRNotification>();
 builder.Services.AddScoped<GetSupplierById>();
 builder.Services.AddScoped<GetSupplierContractById>();
