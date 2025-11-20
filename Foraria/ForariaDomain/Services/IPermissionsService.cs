@@ -19,7 +19,7 @@ namespace Foraria.Application.Services
                 "Calls.Create", "Calls.Join", "Calls.End",
                 "Calls.ViewDetails", "Calls.ViewParticipants",
                 "Calls.ViewState", "Calls.UploadRecording",
-                "Calls.SendMessage",
+                "Calls.SendMessage", "Calls.View",
 
                 "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
 
@@ -84,7 +84,7 @@ namespace Foraria.Application.Services
                 "Calls.Create", "Calls.Join", "Calls.End",
                 "Calls.ViewDetails", "Calls.ViewParticipants",
                 "Calls.ViewState", "Calls.UploadRecording",
-                "Calls.SendMessage",
+                "Calls.SendMessage", "Calls.View",
 
                 "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
 
@@ -148,7 +148,7 @@ namespace Foraria.Application.Services
                 "Blockchain.Verify",
 
                 "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
-                "Calls.ViewState", "Calls.SendMessage",
+                "Calls.ViewState", "Calls.SendMessage", "Calls.View",
 
                 "Claims.Create", "Claims.View",
 
@@ -202,7 +202,7 @@ namespace Foraria.Application.Services
                 "Blockchain.Verify",
 
                 "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
-                "Calls.ViewState", "Calls.SendMessage",
+                "Calls.ViewState", "Calls.SendMessage", "Calls.View",
 
                 "Claims.Create", "Claims.View",
 
