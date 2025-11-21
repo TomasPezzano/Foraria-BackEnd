@@ -35,12 +35,12 @@ namespace ForariaDomain.Services
             },
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                    Success = "https://wagonless-hsiu-grippelike.ngrok-free.dev/swagger",
-                    Failure = "https://www.facebook.com/",
-                    Pending = "https://tuweb.com/pending"
+                    Success = "https://foraria.vercel.app/expensas",
+                    Failure = "https://foraria.vercel.app/expensas",
+                    Pending = "https://foraria.vercel.app/expensas"
                 },
                 AutoReturn = "approved",
-                NotificationUrl = "https://wagonless-hsiu-grippelike.ngrok-free.dev/api/payment/webhook",
+                NotificationUrl = "https://foraria.vercel.app/webhook",
                 Metadata = new Dictionary<string, object>
             {
                 { "expense_id", expenseId },
