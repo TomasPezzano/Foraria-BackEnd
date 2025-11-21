@@ -24,18 +24,32 @@ public class CallHub : Hub
     }
 
 
+
     public async Task JoinCall(string callId, int userId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, callId);
 
         _connections[Context.ConnectionId] = (callId, userId);
 
-        await Clients.Group(callId).SendAsync("UserJoined", new
-        {
-            userId,
-            connectionId = Context.ConnectionId
-        });
+        var usersInCall = _connections
+            .Where(c => c.Value.CallId == callId)
+            .Select(c => new
+            {
+                connectionId = c.Key,
+                userId = c.Value.UserId
+            })
+            .ToList();
+
+        await Clients.Caller.SendAsync("CurrentParticipants", usersInCall);
+
+        await Clients.OthersInGroup(callId)
+            .SendAsync("UserJoined", new
+            {
+                userId,
+                connectionId = Context.ConnectionId
+            });
     }
+
 
 
     public async Task LeaveCall(string callId, int userId)
@@ -50,36 +64,56 @@ public class CallHub : Hub
     }
 
 
-
     public async Task SendOffer(string callId, int toUserId, object offer)
     {
-        await Clients.Group(callId).SendAsync("ReceiveOffer", new
+        var targetConnectionId = _connections
+            .FirstOrDefault(x => x.Value.CallId == callId && x.Value.UserId == toUserId)
+            .Key;
+
+        if (targetConnectionId != null)
         {
-            from = Context.ConnectionId,
-            toUserId,
-            offer
-        });
+            await Clients.Client(targetConnectionId).SendAsync("ReceiveOffer", new
+            {
+                from = Context.ConnectionId,
+                offer
+            });
+        }
     }
+
 
     public async Task SendAnswer(string callId, int toUserId, object answer)
     {
-        await Clients.Group(callId).SendAsync("ReceiveAnswer", new
+        var targetConnectionId = _connections
+            .FirstOrDefault(x => x.Value.CallId == callId && x.Value.UserId == toUserId)
+            .Key;
+
+        if (targetConnectionId != null)
         {
-            from = Context.ConnectionId,
-            toUserId,
-            answer
-        });
+            await Clients.Client(targetConnectionId).SendAsync("ReceiveAnswer", new
+            {
+                from = Context.ConnectionId,
+                answer
+            });
+        }
     }
+
 
     public async Task SendIceCandidate(string callId, int toUserId, object candidate)
     {
-        await Clients.Group(callId).SendAsync("ReceiveIceCandidate", new
+        var targetConnectionId = _connections
+            .FirstOrDefault(x => x.Value.CallId == callId && x.Value.UserId == toUserId)
+            .Key;
+
+        if (targetConnectionId != null)
         {
-            from = Context.ConnectionId,
-            toUserId,
-            candidate
-        });
+            await Clients.Client(targetConnectionId).SendAsync("ReceiveIceCandidate", new
+            {
+                from = Context.ConnectionId,
+                candidate
+            });
+        }
     }
+
 
     public async Task ToggleMute(string callId, int userId, bool isMuted)
     {
