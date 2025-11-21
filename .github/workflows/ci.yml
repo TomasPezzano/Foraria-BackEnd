@@ -1,5 +1,4 @@
-# .github/workflows/dotnet-ci.yml
-name: .NET CI
+name: .NET CI/CD
 
 on:
   push:
@@ -10,26 +9,51 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
+    
     steps:
-      # 1. Checkout del código
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # 2. Setup .NET (ajusta la versión a la que uses, ej: 8.0, 7.0, 6.0)
+      
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-
-      # 3. Restore de dependencias
+      
       - name: Restore dependencies
         run: dotnet restore Foraria/Foraria.sln
-
-      # 4. Build (sin warnings tratados como errores)
+      
       - name: Build
         run: dotnet build Foraria/Foraria.sln --no-restore --configuration Release
-
-      # 5. Run tests
+      
       - name: Test
         run: dotnet test Foraria/Foraria.sln --no-build --configuration Release --verbosity normal
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Restore dependencies
+        run: dotnet restore Foraria/Foraria.sln
+      
+      - name: Build
+        run: dotnet build Foraria/Foraria.sln --configuration Release --no-restore
+      
+      - name: Publish
+        run: dotnet publish Foraria/Foraria/Foraria.csproj --configuration Release --no-build --output ./publish
+      
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish
