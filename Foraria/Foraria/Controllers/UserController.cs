@@ -199,12 +199,10 @@ public class UserController : ControllerBase
         });
     }
 
-    [Authorize(Policy = "All")]
     [HttpPost("refresh")]
     [SwaggerOperation(Summary = "Refresca el token JWT.", Description = "Devuelve un nuevo token JWT y de refresco si el actual es válido.")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto request)
     {
-        await _permissionService.EnsurePermissionAsync(User, "Users.RefreshToken");
 
         if (!ModelState.IsValid)
             throw new DomainValidationException("Solicitud de refresh token inválida.");
