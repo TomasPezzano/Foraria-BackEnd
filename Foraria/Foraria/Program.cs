@@ -229,7 +229,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp", policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins(
+                "http://localhost:3000/",
+                "https://foraria-vercel.app/",
+                "https://foraria-frontend.vercel.app/"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -397,6 +401,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
@@ -412,7 +417,6 @@ app.UseStaticFiles(new StaticFileOptions
 app.MapHub<PollHub>("/pollHub");
 app.MapHub<CallHub>("/callHub");
 
-app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
