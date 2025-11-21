@@ -8,4 +8,6 @@ public interface ICallRepository
     Call? GetById(int id);
     void Update(Call call);
     List<Call> GetActiveCalls();
+    List<Call> GetByConsortium(int consortiumId);
+
 }

@@ -40,6 +40,8 @@ namespace Foraria.DTOs
         public int Thread_id { get; set; }
         public int User_id { get; set; }
         public string? optionalFile { get; set; }
+        public string UserFirstName { get; set; }
+        public string UserLastName { get; set; }
     }
 
 }
