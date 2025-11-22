@@ -93,4 +93,12 @@ public class ConsortiumRepository : IConsortiumRepository
 
         return consortium?.AdministratorId == administratorId;
     }
+
+    public async Task<int> GetByAdminUserId(int id)
+    {
+        var consortium = await _context.Consortium
+            .Where(c => c.AdministratorId == id).FirstOrDefaultAsync();
+        
+        return consortium.Id;
+    }
 }

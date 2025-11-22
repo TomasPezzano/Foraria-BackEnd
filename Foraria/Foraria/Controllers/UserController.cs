@@ -142,7 +142,6 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Policy = "OwnerAndTenant")]
     [HttpPost("update-first-time")]
     [SwaggerOperation(Summary = "Completa el registro inicial del usuario.", Description = "Permite actualizar los datos personales y contraseña en el primer inicio.")]
     [ProducesResponseType(typeof(UpdateUserFirstTimeResponseDto), StatusCodes.Status200OK)]

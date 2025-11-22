@@ -23,4 +23,6 @@ public interface IConsortiumRepository
     Task<bool> ExistsWithoutFilters(int consortiumId);
     Task<List<Consortium>> GetConsortiumsByAdministrator(int administratorId);
     Task<bool> IsAdministratorAssigned(int consortiumId, int administratorId);
+
+    Task<int> GetByAdminUserId(int id);
 }
