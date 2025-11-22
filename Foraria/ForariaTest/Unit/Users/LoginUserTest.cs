@@ -17,6 +17,7 @@ public class LoginUserTests
     private readonly Mock<IRefreshTokenRepository> _mockRefreshTokenRepo;
     private readonly Mock<IOptions<JwtSettings>> _mockJwtSettings;
     private readonly Mock<IRoleRepository> _mockRoleRepo;
+    private readonly Mock<IGetConsortiumByAdminUser> _mockGetConsortiumByAdminUser;
 
     public LoginUserTests()
     {
@@ -27,6 +28,7 @@ public class LoginUserTests
         _mockRefreshTokenRepo = new Mock<IRefreshTokenRepository>();
         _mockJwtSettings = new Mock<IOptions<JwtSettings>>();
         _mockRoleRepo = new Mock<IRoleRepository>();
+        _mockGetConsortiumByAdminUser = new Mock<IGetConsortiumByAdminUser>();
 
         _mockJwtSettings.Setup(x => x.Value).Returns(new JwtSettings
         {
@@ -44,7 +46,8 @@ public class LoginUserTests
             _mockRefreshTokenGenerator.Object,
             _mockRefreshTokenRepo.Object,
             _mockJwtSettings.Object,
-            _mockRoleRepo.Object
+            _mockRoleRepo.Object,
+            _mockGetConsortiumByAdminUser.Object
         );
     }
 
