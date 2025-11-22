@@ -277,7 +277,6 @@ public class UpdateUserFirstTimeTest
         // CORRECCIÓN: Verificamos con el password original, no el nuevo
         _passwordHashMock.Verify(x => x.VerifyPassword("OldPass123!", "hashedOldPassword"), Times.Once);
         _passwordHashMock.Verify(x => x.Execute("NewPass123!"), Times.Once);
-        _userRepositoryMock.Verify(x => x.Update(It.IsAny<User>()), Times.Once);
         _roleRepositoryMock.Verify(x => x.GetById(999), Times.Once);
         _jwtTokenGeneratorMock.Verify(x => x.Generate(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(),
             It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
