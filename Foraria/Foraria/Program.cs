@@ -230,9 +230,9 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithOrigins(
-                "http://localhost:3000/",
-                "https://foraria.vercel.app/",
-                "https://foraria-frontend.vercel.app/"
+                "http://localhost:3000",
+                "https://foraria.vercel.app",
+                "https://foraria-frontend.vercel.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -385,8 +385,7 @@ builder.Services.AddScoped<GetPolls>();
 
 MercadoPagoConfig.AccessToken = builder.Configuration["MercadoPago:AccessToken"];
 var app = builder.Build();
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Add($"http://0.0.0.0:{port}");
+
 
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -401,7 +400,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowReactApp");
 
