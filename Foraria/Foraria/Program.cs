@@ -100,7 +100,7 @@ builder.Services.AddScoped<GetUserExpenseSummary>();
 builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
 builder.Services.AddScoped<GetTotalUsers>();
 builder.Services.AddScoped<GetLatestPendingClaim>();
-builder.Services.AddScoped<GetPendingClaimsCount>();    
+builder.Services.AddScoped<GetPendingClaimsCount>();
 builder.Services.AddScoped<GetCollectedExpensesPercentage>();
 builder.Services.AddScoped<GetUpcomingReserves>();
 builder.Services.AddScoped<GetForumWithThreads>();
@@ -385,6 +385,8 @@ builder.Services.AddScoped<GetPolls>();
 
 MercadoPagoConfig.AccessToken = builder.Configuration["MercadoPago:AccessToken"];
 var app = builder.Build();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
 
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -395,18 +397,11 @@ using (var scope = app.Services.CreateScope())
 
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-    app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+
+app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
