@@ -81,8 +81,6 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
         user.Password = _passwordHash.Execute(newPassword);
         user.RequiresPasswordChange = false;
 
-        await _userRepository.Update(user);
-
         Role? role = await _roleRepository.GetById(user.Role_id);
         if (role == null)
         {
@@ -93,6 +91,9 @@ public class UpdateUserFirstTime : IUpdateUserFirstTime
             };
         }
         user.Role = role;
+
+        await _userRepository.Update(user);
+
 
         var accessToken = _jwtTokenGenerator.Generate(
             user.Id,
