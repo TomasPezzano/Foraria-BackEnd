@@ -100,7 +100,7 @@ builder.Services.AddScoped<GetUserExpenseSummary>();
 builder.Services.AddScoped<GetUserMonthlyExpenseHistory>();
 builder.Services.AddScoped<GetTotalUsers>();
 builder.Services.AddScoped<GetLatestPendingClaim>();
-builder.Services.AddScoped<GetPendingClaimsCount>();    
+builder.Services.AddScoped<GetPendingClaimsCount>();
 builder.Services.AddScoped<GetCollectedExpensesPercentage>();
 builder.Services.AddScoped<GetUpcomingReserves>();
 builder.Services.AddScoped<GetForumWithThreads>();
@@ -230,9 +230,9 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithOrigins(
-                "http://localhost:3000/",
-                "https://foraria.vercel.app/",
-                "https://foraria-frontend.vercel.app/"
+                "http://localhost:3000",
+                "https://foraria.vercel.app",
+                "https://foraria-frontend.vercel.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -386,6 +386,7 @@ builder.Services.AddScoped<GetPolls>();
 MercadoPagoConfig.AccessToken = builder.Configuration["MercadoPago:AccessToken"];
 var app = builder.Build();
 
+
 app.UseMiddleware<ExceptionMiddleware>();
 
 using (var scope = app.Services.CreateScope())
@@ -395,18 +396,14 @@ using (var scope = app.Services.CreateScope())
 
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI();
+
+
+if (!app.Environment.IsProduction())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
     app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowReactApp");
 
