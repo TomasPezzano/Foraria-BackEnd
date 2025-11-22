@@ -13,5 +13,7 @@
 
         public int UserId { get; set; }
         public List<string> Options { get; set; }
+
+        public int ConsortiumId { get; set; }
     }
 }

@@ -83,6 +83,7 @@ namespace Foraria.Controllers
                 CreatedAt = DateTime.Now,
                 DeletedAt = DateTime.Now.AddDays(7),
                 State = "Activa",
+                ConsortiumId = request.ConsortiumId,
                 PollOptions = request.Options.Select(optionText => new PollOption
                 {
                     Text = optionText
