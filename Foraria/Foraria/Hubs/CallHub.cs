@@ -72,14 +72,16 @@ public class CallHub : Hub
 
         if (targetConnectionId != null)
         {
+            var fromUserId = _connections.TryGetValue(Context.ConnectionId, out var info) ? info.UserId : 0;
+
             await Clients.Client(targetConnectionId).SendAsync("ReceiveOffer", new
             {
                 from = Context.ConnectionId,
+                fromUserId,
                 offer
             });
         }
     }
-
 
     public async Task SendAnswer(string callId, int toUserId, object answer)
     {
@@ -89,9 +91,12 @@ public class CallHub : Hub
 
         if (targetConnectionId != null)
         {
+            var fromUserId = _connections.TryGetValue(Context.ConnectionId, out var info) ? info.UserId : 0;
+
             await Clients.Client(targetConnectionId).SendAsync("ReceiveAnswer", new
             {
                 from = Context.ConnectionId,
+                fromUserId,
                 answer
             });
         }
@@ -106,9 +111,12 @@ public class CallHub : Hub
 
         if (targetConnectionId != null)
         {
+            var fromUserId = _connections.TryGetValue(Context.ConnectionId, out var info) ? info.UserId : 0;
+
             await Clients.Client(targetConnectionId).SendAsync("ReceiveIceCandidate", new
             {
                 from = Context.ConnectionId,
+                fromUserId,
                 candidate
             });
         }
