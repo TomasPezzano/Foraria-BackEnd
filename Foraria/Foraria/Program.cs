@@ -231,7 +231,7 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(
                 "http://localhost:3000/",
-                "https://foraria-vercel.app/",
+                "https://foraria.vercel.app/",
                 "https://foraria-frontend.vercel.app/"
             )
             .AllowAnyHeader()
@@ -401,7 +401,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseHttpsRedirection();
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+    app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
