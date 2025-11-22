@@ -94,7 +94,7 @@ public class ClaimController : ControllerBase
 
 
     [HttpPost]
-    [Authorize(Policy = "OwnerAndTenant")]
+    [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Crea un nuevo reclamo.",
         Description = "Permite a un propietario o inquilino crear un nuevo reclamo, opcionalmente con archivo adjunto en formato Base64."

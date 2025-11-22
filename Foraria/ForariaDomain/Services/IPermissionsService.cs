@@ -21,7 +21,7 @@ namespace Foraria.Application.Services
                 "Calls.ViewState", "Calls.UploadRecording",
                 "Calls.SendMessage", "Calls.View",
 
-                "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
+                "Claims.Reject", "Claims.Respond", "Claims.View",
 
                 "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
