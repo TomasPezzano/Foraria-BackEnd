@@ -17,8 +17,7 @@ namespace Foraria.Infrastructure.Repository
         public async Task<IEnumerable<Reserve>> GetUpcomingReservationsAsync(DateTime fromDate, int limit = 5)
         {
             return await _context.Reserves
-                .Include(r => r.Residence)
-                    .ThenInclude(res => res.Consortium)
+                .Include(r => r.Consortium)
                 .Include(r => r.User)
                 .Include(r => r.Place)
                 .Where(r =>
@@ -45,6 +44,7 @@ namespace Foraria.Infrastructure.Repository
         {
             return await _context.Reserves
                 .Include(r => r.Place)
+                .Include(r => r.User)
                 .ToListAsync();
         }
 
@@ -59,7 +59,6 @@ namespace Foraria.Infrastructure.Repository
             return await _context.Reserves
                 .Include(r => r.Place)
                 .Include(r => r.User)
-                .Include(r => r.Residence)
                 .Where(r =>  r.State == "active" &&            
                     r.DeletedAt == null &&
                     r.Date >= now)

@@ -21,10 +21,6 @@ namespace ForariaDomain
 
         public Place Place { get; set; }
 
-        public int Residence_id { get; set; }
-
-        public Residence Residence { get; set; }
-
         public int User_id { get; set; }
 
         public User User { get; set; }

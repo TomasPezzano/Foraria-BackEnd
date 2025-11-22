@@ -36,7 +36,7 @@ public class ReserveController : ControllerBase
         _permissionService = permissionService;
     }
 
-    [HttpGet("{idConsortium}")]
+    [HttpGet]
     [Authorize(Policy = "All")]
     [SwaggerOperation(
         Summary = "Obtiene todas las reservas registradas.",
@@ -45,7 +45,7 @@ public class ReserveController : ControllerBase
     [ProducesResponseType(typeof(List<ReserveDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(int idConsortium)
+    public async Task<IActionResult> GetAll()
     {
         await _permissionService.EnsurePermissionAsync(User, "Reserves.ViewAll");
         var reserves = await _getAllReserve.Execute();
@@ -63,7 +63,6 @@ public class ReserveController : ControllerBase
                 DeletedAt = reserve.DeletedAt,
                 Place_id = reserve.Place_id,
                 PlaceName = reserve.Place?.Name,
-                Residence_id = reserve.Residence_id,
                 User_id = reserve.User_id,
                 UserName = reserve.User?.Name,
                 DateReserve = reserve.CreatedAt
@@ -74,7 +73,7 @@ public class ReserveController : ControllerBase
 
 
         if (reserves == null || !reserves.Any())
-            throw new NotFoundException($"No se encontraron reservas para el consorcio con ID {idConsortium}.");
+            throw new NotFoundException($"No se encontraron reservas para el consorcio.");
 
         return Ok(reservesDto);
     }
@@ -112,7 +111,6 @@ public class ReserveController : ControllerBase
             State = "Nuevo",
             CreatedAt = reserveDto.CreatedAt,
             Place_id = reserveDto.Place_id,
-            Residence_id = reserveDto.Residence_id,
             ConsortiumId = reserveDto.Consortium_id,
             User_id = reserveDto.User_id
         };
@@ -130,7 +128,6 @@ public class ReserveController : ControllerBase
             DeletedAt = created.DeletedAt,
             Place_id = created.Place_id,
             PlaceName = created.Place?.Name,
-            Residence_id = created.Residence_id,
             User_id = created.User_id,
             UserName = created.User?.Name,
             DateReserve = created.CreatedAt

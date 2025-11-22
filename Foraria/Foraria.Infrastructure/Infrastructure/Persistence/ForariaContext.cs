@@ -209,11 +209,6 @@ namespace Foraria.Infrastructure.Persistence
               .HasForeignKey(u => u.Place_id)
               .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Reserve>()
-                .HasOne(u => u.Residence)
-                .WithMany(r => r.Reserves)
-                .HasForeignKey(u => u.Residence_id)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>()
                  .HasMany(u => u.Residences)
