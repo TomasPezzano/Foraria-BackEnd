@@ -18,8 +18,6 @@ public class ReserveDto
     [Required(ErrorMessage = "Debe especificar el lugar.")]
     public int Place_id { get; set; }
 
-    [Required(ErrorMessage = "Debe especificar la residencia.")]
-    public int Residence_id { get; set; }
 
     [Required(ErrorMessage = "Debe especificar el usuario que crea la reserva.")]
     public int User_id { get; set; }
@@ -35,9 +33,6 @@ public class ReserveResponseDto
 
     public int Place_id { get; set; }
     public string? PlaceName { get; set; }
-
-    public int Residence_id { get; set; }
-    public string? Residence { get; set; }
 
     public int User_id { get; set; }
     public string? UserName { get; set; }
