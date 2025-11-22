@@ -21,6 +21,7 @@ public class LoginUser : ILoginUser
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly JwtSettings _jwtSettings;
     private readonly IRoleRepository _roleRepository;
+    private readonly IGetConsortiumByAdminUser _getConsortiumByAdminUser;
 
     public LoginUser(
         IUserRepository userRepository,
@@ -29,7 +30,8 @@ public class LoginUser : ILoginUser
         IRefreshTokenGenerator refreshTokenGenerator,
         IRefreshTokenRepository refreshTokenRepository,
         IOptions<JwtSettings> jwtSettings,
-        IRoleRepository roleRepository)
+        IRoleRepository roleRepository,
+        IGetConsortiumByAdminUser getConsortiumByAdminUser)
     {
         _userRepository = userRepository;
         _passwordHash = passwordHash;
@@ -38,6 +40,7 @@ public class LoginUser : ILoginUser
         _refreshTokenRepository = refreshTokenRepository;
         _jwtSettings = jwtSettings.Value;
         _roleRepository = roleRepository;
+        _getConsortiumByAdminUser = getConsortiumByAdminUser;
     }
 
     public async Task<LoginResult> Login(User usuarioLogueado, string passRequest, string ipAddress)
@@ -55,10 +58,14 @@ public class LoginUser : ILoginUser
 
 
         usuarioLogueado.Role = role;
-
+        
         var residence = usuarioLogueado.Residences.FirstOrDefault();
         var residenceId = residence?.Id;
         var consortiumId = residence?.ConsortiumId;
+
+        if (usuarioLogueado.Role.Description.Equals("Administrador")) { 
+        consortiumId = await _getConsortiumByAdminUser.Execute(usuarioLogueado.Id);
+        }
 
         var accessToken = _jwtTokenGenerator.Generate(
             usuarioLogueado.Id,
@@ -68,7 +75,7 @@ public class LoginUser : ILoginUser
             usuarioLogueado.RequiresPasswordChange,
             usuarioLogueado.HasPermission
         );
-
+        
         var refreshToken = _refreshTokenGenerator.Generate();
         var refreshTokenEntity = new RefreshToken
         {
