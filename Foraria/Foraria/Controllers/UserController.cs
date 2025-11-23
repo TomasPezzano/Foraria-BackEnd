@@ -215,7 +215,7 @@ public class UserController : ControllerBase
         return Ok(new { message = "Logout successful" });
     }
 
-    [Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "All")]
     [HttpGet("count")]
     [SwaggerOperation(Summary = "Obtiene la cantidad total de usuarios.", Description = "Devuelve el total de usuarios registrados en el sistema.")]
     public async Task<IActionResult> GetUsersCount(int consortiumId)

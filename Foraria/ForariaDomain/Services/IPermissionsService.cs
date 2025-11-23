@@ -191,7 +191,7 @@ namespace Foraria.Application.Services
                 "Users.ViewTotalOwners","Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
 
-                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
+                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll", "Users.ViewCount",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
                 "Votes.Cast"
@@ -242,7 +242,7 @@ namespace Foraria.Application.Services
                 "Users.ViewTotalOwners","Users.ViewTotalTenants", "Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
 
-                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
+                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll", "Users.ViewCount",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
                 "Votes.Cast"

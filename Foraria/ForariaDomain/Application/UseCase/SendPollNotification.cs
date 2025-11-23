@@ -50,13 +50,13 @@ public class SendPollNotification : ISendPollNotification
         }
 
         var title = "🗳️ Nueva Votación Disponible";
-        var body = $"Nueva votación: '{poll.Title}'. Tienes hasta el {poll.EndDate:dd/MM/yyyy} para votar.";
+        var body = $"Nueva votación: '{poll.Title}'. Tienes hasta el {poll.DeletedAt:dd/MM/yyyy} para votar.";
 
         var metadata = new Dictionary<string, string>
         {
             { "pollId", poll.Id.ToString() },
             { "title", poll.Title },
-            { "endDate", poll.EndDate.ToString("yyyy-MM-dd") },
+            { "endDate", poll.DeletedAt.ToString("yyyy-MM-dd") },
             { "category", poll.CategoryPoll.Description }
         };
 
@@ -96,7 +96,7 @@ public class SendPollNotification : ISendPollNotification
             return;
         }
 
-        var hoursRemaining = (poll.EndDate - DateTime.Now).TotalHours;
+        var hoursRemaining = (poll.DeletedAt - DateTime.Now).TotalHours;
         var timeLeft = hoursRemaining <= 24
             ? $"{(int)hoursRemaining} horas"
             : $"{(int)(hoursRemaining / 24)} días";
@@ -108,7 +108,7 @@ public class SendPollNotification : ISendPollNotification
         {
             { "pollId", poll.Id.ToString() },
             { "title", poll.Title },
-            { "endDate", poll.EndDate.ToString("yyyy-MM-dd") }
+            { "endDate", poll.DeletedAt.ToString("yyyy-MM-dd") }
         };
 
         var userIds = usersToNotify.Select(u => u.Id).ToList();
