@@ -39,7 +39,7 @@ public class Invoice
 
     [Required]
     [Precision(18, 2)]
-    public decimal Amount { get; set; }  // Total con impuestos
+    public decimal Amount { get; set; }
 
     [Required]
     [MaxLength(11)]

@@ -51,7 +51,6 @@ namespace Foraria.Controllers
             if (request.ReactionType == null)
                 throw new ValidationException("Debe especificar el tipo de reacción.");
 
-            // debe apuntar a mensaje o hilo, al menos uno
             if (request.Message_id == null && request.Thread_id == null)
                 throw new ValidationException("Debe asociar la reacción a un mensaje o a un hilo.");
 

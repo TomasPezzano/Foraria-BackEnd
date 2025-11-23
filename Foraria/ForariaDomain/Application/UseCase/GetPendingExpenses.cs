@@ -19,7 +19,6 @@ namespace Foraria.Application.UseCase
 
             var pending = await _repository.GetPendingExpenses();
 
-            // traduce el día al español
             var culture = new CultureInfo("es-AR");
 
             return pending

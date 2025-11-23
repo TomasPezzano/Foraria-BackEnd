@@ -36,10 +36,8 @@ public class SupplierContract
 
     public bool Active { get; set; } = true;
 
-    // Archivo del contrato (PDF, etc.)
     public string? FilePath { get; set; }
 
-    // Relación con Proveedor
     public int SupplierId { get; set; }
     public Supplier Supplier { get; set; } = null!;
 

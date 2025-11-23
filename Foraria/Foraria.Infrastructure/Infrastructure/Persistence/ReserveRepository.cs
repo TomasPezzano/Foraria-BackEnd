@@ -22,7 +22,7 @@ namespace Foraria.Infrastructure.Repository
                 .Include(r => r.Place)
                 .Where(r =>
                     r.Date >= fromDate &&
-                    r.State == "Confirmed") //open?
+                    r.State == "Confirmed") 
                 .OrderBy(r => r.Date)
                 .Take(limit)
                 .ToListAsync();

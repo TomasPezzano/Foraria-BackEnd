@@ -28,7 +28,7 @@ public class OldReserveBackgroundService : BackgroundService
                 await updater.Execute();
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken); // revisa cada 5 minutos
+            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken); 
         }
     }
 }

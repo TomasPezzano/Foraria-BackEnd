@@ -18,7 +18,6 @@ public class GeneratePassword : IGeneratePassword
         const int length = 10;
         string all = Upper + Lower + Digits + Special;
 
-        // Garantizar al menos 1 de cada tipo
         var chars = new List<char>(length)
         {
             GetRandomChar(Upper),
@@ -27,11 +26,9 @@ public class GeneratePassword : IGeneratePassword
             GetRandomChar(Special)
         };
 
-        // Completar con caracteres aleatorios
         while (chars.Count < length)
             chars.Add(GetRandomChar(all));
 
-        // Mezclar
         Shuffle(chars);
 
         var password = new string(chars.ToArray());

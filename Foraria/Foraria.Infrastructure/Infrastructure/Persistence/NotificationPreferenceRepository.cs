@@ -27,7 +27,6 @@ public class NotificationPreferenceRepository : INotificationPreferenceRepositor
 
         if (existing != null)
         {
-            // Actualizar existente
             existing.PushEnabled = preference.PushEnabled;
             existing.EmailEnabled = preference.EmailEnabled;
             existing.SmsEnabled = preference.SmsEnabled;
@@ -46,7 +45,6 @@ public class NotificationPreferenceRepository : INotificationPreferenceRepositor
         }
         else
         {
-            // Crear nuevo
             preference.UpdatedAt = DateTime.Now;
             _context.NotificationPreferences.Add(preference);
             await _context.SaveChangesAsync();
@@ -66,7 +64,6 @@ public class NotificationPreferenceRepository : INotificationPreferenceRepositor
         }
         else
         {
-            // Crear preferencia con valores por defecto si no existe
             var newPreference = new NotificationPreference
             {
                 UserId = userId,

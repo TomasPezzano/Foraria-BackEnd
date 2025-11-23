@@ -35,7 +35,6 @@ public class SendForumNotification : ISendForumNotification
 
         var users = await _userRepository.GetUsersByConsortiumIdAsync(thread.ConsortiumId);
 
-        // Notificar a todos excepto al creador del thread
         var usersToNotify = users
             .Where(u => u.Id != thread.UserId)
             .ToList();

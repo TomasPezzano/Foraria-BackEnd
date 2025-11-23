@@ -28,7 +28,7 @@ public class ConfigureNotificationPreferences : IConfigureNotificationPreference
         int userId,
         NotificationPreference preferences)
     {
-        // ✅ FIX: Usar método async
+        
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null)
         {
@@ -44,7 +44,7 @@ public class ConfigureNotificationPreferences : IConfigureNotificationPreference
 
     public async Task UpdateFcmTokenAsync(int userId, string fcmToken)
     {
-        // ✅ FIX: Usar método async
+        
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null)
         {
@@ -65,7 +65,6 @@ public class ConfigureNotificationPreferences : IConfigureNotificationPreference
 
         if (preferences == null)
         {
-            // Retornar preferencias por defecto sin crear en BD
             return new NotificationPreference
             {
                 UserId = userId,

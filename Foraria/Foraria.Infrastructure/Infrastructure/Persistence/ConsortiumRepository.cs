@@ -1,5 +1,4 @@
-﻿// Ubicación: Foraria.Infrastructure/Persistence/ConsortiumRepository.cs
-using Foraria.Infrastructure.Persistence;
+﻿using Foraria.Infrastructure.Persistence;
 using ForariaDomain;
 using ForariaDomain.Exceptions;
 using ForariaDomain.Repository;

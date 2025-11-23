@@ -7,7 +7,7 @@ using Xunit;
 
 public class PolygonBlockchainServiceTests
 {
-    private readonly PolygonBlockchainService _service;
+    private readonly BlockchainService _service;
 
     public PolygonBlockchainServiceTests()
     {
@@ -32,7 +32,7 @@ public class PolygonBlockchainServiceTests
         if (!File.Exists(abiPath))
             File.WriteAllText(abiPath, "{}");
 
-        _service = new PolygonBlockchainService(configuration, settings);
+        _service = new BlockchainService(configuration, settings);
     }
 
     [Fact]

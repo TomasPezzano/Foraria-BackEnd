@@ -151,11 +151,6 @@ public class NotificationController : ControllerBase
         return Ok(updated);
     }
 
-    /// <summary>
-    /// Endpoint de prueba para enviar una notificación push
-    /// </summary>
-    /// 
-
     [SwaggerOperation(
     Summary = "Actualiza las preferencias.",
     Description = "Actualiza las preferencias de notificación del usuario autenticado"
@@ -200,10 +195,6 @@ public class NotificationController : ControllerBase
         return userId;
     }
 
-    /// <summary>
-    /// ENDPOINT DE PRUEBA - Solo para desarrollo
-    /// Registra un token y crea una expensa de prueba
-    /// </summary>
     [HttpPost("setup-test")]
     [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> SetupTest(
@@ -215,7 +206,6 @@ public class NotificationController : ControllerBase
 
         try
         {
-            // 1. Validar que el consortiumId sea válido
             if (request.ConsortiumId == 0)
             {
                 return BadRequest(new
@@ -225,10 +215,8 @@ public class NotificationController : ControllerBase
                 });
             }
 
-            // 2. Registrar FCM Token
             await _configurePreferences.UpdateFcmTokenAsync(userId, request.FcmToken);
 
-            // 3. Crear expensa de prueba que vence mañana
             var tomorrow = DateTime.Now.AddDays(1);
 
             var testExpense = new Expense
@@ -266,9 +254,7 @@ public class NotificationController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// ENDPOINT DE PRUEBA - Forzar chequeo de expensas por vencer
-    /// </summary>
+
     [HttpPost("trigger-reminders")]
     [Authorize(Policy = "ConsortiumAndAdmin")]
     public async Task<IActionResult> TriggerReminders(
@@ -317,11 +303,10 @@ public class NotificationController : ControllerBase
         });
     }
 
-    // DTO para el request
     public class SetupTestRequest
     {
         public string FcmToken { get; set; } = string.Empty;
-        public int ConsortiumId { get; set; } = 0; // Opcional
+        public int ConsortiumId { get; set; } = 0; 
     }
 
 

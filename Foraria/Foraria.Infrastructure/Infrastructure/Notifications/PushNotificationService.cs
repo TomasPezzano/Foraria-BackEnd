@@ -24,14 +24,14 @@ public interface IFcmPushNotificationService
         List<(string fcmToken, string title, string body, Dictionary<string, string>? data)> notifications);
 }
 
-public class FcmPushNotificationService : IFcmPushNotificationService
+public class PushNotificationService : IFcmPushNotificationService
 {
-    private readonly ILogger<FcmPushNotificationService> _logger;
+    private readonly ILogger<PushNotificationService> _logger;
     private readonly FirebaseApp _firebaseApp;
 
-    public FcmPushNotificationService(
+    public PushNotificationService(
         IConfiguration configuration,
-        ILogger<FcmPushNotificationService> logger)
+        ILogger<PushNotificationService> logger)
     {
         _logger = logger;
 

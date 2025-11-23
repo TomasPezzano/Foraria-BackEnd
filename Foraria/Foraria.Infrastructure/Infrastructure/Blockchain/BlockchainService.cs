@@ -19,7 +19,7 @@ using ForariaDomain.Models;
 
 namespace Foraria.Infrastructure.Blockchain
 {
-    public class PolygonBlockchainService : IBlockchainService
+    public class BlockchainService : IBlockchainService
     {
         private readonly string _rpcUrl;
         private readonly string _privateKey;
@@ -32,7 +32,7 @@ namespace Foraria.Infrastructure.Blockchain
 
 
 
-        public PolygonBlockchainService(IConfiguration configuration, IOptions<BlockchainSettings> settings)
+        public BlockchainService(IConfiguration configuration, IOptions<BlockchainSettings> settings)
         {
             var blockchainSection = configuration.GetSection("Blockchain");
 
