@@ -73,7 +73,7 @@ namespace ForariaDomain.Services
                 }
 
                 await uow.SaveChangesAsync();
-                await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }
         }
 
