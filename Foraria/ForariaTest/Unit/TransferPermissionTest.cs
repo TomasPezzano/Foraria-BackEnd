@@ -98,7 +98,7 @@ namespace ForariaTest.Unit
         [Fact]
         public async Task Execute_WhenValid_TransfersPermissionsCorrectly()
         {
-            var owner = CreateUser(1, "Propietario", hasPermission: false);
+            var owner = CreateUser(1, "Propietario", hasPermission: true);
             var tenant = CreateUser(2, "Inquilino");
 
             _userRepositoryMock.Setup(r => r.GetByIdWithRole(1)).ReturnsAsync(owner);
