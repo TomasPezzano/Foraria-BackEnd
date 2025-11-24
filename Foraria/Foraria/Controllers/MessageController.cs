@@ -172,7 +172,7 @@ namespace Foraria.Controllers
         )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(int id, [FromForm] UpdateMessageRequest request)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateMessageRequest request)
         {
             await _permissionService.EnsurePermissionAsync(User, "Messages.UpdateOwn");
 
