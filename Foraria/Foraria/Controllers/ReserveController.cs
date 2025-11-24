@@ -163,7 +163,7 @@ public class ReserveController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetActiveReserveCount()
     {
-        await _permissionService.EnsurePermissionAsync(User, "Reserve.ViewAll");
+        await _permissionService.EnsurePermissionAsync(User, "Reserve.ViewActiveCount");
 
         var count = await _getActiveReserveCount.ExecuteAsync();
 

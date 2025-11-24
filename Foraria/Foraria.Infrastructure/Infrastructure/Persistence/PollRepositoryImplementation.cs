@@ -71,11 +71,8 @@ namespace Foraria.Infrastructure.Persistence
         public async Task<IEnumerable<Poll>> GetActivePolls(int consortiumId, DateTime now)
         {
             return await _context.Polls
-                .Include(p => p.User)
-                    .ThenInclude(u => u.Residences)
-                        .ThenInclude(r => r.Consortium)
                 .Where(p =>
-                    p.State == "Activa" &&
+                    p.State.Equals("Activa") &&
                     p.StartDate <= now &&
                     p.EndDate >= now)
                 .ToListAsync();

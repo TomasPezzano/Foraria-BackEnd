@@ -54,7 +54,7 @@ namespace Foraria.Application.Services
 
                 "Reactions.Toggle", "Reactions.ViewMessage", "Reactions.ViewThread",
 
-                "Reserves.Create", "Reserves.ViewAll",
+                "Reserves.Create", "Reserves.ViewAll", "Reserve.ViewActiveCount",
 
                 "Residences.Create", "Residences.View", "Residences.ViewAllByConsortium",
 
@@ -120,7 +120,7 @@ namespace Foraria.Application.Services
 
                 "Reactions.Toggle", "Reactions.ViewMessage", "Reactions.ViewThread",
 
-                "Reserves.Create", "Reserves.ViewAll",
+                "Reserves.Create", "Reserves.ViewAll", "Reserve.ViewActiveCount",
 
                 "Residences.Create", "Residences.View", "Residences.ViewAllByConsortium",
 
@@ -178,7 +178,7 @@ namespace Foraria.Application.Services
 
                 "Reactions.Toggle", "Reactions.ViewMessage", "Reactions.ViewThread",
 
-                "Reserves.Create", "Reserves.ViewAll",
+                "Reserves.Create", "Reserves.ViewAll", "Reserve.ViewActiveCount",
 
                 "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
@@ -229,7 +229,7 @@ namespace Foraria.Application.Services
 
                 "Reactions.Toggle", "Reactions.ViewMessage", "Reactions.ViewThread",
 
-                "Reserves.Create", "Reserves.ViewAll",
+                "Reserves.Create", "Reserves.ViewAll", "Reserve.ViewActiveCount",
 
                 "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
