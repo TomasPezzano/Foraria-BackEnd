@@ -21,7 +21,7 @@ namespace Foraria.Application.Services
                 "Calls.ViewState", "Calls.UploadRecording",
                 "Calls.SendMessage", "Calls.View",
 
-                "Claims.Reject", "Claims.Respond", "Claims.View",
+                "Claims.Reject", "Claims.Respond", "Claims.View", "Claim.ViewPendingClaim",
 
                 "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
@@ -74,7 +74,7 @@ namespace Foraria.Application.Services
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
-                "Votes.Cast"
+                
             },
 
             ["Consorcio"] = new()
@@ -86,7 +86,7 @@ namespace Foraria.Application.Services
                 "Calls.ViewState", "Calls.UploadRecording",
                 "Calls.SendMessage", "Calls.View",
 
-                "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
+                "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View", "Claim.ViewPendingClaim",
 
                 "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
@@ -150,7 +150,7 @@ namespace Foraria.Application.Services
                 "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
                 "Calls.ViewState", "Calls.SendMessage", "Calls.View",
 
-                "Claims.Create", "Claims.View",
+                "Claims.Create", "Claims.View", "Claim.ViewPendingClaim",
 
                 "Consortium.ViewAvailable", 
 
@@ -204,7 +204,7 @@ namespace Foraria.Application.Services
                 "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
                 "Calls.ViewState", "Calls.SendMessage", "Calls.View",
 
-                "Claims.Create", "Claims.View",
+                "Claims.Create", "Claims.View", "Claim.ViewPendingClaim",
 
                 "Consortium.ViewAvailable",
 

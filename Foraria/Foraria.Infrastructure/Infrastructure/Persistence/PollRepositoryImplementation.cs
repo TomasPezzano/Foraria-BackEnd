@@ -75,7 +75,7 @@ namespace Foraria.Infrastructure.Persistence
                     .ThenInclude(u => u.Residences)
                         .ThenInclude(r => r.Consortium)
                 .Where(p =>
-                    p.State == "Active" &&
+                    p.State == "Activa" &&
                     p.StartDate <= now &&
                     p.EndDate >= now)
                 .ToListAsync();

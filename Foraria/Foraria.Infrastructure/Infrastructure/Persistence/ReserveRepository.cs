@@ -59,7 +59,7 @@ namespace Foraria.Infrastructure.Repository
             return await _context.Reserves
                 .Include(r => r.Place)
                 .Include(r => r.User)
-                .Where(r =>  r.State == "active" &&            
+                .Where(r =>  r.State == "Nuevo" &&            
                     r.DeletedAt == null &&
                     r.Date >= now)
                 .ToListAsync();
