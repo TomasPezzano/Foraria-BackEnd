@@ -83,7 +83,10 @@ public class RegisterUser : IRegisterUser
             user.Residences = new List<Residence?> { residence };
         }
 
-        user.HasPermission = role.Description == "Propietario";
+        user.HasPermission =
+            role.Description == "Propietario" ||
+            role.Description == "Administrador" ||
+            role.Description == "Consorcio";
 
         var temporaryPassword = await _generatePasswordUseCase.Generate();
         var passwordHash = _passwordHashUseCase.Execute(temporaryPassword);
