@@ -30,6 +30,7 @@ namespace Foraria.Application.Services
                 "Dashboard.ViewReservationsCount", "Dashboard.ViewUpcomingReservations",
                 "Dashboard.ViewUsersCount", "Dashboard.ViewCollectedExpensesPercentage",
                 "Dashboard.ViewMonthlyExpenseTotal", "Dashboard.ViewPendingExpenses",
+                "Dashboard.PercentageByCategory",
 
                 "ExpenseDetails.Generate", "ExpenseDetails.ViewByResidence",
 
@@ -95,6 +96,7 @@ namespace Foraria.Application.Services
                 "Dashboard.ViewReservationsCount", "Dashboard.ViewUpcomingReservations",
                 "Dashboard.ViewUsersCount", "Dashboard.ViewCollectedExpensesPercentage",
                 "Dashboard.ViewMonthlyExpenseTotal", "Dashboard.ViewPendingExpenses",
+                "Dashboard.PercentageByCategory",
 
                 "ExpenseDetails.Generate", "ExpenseDetails.ViewByResidence",
 
@@ -157,7 +159,7 @@ namespace Foraria.Application.Services
                 "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations", 
                 "Dashboard.ViewReservationsCount", "Dashboard.ViewMonthlyExpenseTotal",
                 "Dashboard.ViewPendingExpenses","Dashboard.ViewUserExpenseSummary",
-                "Dashboard.ViewUserMonthlyExpenseHistory", 
+                "Dashboard.ViewUserMonthlyExpenseHistory", "Dashboard.PercentageByCategory",
 
                 "Expenses.ViewAll",
 
@@ -211,7 +213,7 @@ namespace Foraria.Application.Services
                 "Dashboard.ViewActivePolls", "Dashboard.ViewActiveReservations",
                 "Dashboard.ViewReservationsCount", "Dashboard.ViewMonthlyExpenseTotal",
                 "Dashboard.ViewPendingExpenses","Dashboard.ViewUserExpenseSummary",
-                "Dashboard.ViewUserMonthlyExpenseHistory", 
+                "Dashboard.ViewUserMonthlyExpenseHistory", "Dashboard.PercentageByCategory",
 
                 "Expenses.ViewAll",
 

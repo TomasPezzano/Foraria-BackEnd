@@ -224,6 +224,7 @@ builder.Services.AddScoped<GetCallsByConsortium>();
 builder.Services.AddScoped<IGetExtraordinaryInvoicesByResidence, GetExtraordinaryInvoicesByResidence>();
 builder.Services.AddScoped<SendCallMessage>();
 builder.Services.AddScoped<IGetConsortiumByAdminUser, GetConsortiumByAdminUser>();
+builder.Services.AddScoped<IGetPercentageByCategoryInExpense, GetPercentageByCategoryInExpense>();
 
 builder.Services.AddCors(options =>
 {
