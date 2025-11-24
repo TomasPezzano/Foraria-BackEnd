@@ -73,8 +73,8 @@ namespace Foraria.Infrastructure.Persistence
             return await _context.Polls
                 .Where(p =>
                     p.State.Equals("Activa") &&
-                    p.StartDate <= now &&
-                    p.EndDate >= now)
+                    p.CreatedAt <= now &&
+                    p.DeletedAt >= now)
                 .ToListAsync();
         }
 
