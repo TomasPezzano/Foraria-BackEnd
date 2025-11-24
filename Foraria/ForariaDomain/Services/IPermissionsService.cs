@@ -21,7 +21,7 @@ namespace Foraria.Application.Services
                 "Calls.ViewState", "Calls.UploadRecording",
                 "Calls.SendMessage", "Calls.View",
 
-                "Claims.Reject", "Claims.Respond", "Claims.View",
+                "Claims.Reject", "Claims.Respond", "Claims.View", "Claim.ViewPendingClaim",
 
                 "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
@@ -55,7 +55,7 @@ namespace Foraria.Application.Services
 
                 "Reactions.Toggle", "Reactions.ViewMessage", "Reactions.ViewThread",
 
-                "Reserves.Create", "Reserves.ViewAll",
+                "Reserves.Create", "Reserves.ViewAll", "Reserve.ViewActiveCount",
 
                 "Residences.Create", "Residences.View", "Residences.ViewAllByConsortium",
 
@@ -75,7 +75,7 @@ namespace Foraria.Application.Services
                 "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
-                "Votes.Cast"
+                
             },
 
             ["Consorcio"] = new()
@@ -87,7 +87,7 @@ namespace Foraria.Application.Services
                 "Calls.ViewState", "Calls.UploadRecording",
                 "Calls.SendMessage", "Calls.View",
 
-                "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View",
+                "Claims.Create", "Claims.Reject", "Claims.Respond", "Claims.View", "Claim.ViewPendingClaim",
 
                 "Consortium.Select", "Consortium.ViewAvailable", "Consortium.AssignToAdmin", "Consortium.ViewAdminConsortiums",
 
@@ -122,7 +122,7 @@ namespace Foraria.Application.Services
 
                 "Reactions.Toggle", "Reactions.ViewMessage", "Reactions.ViewThread",
 
-                "Reserves.Create", "Reserves.ViewAll",
+                "Reserves.Create", "Reserves.ViewAll", "Reserve.ViewActiveCount",
 
                 "Residences.Create", "Residences.View", "Residences.ViewAllByConsortium",
 
@@ -152,7 +152,7 @@ namespace Foraria.Application.Services
                 "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
                 "Calls.ViewState", "Calls.SendMessage", "Calls.View",
 
-                "Claims.Create", "Claims.View",
+                "Claims.Create", "Claims.View", "Claim.ViewPendingClaim",
 
                 "Consortium.ViewAvailable", 
 
@@ -180,7 +180,7 @@ namespace Foraria.Application.Services
 
                 "Reactions.Toggle", "Reactions.ViewMessage", "Reactions.ViewThread",
 
-                "Reserves.Create", "Reserves.ViewAll",
+                "Reserves.Create", "Reserves.ViewAll", "Reserve.ViewActiveCount",
 
                 "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
@@ -193,7 +193,7 @@ namespace Foraria.Application.Services
                 "Users.ViewTotalOwners","Users.ViewTotalTenants","Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
 
-                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
+                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll", "Users.ViewCount",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
                 "Votes.Cast"
@@ -206,7 +206,7 @@ namespace Foraria.Application.Services
                 "Calls.Join", "Calls.ViewDetails", "Calls.ViewParticipants",
                 "Calls.ViewState", "Calls.SendMessage", "Calls.View",
 
-                "Claims.Create", "Claims.View",
+                "Claims.Create", "Claims.View", "Claim.ViewPendingClaim",
 
                 "Consortium.ViewAvailable",
 
@@ -231,7 +231,7 @@ namespace Foraria.Application.Services
 
                 "Reactions.Toggle", "Reactions.ViewMessage", "Reactions.ViewThread",
 
-                "Reserves.Create", "Reserves.ViewAll",
+                "Reserves.Create", "Reserves.ViewAll", "Reserve.ViewActiveCount",
 
                 "Suppliers.View", "Suppliers.ViewAll", "Suppliers.CategoriesCount",
 
@@ -244,7 +244,7 @@ namespace Foraria.Application.Services
                 "Users.ViewTotalOwners","Users.ViewTotalTenants", "Users.ViewById", "Users.Logout",
                 "Users.RefreshToken", "Users.UpdateFirstTime", "Users.ViewByConsortium",
 
-                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll",
+                "UserDocuments.Create", "UserDocuments.Update", "UserDocuments.ViewAll", "Users.ViewCount",
                 "UserDocuments.ViewByCategory", "UserDocuments.ViewLastUpload", "UserDocuments.ViewStats",
 
                 "Votes.Cast"

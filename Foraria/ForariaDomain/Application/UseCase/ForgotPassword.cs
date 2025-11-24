@@ -40,7 +40,6 @@ public class ForgotPassword : IForgotPassword
 
         if (user == null)
         {
-            // Por seguridad, no revelamos si el email existe o no
             return new ForgotPasswordResult
             {
                 Success = true,
@@ -48,7 +47,6 @@ public class ForgotPassword : IForgotPassword
             };
         }
 
-        // Invalidar tokens activos previos
         var activeTokens = await _passwordResetTokenRepository.GetActiveTokensByUserId(user.Id);
         foreach (var token in activeTokens)
         {
@@ -57,7 +55,6 @@ public class ForgotPassword : IForgotPassword
             await _passwordResetTokenRepository.Update(token);
         }
 
-        // Generar nuevo token
         var resetToken = _tokenGenerator.Generate();
         var passwordResetToken = new PasswordResetToken
         {
@@ -71,7 +68,6 @@ public class ForgotPassword : IForgotPassword
 
         await _passwordResetTokenRepository.Add(passwordResetToken);
 
-        // Enviar email
         await _emailService.SendPasswordResetEmail(user.Mail, user.Name, resetToken);
 
         return new ForgotPasswordResult

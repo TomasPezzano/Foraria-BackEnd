@@ -69,24 +69,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterUserRequestDto request)
     {
-        //await _permissionService.EnsurePermissionAsync(User, "Users.Register");
-
         if (!ModelState.IsValid)
             throw new DomainValidationException("Los datos del usuario no son válidos.");
-
-        //if (request.ResidenceId.HasValue && !request.ConsortiumId.HasValue)
-        //{
-        //    // Obtener la residencia para saber a qué consorcio pertenece
-        //    var residence = await _residenceRepository.GetByIdWithoutFilters(request.ResidenceId.Value);
-        //    if (residence == null)
-        //        throw new NotFoundException("Residencia no encontrada.");
-
-        //    // Verificar que el usuario actual tenga acceso a ese consorcio
-        //    var currentUserConsortiums = _permissionService.GetUserConsortiumIds(User);
-        //    if (!currentUserConsortiums.Contains(residence.ConsortiumId))
-        //        throw new ForbiddenAccessException(
-        //            "No tienes permiso para registrar usuarios en este consorcio.");
-        //}
 
         var user = new User
         {
@@ -231,7 +215,7 @@ public class UserController : ControllerBase
         return Ok(new { message = "Logout successful" });
     }
 
-    [Authorize(Policy = "ConsortiumAndAdmin")]
+    [Authorize(Policy = "All")]
     [HttpGet("count")]
     [SwaggerOperation(Summary = "Obtiene la cantidad total de usuarios.", Description = "Devuelve el total de usuarios registrados en el sistema.")]
     public async Task<IActionResult> GetUsersCount(int consortiumId)

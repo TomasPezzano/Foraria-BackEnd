@@ -34,7 +34,6 @@ public class Supplier
 
     public string? Observations { get; set; }
 
-    // Rating (calificación)
     public decimal? Rating { get; set; }
 
     public bool Active { get; set; } = true;
@@ -43,7 +42,6 @@ public class Supplier
 
     public DateTime? LastInteraction { get; set; }
 
-    // Relación con Contratos
     public ICollection<SupplierContract?> Contracts { get; set; }
 
 

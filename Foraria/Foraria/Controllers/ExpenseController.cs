@@ -37,7 +37,7 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateExpense([FromBody] ExpenseDto expenseDto) // si no se puede generar mas de 1 expensa el mismo mes, preguntar si ya hay una creada y devolverla 
+    public async Task<IActionResult> CreateExpense([FromBody] ExpenseDto expenseDto)  
     {
         await _permissionService.EnsurePermissionAsync(User, "Expenses.Create");
 

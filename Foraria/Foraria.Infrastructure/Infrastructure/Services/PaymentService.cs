@@ -8,12 +8,12 @@ using MP = MercadoPago.Resource.Payment;
 
 namespace ForariaDomain.Services
 {
-    public class MercadoPagoService : IPaymentService
+    public class PaymentService : IPaymentService
     {
         private readonly PaymentClient _paymentClient;
         private readonly MerchantOrderClient _orderClient;
 
-        public MercadoPagoService()
+        public PaymentService()
         {
             _paymentClient = new PaymentClient();
             _orderClient = new MerchantOrderClient();

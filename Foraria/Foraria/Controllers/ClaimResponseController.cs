@@ -79,7 +79,7 @@ public class ClaimResponseController : ControllerBase
 
             var result = await _createClaimResponse.Execute(claimResponse);
 
-            // Enriquecemos el resultado con info adicional para devolver al front
+
             var response = new
             {
                 result.Id,

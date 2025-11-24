@@ -42,7 +42,7 @@ public class SendClaimNotification : ISendClaimNotification
 
         var users = await _userRepository.GetUsersByConsortiumIdAsync(claim.ConsortiumId);
 
-        // Notificar a todos los usuarios del consorcio
+
         var usersToNotify = users.ToList();
 
         if (!usersToNotify.Any())
@@ -84,7 +84,6 @@ public class SendClaimNotification : ISendClaimNotification
             throw new KeyNotFoundException($"No se encontró el reclamo con ID {claimId}");
         }
 
-        // Solo notificar al creador del reclamo
         if (claim.User_id == null)
         {
             return;
@@ -119,7 +118,6 @@ public class SendClaimNotification : ISendClaimNotification
             throw new KeyNotFoundException($"No se encontró el reclamo con ID {claimId}");
         }
 
-        // Solo notificar al creador del reclamo
         if (claim.User_id == null)
         {
             return;

@@ -38,7 +38,6 @@ namespace ForariaDomain
 
         public ICollection<Reserve> Reserves { get; set; }
 
-        //preguntar si esto es correcto
         public ICollection<Event> Events { get; set; }
 
         public ICollection<Thread> Threads { get; set; }

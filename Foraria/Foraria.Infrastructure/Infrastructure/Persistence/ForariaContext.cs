@@ -330,7 +330,7 @@ namespace Foraria.Infrastructure.Persistence
                 .IsUnique();
 
             modelBuilder.Entity<BlockchainProof>()
-                .HasOne(bp => bp.Poll) //TODO transcripciones/actas,etc
+                .HasOne(bp => bp.Poll) 
                 .WithOne(p => p.BlockchainProof)
                 .HasForeignKey<BlockchainProof>(bp => bp.PollId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -559,7 +559,7 @@ namespace Foraria.Infrastructure.Persistence
                 .HasForeignKey(c => c.ConsortiumId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Índice para búsquedas por administrador
+          
             modelBuilder.Entity<Consortium>()
                 .HasIndex(c => c.AdministratorId);
 

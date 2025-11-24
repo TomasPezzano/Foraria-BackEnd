@@ -13,6 +13,6 @@ namespace Foraria.DTOs
 
         [Range(1, int.MaxValue, ErrorMessage = "El ID del hilo debe ser válido.")]
         public int? Thread_id { get; set; }
-        public int ReactionType { get; set; } // +1 like -1 dislike
+        public int ReactionType { get; set; } 
     }
 }

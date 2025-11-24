@@ -124,7 +124,7 @@ public class InvoiceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll()
     {
-        await _permissionService.EnsurePermissionAsync(User, "Invoices.ViewAll"); //admin y consorcio, igual que expensas, asumo que un usuario no va a ver TODAS las facturas
+        await _permissionService.EnsurePermissionAsync(User, "Invoices.ViewAll"); 
 
         var invoices = await _getAllInvoices.Execute();
 

@@ -24,7 +24,6 @@ public class PermissionController : ControllerBase
     }
 
     [HttpPost("transfer")]
-    //[Authorize(Policy = "Owner")]
     [SwaggerOperation(
         Summary = "Transfiere los permisos del propietario a un inquilino.",
         Description = "Permite al propietario transferir sus permisos de acceso al inquilino indicado. El inquilino deberá iniciar sesión nuevamente para obtenerlos."
@@ -55,7 +54,6 @@ public class PermissionController : ControllerBase
     }
 
     [HttpPost("revoke")]
-    //[Authorize(Policy = "Owner")]
     [SwaggerOperation(
         Summary = "Revoca los permisos del inquilino.",
         Description = "Permite al propietario revocar los permisos que había transferido al inquilino, invalidando su acceso actual."

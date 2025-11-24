@@ -22,11 +22,9 @@ public class GetSupplierContractById
         if (contract == null)
             return null;
 
-        // Verificar y actualizar si está vencido
         var wasActive = contract.Active;
         _expirationService.CheckAndUpdateExpiration(contract);
 
-        // Si cambió de activo a inactivo, guardar en la DB
         if (wasActive && !contract.Active)
         {
             _contractRepository.Update(contract);

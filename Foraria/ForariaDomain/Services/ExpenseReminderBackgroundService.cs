@@ -24,7 +24,6 @@ public class ExpenseReminderBackgroundService : BackgroundService
     {
         _logger.LogInformation("ExpenseReminderBackgroundService iniciado");
 
-        // Esperar 10 segundos antes de la primera ejecución (permite que la app termine de inicializarse)
         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -38,7 +37,6 @@ public class ExpenseReminderBackgroundService : BackgroundService
                 _logger.LogError(ex, "Error al procesar recordatorios de expensas");
             }
 
-            // Ejecutar cada 1 hora
             await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
         }
 
@@ -55,7 +53,6 @@ public class ExpenseReminderBackgroundService : BackgroundService
         var tomorrow = DateTime.Now.Date.AddDays(1);
         var today = DateTime.Now.Date;
 
-        // Obtener expensas que vencen hoy o mañana
         var expiringExpenses = await expenseRepository.GetExpensesExpiringBetweenAsync(today, tomorrow.AddDays(1));
 
         if (!expiringExpenses.Any())

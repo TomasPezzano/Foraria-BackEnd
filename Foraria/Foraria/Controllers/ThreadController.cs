@@ -215,7 +215,8 @@ namespace Foraria.Controllers
             {
                 Theme = request.Theme,
                 Description = request.Description,
-                State = request.State
+                State = request.State,
+                UserId = request.UserId
             };
 
 

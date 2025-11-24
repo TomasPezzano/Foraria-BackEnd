@@ -38,10 +38,8 @@ namespace Foraria.Infrastructure.Repository
 
             foreach (var expense in expenses)
             {
-                // ids de invoices de la expensa
                 var invoiceIds = expense.Invoices.Select(x => x.Id).ToHashSet();
 
-                // filtro las invoices de cada residence
                 foreach (var detail in expense.ExpenseDetailsByResidence)
                 {
                     detail.Residence.Invoices = detail.Residence.Invoices

@@ -97,7 +97,7 @@ public class PollNotificationBackgroundService : BackgroundService
             var recentlyClosedPolls = await pollRepository.GetClosingSoonAsync(sixHoursAgo, now);
 
             var closedPolls = recentlyClosedPolls
-                .Where(p => p.EndDate <= now && p.State == "Active")
+                .Where(p => p.DeletedAt <= now && p.State == "Active")
                 .ToList();
 
             _logger.LogInformation(

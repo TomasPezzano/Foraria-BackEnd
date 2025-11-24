@@ -21,19 +21,22 @@ public class ReserveController : ControllerBase
     private readonly IUpdateOldReserves _updateOldReserves;
     private readonly IGetPlaceById _getPlaceById;
     private readonly IPermissionService _permissionService;
+    private readonly GetActiveReserveCount _getActiveReserveCount;
 
     public ReserveController(
         ICreateReserve createReserve,
         IGetAllReserve getAllReserve,
         IUpdateOldReserves updateOldReserves,
         IGetPlaceById getPlaceById,
-        IPermissionService permissionService)
+        IPermissionService permissionService,
+        GetActiveReserveCount getActiveReserveCount)
     {
         _createReserve = createReserve;
         _getAllReserve = getAllReserve;
         _updateOldReserves = updateOldReserves;
         _getPlaceById = getPlaceById;
         _permissionService = permissionService;
+        _getActiveReserveCount = getActiveReserveCount;
     }
 
     [HttpGet]
@@ -149,4 +152,25 @@ public class ReserveController : ControllerBase
         await _updateOldReserves.Execute();
         return Ok("Reservas viejas actualizadas correctamente.");
     }
+
+
+    [HttpGet("reserves/active-count")]
+    [Authorize(Policy = "All")]
+    [SwaggerOperation(
+    Summary = "Obtiene la cantidad de reservas activas.",
+    Description = "Cuenta las reservas activas en el consorcio indicado"
+)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetActiveReserveCount()
+    {
+        await _permissionService.EnsurePermissionAsync(User, "Reserve.ViewActiveCount");
+
+        var count = await _getActiveReserveCount.ExecuteAsync();
+
+        return Ok(new
+        {
+            activeReserves = count,
+        });
+    }
+
 }

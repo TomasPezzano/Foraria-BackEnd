@@ -16,14 +16,12 @@ namespace Foraria.Hubs
             Console.WriteLine($"Cliente desconectado: {Context.ConnectionId}");
         }
 
-        // ✅ Enviar una nueva votación a todos los clientes
         public async Task SendNewPoll(object poll)
         {
             Console.WriteLine("📢 Enviando nueva votación a los clientes");
             await Clients.All.SendAsync("NewPollCreated", poll);
         }
 
-        // ✅ Enviar un nuevo voto a todos los clientes
         public async Task SendNewVote(object vote)
         {
             Console.WriteLine("📢 Enviando nuevo voto a los clientes");

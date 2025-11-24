@@ -43,7 +43,7 @@ public class TranscriptionInternalController : ControllerBase
     }
 
     [HttpPost("internal/{callId}/complete")]
-    [AllowAnonymous] //microservicio
+    [AllowAnonymous] 
     [SwaggerOperation(
         Summary = "Registra el resultado de la transcripción.",
         Description = "Endpoint llamado por el microservicio de transcripción."

@@ -41,7 +41,7 @@ public class SendCallNotification : ISendCallNotification
 
         var users = await _userRepository.GetUsersByConsortiumIdAsync(call.ConsortiumId);
 
-        // Notificar a todos los usuarios del consorcio
+
         var usersToNotify = users.Where(u =>
             u.Role.Description == "Propietario" ||
             u.Role.Description == "Inquilino" ||
@@ -85,11 +85,10 @@ public class SendCallNotification : ISendCallNotification
             throw new KeyNotFoundException($"No se encontró la reunión con ID {callId}");
         }
 
-        // Verificar que la reunión sea mañana (±2 horas de margen)
         var tomorrow = DateTime.Now.AddDays(1);
         var timeDifference = Math.Abs((call.StartedAt - tomorrow).TotalHours);
 
-        if (timeDifference > 2) // Si no es aproximadamente mañana, no enviar
+        if (timeDifference > 2) 
         {
             return;
         }

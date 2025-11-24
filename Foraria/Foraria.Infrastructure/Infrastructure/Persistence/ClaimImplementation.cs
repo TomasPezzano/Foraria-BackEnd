@@ -43,7 +43,7 @@ public class ClaimImplementation : IClaimRepository
             .Include(c => c.Residence)
             .AsQueryable();
 
-        return await query.CountAsync(c => c.State == "Pending");
+        return await query.CountAsync(c => c.State == "Nuevo");
     }
 
     public async Task<Claim?> GetLatestPendingAsync()

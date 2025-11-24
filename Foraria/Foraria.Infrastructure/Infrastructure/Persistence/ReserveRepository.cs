@@ -22,7 +22,7 @@ namespace Foraria.Infrastructure.Repository
                 .Include(r => r.Place)
                 .Where(r =>
                     r.Date >= fromDate &&
-                    r.State == "Confirmed") //open?
+                    r.State == "Confirmed") 
                 .OrderBy(r => r.Date)
                 .Take(limit)
                 .ToListAsync();
@@ -59,9 +59,10 @@ namespace Foraria.Infrastructure.Repository
             return await _context.Reserves
                 .Include(r => r.Place)
                 .Include(r => r.User)
-                .Where(r =>  r.State == "active" &&            
-                    r.DeletedAt == null &&
-                    r.Date >= now)
+                .Where(r =>
+                    r.State == "Nuevo" &&
+                    r.CreatedAt >= now &&  
+                    r.DeletedAt > now)             
                 .ToListAsync();
         }
 

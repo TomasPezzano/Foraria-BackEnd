@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System.Security.Claims;
+using Foraria.Domain.Repository;
 
 public class ClaimTests
 {
@@ -16,6 +17,11 @@ public class ClaimTests
     private readonly Mock<IRejectClaim> _rejectClaimMock;
     private readonly Mock<IFileProcessor> _fileProcessorMock;
     private readonly Mock<IPermissionService> _permissionServiceMock;
+
+    // 👉 FIX IMPORTANTE
+    private readonly Mock<IClaimRepository> _claimRepositoryMock;
+    private readonly GetPendingClaimsCount _getPendingClaimsCount;
+
     private readonly ClaimController _controller;
 
     public ClaimTests()
@@ -26,23 +32,31 @@ public class ClaimTests
         _fileProcessorMock = new Mock<IFileProcessor>();
         _permissionServiceMock = new Mock<IPermissionService>();
 
-        // Mock básico: siempre permite el permiso
+        // 👉 Se mockea el repositorio real
+        _claimRepositoryMock = new Mock<IClaimRepository>();
+
+        // 👉 Se instancia el caso de uso REAL
+        _getPendingClaimsCount = new GetPendingClaimsCount(_claimRepositoryMock.Object);
+
+        // Permisos siempre permitidos en tests
         _permissionServiceMock
             .Setup(p => p.EnsurePermissionAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
+        // Crear el controller
         _controller = new ClaimController(
             _createClaimMock.Object,
             _getClaimsMock.Object,
             _rejectClaimMock.Object,
             _fileProcessorMock.Object,
-            _permissionServiceMock.Object
+            _permissionServiceMock.Object,
+            _getPendingClaimsCount
         );
 
-        // SE AGREGA EL USUARIO VACÍO (REQUIRED por ASP.NET Core)
+        // Usuario vacío para el HttpContext
         var httpContext = new DefaultHttpContext
         {
-            User = new ClaimsPrincipal(new ClaimsIdentity()) // usuario vacío
+            User = new ClaimsPrincipal(new ClaimsIdentity())
         };
 
         _controller.ControllerContext = new ControllerContext
@@ -51,9 +65,15 @@ public class ClaimTests
         };
     }
 
+
+
+    // ======================================================
+    //                 TEST: ADD OK
+    // ======================================================
     [Fact]
     public async Task Add_ValidClaimDtoWithArchive_ReturnsOkObjectResult()
     {
+        // Arrange
         var dto = new ClaimDto
         {
             Title = "Nuevo reclamo",
@@ -66,7 +86,7 @@ public class ClaimTests
             ConsortiumId = 9
         };
 
-        var claim = new ForariaDomain.Claim
+        var createdClaim = new ForariaDomain.Claim
         {
             Id = 99,
             Title = dto.Title,
@@ -76,9 +96,9 @@ public class ClaimTests
             Archive = "claims/archivo.png",
             User_id = dto.User_id,
             ResidenceId = dto.ResidenceId,
+            ConsortiumId = dto.ConsortiumId,
             CreatedAt = DateTime.Now,
-            State = "Nuevo",
-            ConsortiumId = 9
+            State = "Nuevo"
         };
 
         _fileProcessorMock
@@ -87,24 +107,28 @@ public class ClaimTests
 
         _createClaimMock
             .Setup(x => x.Execute(It.IsAny<ForariaDomain.Claim>()))
-            .ReturnsAsync(claim);
+            .ReturnsAsync(createdClaim);
 
         // Act
         var result = await _controller.Add(dto);
 
         // Assert
         var ok = Assert.IsType<OkObjectResult>(result);
+        var value = ok.Value;
 
-        // Anonymous type → dictionary
-        var dict = ok.Value
-            .GetType()
+        var dict = value.GetType()
             .GetProperties()
-            .ToDictionary(p => p.Name, p => p.GetValue(ok.Value));
+            .ToDictionary(p => p.Name, p => p.GetValue(value));
 
-        Assert.Equal(99, (int)dict["Id"]);
+        Assert.Equal(99, dict["Id"]);
         Assert.Equal("claims/archivo.png", dict["ArchiveUrl"]);
     }
 
+
+
+    // ======================================================
+    //        TEST: BASE64 INVÁLIDO (FormatException)
+    // ======================================================
     [Fact]
     public async Task Add_InvalidBase64_ThrowsDomainValidationException()
     {
@@ -114,7 +138,7 @@ public class ClaimTests
             Description = "Descripción",
             Priority = "Alta",
             Category = "General",
-            Archive = "data:image/png;base64,estoNoEsBase64",
+            Archive = "data:image/png;base64,ESTONOESBASE64",
             User_id = 1,
             ResidenceId = 2,
             ConsortiumId = 3
@@ -124,9 +148,8 @@ public class ClaimTests
             .Setup(fp => fp.SaveBase64FileAsync(dto.Archive, "claims"))
             .ThrowsAsync(new FormatException());
 
-        var ex = await Assert.ThrowsAsync<DomainValidationException>(() =>
-            _controller.Add(dto)
-        );
+        // Act + Assert
+        var ex = await Assert.ThrowsAsync<DomainValidationException>(() => _controller.Add(dto));
 
         Assert.Equal("El formato del archivo Base64 no es válido.", ex.Message);
     }
