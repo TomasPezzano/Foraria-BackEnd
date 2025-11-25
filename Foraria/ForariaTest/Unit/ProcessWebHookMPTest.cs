@@ -14,7 +14,6 @@ namespace ForariaTest.Unit
         [Fact]
         public async Task ExecuteAsync_ShouldApprovePaymentAndMarkExpenseAsPaid()
         {
-            // Arrange
             var paymentRepo = new Mock<IPaymentRepository>();
             var expenseRepo = new Mock<IExpenseDetailRepository>();
             var paymentMethodRepo = new Mock<IPaymentMethodRepository>();

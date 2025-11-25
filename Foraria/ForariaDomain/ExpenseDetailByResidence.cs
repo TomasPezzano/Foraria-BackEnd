@@ -16,6 +16,7 @@ public class ExpenseDetailByResidence
     public int Id { get; set; }
     public double TotalAmount { get; set; }
     public string State { get; set; } = string.Empty;
+    public DateTime ExpirationDate { get; set; }
     public ICollection<Expense> Expenses { get; set; }
 
     [ForeignKey("Residence")]
