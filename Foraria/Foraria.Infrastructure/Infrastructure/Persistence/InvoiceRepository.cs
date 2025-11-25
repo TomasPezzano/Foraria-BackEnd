@@ -38,7 +38,7 @@ public class InvoiceRepository : IInvoiceRepository
     {
         var fin = inicio.AddMonths(1).AddDays(-1);
 
-        return await _context.Invoices.Where(i => i.CreatedAt >= inicio && i.CreatedAt <= fin && i.ResidenceId == null).Include(i => i.Items).ToListAsync();
+        return await _context.Invoices.Where(i => i.DateOfIssue >= inicio && i.DateOfIssue <= fin && i.ResidenceId == null).Include(i => i.Items).ToListAsync();
     }
 
     public async Task<IEnumerable<Invoice>> GetExtraordinaryInvoicesByResidenceIdAsync(int residenceId)
