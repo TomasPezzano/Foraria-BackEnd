@@ -40,7 +40,7 @@ namespace ForariaDomain.Services
                     Pending = "https://foraria.vercel.app/expensas"
                 },
                 AutoReturn = "approved",
-                NotificationUrl = "https://foraria.vercel.app/webhook",
+                NotificationUrl = "https://foraria.vercel.app/api/payment/webhook",
                 Metadata = new Dictionary<string, object>
             {
                 { "expense_id", expenseId },
