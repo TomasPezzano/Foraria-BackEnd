@@ -16,7 +16,7 @@ public class GetActiveReserveCount
     {
         var now = dateTime ?? DateTime.Now;
 
-        var activeReservations = await _repository.GetActiveReservationsAsync( now);
+        var activeReservations = await _repository.GetActiveReservationsAsync(now);
         return activeReservations.Count();
     }
 }

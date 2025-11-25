@@ -21,6 +21,7 @@ namespace Foraria.Controllers
         private readonly GetUpcomingReserves _getUpcomingReserves;
         private readonly GetActiveReserveCount _getActiveReserveCount;
         private readonly IPermissionService _permissionService;
+        private readonly IGetPercentageByCategoryInExpense _getPercentageByCategoryInExpense;
 
 
         public DashboardController(
@@ -31,7 +32,8 @@ namespace Foraria.Controllers
             GetActivePollCount getActivePollCount,
             GetUpcomingReserves getUpcomingReserves,
             GetActiveReserveCount getActiveReserveCount,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            IGetPercentageByCategoryInExpense getPercentageByCategoryInExpense)
         {
             _getMonthlyExpenseTotal = getMonthlyExpenseTotal;
             _getPendingExpenses = getPendingExpenses;
@@ -41,6 +43,7 @@ namespace Foraria.Controllers
             _getUpcomingReserves = getUpcomingReserves;
             _getActiveReserveCount = getActiveReserveCount;
             _permissionService = permissionService;
+            _getPercentageByCategoryInExpense = getPercentageByCategoryInExpense;
         }
         
         [HttpGet("expenses/total")]
@@ -147,6 +150,25 @@ namespace Foraria.Controllers
 
             if (result is IEnumerable<object> collection && !collection.Any())
                 throw new NotFoundException("No se encontró historial mensual de gastos para este usuario.");
+
+            return Ok(result);
+        }
+
+        [HttpGet("expenses/percentage-category")]
+        [Authorize(Policy = "All")]
+        [SwaggerOperation(
+            Summary = "Obtiene el porcentaje del total por categoria de la ultima expensa del usuario.",
+            Description = "Devuelve el porcentaje del total por categoria de la ultima expensa del usuario."
+        )]
+        public async Task<IActionResult> GetPercentageByCategoryInExpense()
+        {
+            await _permissionService.EnsurePermissionAsync(User, "Dashboard.PercentageByCategory");
+           
+            var result = await _getPercentageByCategoryInExpense.ExecuteAsync();
+
+            if (result.Count == 0)
+                return Ok(new { message = "No hay datos para este mes." });
+
 
             return Ok(result);
         }

@@ -13,7 +13,7 @@ public class CreateVote
     private readonly IGetPollById _getPollById;
 
 
-    public CreateVote(IVoteRepository voteRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, ISignalRNotification signalRNotification,IGetPollById getPollById)
+    public CreateVote(IVoteRepository voteRepository, IUnitOfWork unitOfWork, IUserRepository userRepository, ISignalRNotification signalRNotification, IGetPollById getPollById)
     {
         _voteRepository = voteRepository;
         _unitOfWork = unitOfWork;
@@ -36,26 +36,41 @@ public class CreateVote
             throw new NotFoundException($"La votacion con ID {vote.Poll_id} no existe.");
         }
 
+
         var existingVote = await _voteRepository.GetByUserAndPollAsync(vote.User_id, vote.Poll_id);
         if (existingVote != null)
         {
             throw new InvalidOperationException("El usuario ya votó en esta encuesta.");
         }
 
-        if(poll.State.Equals("Finalizada") || poll.State.Equals("Pendiente"))
+        if (poll.State.Equals("Finalizada") || poll.State.Equals("Pendiente"))
         {
             throw new InvalidOperationException("No se puede votar en una votacion en estado pendiente o finalizada");
         }
 
-
-        await _voteRepository.AddAsync(vote);
-        await _unitOfWork.SaveChangesAsync();
+        if (user.Role.Description == "Inquilino")
+        {
+            if (user.HasPermission)
+            {
+                await _voteRepository.AddAsync(vote);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            else
+            {
+                throw new InvalidOperationException("El inquilino no tiene permiso para votar.");
+            }
+        }
+        else
+        {
+            await _voteRepository.AddAsync(vote);
+            await _unitOfWork.SaveChangesAsync();
+        }
 
 
         var updatedResults = await _voteRepository.GetPollResultsAsync(vote.Poll_id);
 
 
-       await _signalRNotification.NotifyPollUpdatedAsync(vote.Poll_id, updatedResults);
+        await _signalRNotification.NotifyPollUpdatedAsync(vote.Poll_id, updatedResults);
     }
 }
 

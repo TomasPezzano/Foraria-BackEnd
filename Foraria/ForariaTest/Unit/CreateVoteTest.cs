@@ -32,29 +32,63 @@ namespace ForariaTest.Unit
                 _getPollById.Object
             );
         }
-
         [Fact]
         public async Task ExecuteAsync_ShouldCreateVote_WhenUserExistsAndHasNotVoted()
         {
+    
             var vote = new Vote { User_id = 1, Poll_id = 10, PollOption_id = 100 };
-            var user = new User { Id = vote.User_id };
-            var poll = new Poll { Id = vote.Poll_id, State = "Activa" };
 
-            _userRepoMock.Setup(r => r.GetById(vote.User_id)).ReturnsAsync(user);
-            _getPollById.Setup(g => g.ExecuteAsync(vote.Poll_id)).ReturnsAsync(poll);
-            _voteRepoMock.Setup(r => r.GetByUserAndPollAsync(vote.User_id, vote.Poll_id)).ReturnsAsync((Vote?)null);
-            _voteRepoMock.Setup(r => r.AddAsync(It.IsAny<Vote>())).Returns(Task.CompletedTask);
-            _unitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
-            _voteRepoMock.Setup(r => r.GetPollResultsAsync(vote.Poll_id)).ReturnsAsync(new List<PollResult>());
-            _signalRNotificationMock.Setup(n => n.NotifyPollUpdatedAsync(It.IsAny<int>(), It.IsAny<IEnumerable<PollResult>>()))
-                                     .Returns(Task.CompletedTask);
+            var user = new User
+            {
+                Id = vote.User_id,
+                HasPermission = true,
+                Role = new Role { Description = "Inquilino" }
+            };
+
+            var poll = new Poll
+            {
+                Id = vote.Poll_id,
+                State = "Activa"
+            };
+
+            _userRepoMock
+                .Setup(r => r.GetById(vote.User_id))
+                .ReturnsAsync(user);
+
+            _getPollById
+                .Setup(g => g.ExecuteAsync(vote.Poll_id))
+                .ReturnsAsync(poll);
+
+            _voteRepoMock
+                .Setup(r => r.GetByUserAndPollAsync(vote.User_id, vote.Poll_id))
+                .ReturnsAsync((Vote?)null);
+
+            _voteRepoMock
+                .Setup(r => r.AddAsync(It.IsAny<Vote>()))
+                .Returns(Task.CompletedTask);
+
+            _unitOfWorkMock
+                .Setup(u => u.SaveChangesAsync())
+                .ReturnsAsync(1);
+
+            _voteRepoMock
+                .Setup(r => r.GetPollResultsAsync(vote.Poll_id))
+                .ReturnsAsync(new List<PollResult>());
+
+            _signalRNotificationMock
+                .Setup(n => n.NotifyPollUpdatedAsync(It.IsAny<int>(), It.IsAny<IEnumerable<PollResult>>()))
+                .Returns(Task.CompletedTask);
 
             await _createVote.ExecuteAsync(vote);
 
             _voteRepoMock.Verify(r => r.AddAsync(It.Is<Vote>(v => v.User_id == vote.User_id)), Times.Once);
             _unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
-            _signalRNotificationMock.Verify(n => n.NotifyPollUpdatedAsync(vote.Poll_id, It.IsAny<IEnumerable<PollResult>>()), Times.Once);
+            _signalRNotificationMock.Verify(
+                n => n.NotifyPollUpdatedAsync(vote.Poll_id, It.IsAny<IEnumerable<PollResult>>()),
+                Times.Once
+            );
         }
+
 
         [Fact]
         public async Task ExecuteAsync_ShouldThrowNotFoundException_WhenUserDoesNotExist()

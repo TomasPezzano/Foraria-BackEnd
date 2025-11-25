@@ -20,19 +20,22 @@ public class ClaimController : ControllerBase
     private readonly IRejectClaim _rejectClaim;
     private readonly IFileProcessor _fileProcessor;
     private readonly IPermissionService _permissionService;
+    private readonly GetPendingClaimsCount _getPendingClaimsCount;
 
     public ClaimController(
         ICreateClaim createClaim,
         IGetClaims getClaims,
         IRejectClaim rejectClaim,
         IFileProcessor fileProcessor,
-        IPermissionService permissionService)
+        IPermissionService permissionService,
+        GetPendingClaimsCount getPendingClaimsCount)
     {
         _createClaim = createClaim;
         _getClaims = getClaims;
         _rejectClaim = rejectClaim;
         _fileProcessor = fileProcessor;
         _permissionService = permissionService;
+        _getPendingClaimsCount = getPendingClaimsCount;
     }
 
 
@@ -178,5 +181,23 @@ public class ClaimController : ControllerBase
         await _rejectClaim.Execute(id);
 
         return Ok(new { message = $"El reclamo con ID {id} fue rechazado correctamente." });
+    }
+
+    [HttpGet("claim/pending-claim")]
+    [Authorize(Policy = "All")]
+    [SwaggerOperation(
+    Summary = "Obtiene la de reclamos pendientes.",
+    Description = "Cuenta los reclamos pendientes en el consorcio indicado y los devuelve.")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPendingClaimCount()
+    {
+        await _permissionService.EnsurePermissionAsync(User, "Claim.ViewPendingClaim");
+
+        var count = await _getPendingClaimsCount.ExecuteAsync();
+
+        return Ok(new
+        {
+            pendingClaim = count,
+        });
     }
 }

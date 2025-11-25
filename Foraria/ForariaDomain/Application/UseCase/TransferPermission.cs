@@ -69,7 +69,7 @@ public class TransferPermission : ITransferPermission
             throw new BusinessException("El propietario y el inquilino deben compartir al menos una residencia");
         }
 
-        if (owner.HasPermission != null && owner.HasPermission == true)
+        if (owner.HasPermission == false)
         {
             throw new BusinessException("El propietario no tiene permisos para transferir");
         }

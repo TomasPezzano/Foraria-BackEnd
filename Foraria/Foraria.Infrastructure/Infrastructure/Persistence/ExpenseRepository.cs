@@ -124,5 +124,14 @@ namespace Foraria.Infrastructure.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task<Expense?> GetExpensesByUserAndDateRangeAsync(int year, int month)
+        {
+            return await _context.Expenses
+            .Include(e => e.Invoices)
+            .Where(e => e.CreatedAt.Year == year &&
+                        e.CreatedAt.Month == month)
+            .OrderByDescending(e => e.Id)
+            .FirstOrDefaultAsync();
+        }
     }
 }

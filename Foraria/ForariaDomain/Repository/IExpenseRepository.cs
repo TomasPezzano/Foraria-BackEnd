@@ -14,6 +14,6 @@ namespace Foraria.Domain.Repository
         Task<Expense?> GetByIdAsync(int id);
         Task SaveChangesAsync();
         Task<IEnumerable<Expense>> GetExpensesExpiringBetweenAsync(DateTime startDate, DateTime endDate);
-
+        Task<Expense?> GetExpensesByUserAndDateRangeAsync(int year, int month);
     }
 }
