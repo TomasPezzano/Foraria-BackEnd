@@ -11,4 +11,6 @@ public class UserDetailDto
     public List<ResidenceDto> Residences { get; set; }
 
     public int ConsortiumId {  get; set; }
+
+    public bool HasPermission { get; set; }
 }

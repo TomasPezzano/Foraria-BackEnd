@@ -303,6 +303,7 @@ public class UserController : ControllerBase
             PhoneNumber = u.PhoneNumber,
             Role = u.Role.Description,
             ConsortiumId = consortiumId,
+            HasPermission = u.HasPermission,
             Residences = u.Residences.Select(r => new ResidenceDto
             {
                 Id = r.Id,
