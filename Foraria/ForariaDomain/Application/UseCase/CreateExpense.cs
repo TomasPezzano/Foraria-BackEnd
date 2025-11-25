@@ -75,7 +75,7 @@ public class CreateExpense : ICreateExpense
         {
             Description = $"Gastos del mes {inicio.ToString("MMMM yyyy")}",
             CreatedAt = inicio.AddMonths(1),
-            ExpirationDate = inicio.AddDays(15),
+            ExpirationDate = inicio.AddMonths(1).AddDays(15),
             TotalAmount = totalAmount,
             ConsortiumId = consortiumId,
             Consortium = consortium,

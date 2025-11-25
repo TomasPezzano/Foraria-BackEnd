@@ -70,5 +70,16 @@ public class ExpenseDatailRepository : IExpenseDetailRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<ExpenseDetailByResidence>> GetAllExpenseDetailsByStateAsync(string state)
+    {
+        return await _context.ExpenseDetailByResidences
+           .Where(ed => ed.State == state)
+           .ToListAsync();
+    }
 
+    public async Task UpdateExpenseDetailAsync(ExpenseDetailByResidence expenseDetail)
+    {
+        _context.ExpenseDetailByResidences.Update(expenseDetail);
+        await _context.SaveChangesAsync();
+    }
 }

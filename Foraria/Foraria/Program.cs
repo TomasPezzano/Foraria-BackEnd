@@ -216,6 +216,7 @@ builder.Services.AddScoped<ISendClaimNotification, SendClaimNotification>();
 builder.Services.AddScoped<ISendForumNotification, SendForumNotification>();
 builder.Services.AddHostedService<CallReminderBackgroundService>();
 builder.Services.AddHostedService<PollExpirationService>();
+builder.Services.AddHostedService<ExpenseDetailsExpirationService>();
 builder.Services.AddHostedService<OldReserveBackgroundService>();
 builder.Services.AddHostedService<ExpenseReminderBackgroundService>();
 builder.Services.AddHostedService<ClaimStatusMonitorService>();

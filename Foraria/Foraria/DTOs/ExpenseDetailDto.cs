@@ -11,6 +11,8 @@ public class ExpenseDetailDto
     public int Id { get; set; }
     public double Total { get; set; }
     public string State { get; set; } = string.Empty;
+    public DateTime ExpirationDate { get; set; }
+
     public ICollection<ExpenseResponseDto?> Expenses { get; set; }
     public int ResidenceId { get; set; }
 

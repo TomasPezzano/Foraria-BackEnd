@@ -69,6 +69,7 @@ namespace Foraria.Controllers
                 Total = detail.TotalAmount,
                 State = detail.State,
                 ResidenceId = detail.ResidenceId,
+                ExpirationDate = detail.ExpirationDate,
                 Expenses = detail.Expenses
                 .Select(exp => new ExpenseResponseDto
                 {
@@ -123,6 +124,7 @@ namespace Foraria.Controllers
                 Total = detail.TotalAmount,
                 State = detail.State,
                 ResidenceId = detail.ResidenceId,
+                ExpirationDate = detail.ExpirationDate,
                 Expenses = detail.Expenses?
                 .Select(exp => new ExpenseResponseDto
                 {

@@ -52,6 +52,9 @@ public class CreateExpenseDetail : ICreateExpenseDetail
 
             var result = new List<ExpenseDetailByResidence>();
 
+            var expirationDate = expense.CreatedAt.AddDays(15);
+
+
             foreach (var residence in residences)
             {
                 decimal amountInvoices = 0;
@@ -74,6 +77,7 @@ public class CreateExpenseDetail : ICreateExpenseDetail
                     ResidenceId = residence.Id,
                     TotalAmount = residenceShare,
                     State = "Pending",
+                    ExpirationDate = expirationDate,
                     Expenses = new List<Expense>()
                 };
 
