@@ -151,7 +151,7 @@ public class ExpenseController : ControllerBase
                         })
                         .ToList(),
                  Users = d.Residence.Users
-                     .Where(u => u.Role_id == 3) 
+                     .Where(u => u.Role_id == 3 || u.Role_id == 1) 
                      .Select(u => new UserDto
                      {
                          Id = u.Id,
