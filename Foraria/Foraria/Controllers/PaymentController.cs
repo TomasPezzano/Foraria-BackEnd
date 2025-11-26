@@ -57,7 +57,7 @@ namespace Foraria.Controllers
             return Ok(result);
         }
 
-        [HttpPost("webhook")]
+        [HttpGet("webhook")]
         [SwaggerOperation(
             Summary = "Procesa el webhook de Mercado Pago.",
             Description = "Recibe las notificaciones enviadas por Mercado Pago sobre el estado de las transacciones y las procesa de forma asincrónica."
