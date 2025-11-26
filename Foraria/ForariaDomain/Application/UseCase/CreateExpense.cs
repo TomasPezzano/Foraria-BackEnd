@@ -1,4 +1,5 @@
-﻿using Foraria.Domain.Repository;
+﻿using System.Globalization;
+using Foraria.Domain.Repository;
 using ForariaDomain.Repository;
 using ForariaDomain.Services;
 
@@ -73,7 +74,7 @@ public class CreateExpense : ICreateExpense
 
         var newExpense = new Expense
         {
-            Description = $"Gastos del mes {inicio.ToString("MMMM yyyy")}",
+            Description = $"Gastos del mes {inicio.ToString("MMMM yyyy", new CultureInfo("es-ES"))}",
             CreatedAt = inicio.AddMonths(1),
             ExpirationDate = inicio.AddMonths(1).AddDays(15),
             TotalAmount = totalAmount,
