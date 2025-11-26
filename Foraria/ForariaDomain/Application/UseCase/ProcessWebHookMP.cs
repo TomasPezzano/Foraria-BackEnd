@@ -2,6 +2,7 @@
 using Foraria.Domain.Repository;
 using ForariaDomain.Repository;
 using ForariaDomain.Services;
+using MercadoPago.Resource.Payment;
 
 namespace ForariaDomain.Application.UseCase;
 
@@ -24,119 +25,146 @@ public class ProcessWebHookMP
         _expenseDetailRepository = expenseDetailRepository;
     }
 
-    public async Task ExecuteAsync(JsonElement body)
+    public async Task ExecuteAsync(JsonElement body, bool isMerchantOrder = false)
     {
         string? paymentId = null;
+        string? orderId = null;
 
-        if (body.TryGetProperty("data", out var dataNode) &&
-            dataNode.TryGetProperty("id", out var idProp))
+        // Obtener el paymentId o orderId del cuerpo JSON
+        if (body.TryGetProperty("data", out var dataNode))
         {
-            paymentId = idProp.GetString();
+            if (dataNode.TryGetProperty("id", out var idProp))
+            {
+                paymentId = idProp.GetString();  // Puede ser un paymentId
+            }
+            if (dataNode.TryGetProperty("order_id", out var orderIdProp))
+            {
+                orderId = orderIdProp.GetString();  // Puede ser un orderId
+            }
         }
 
-        if (string.IsNullOrEmpty(paymentId))
+        // Verificar si tenemos un paymentId o un orderId
+        if (isMerchantOrder && !string.IsNullOrEmpty(orderId))
         {
-            Console.WriteLine("⚠️ Webhook recibido sin data.id válido.");
-            return;
-        }
+            // Procesar como una MerchantOrder
+            Console.WriteLine($"🔔 Procesando Merchant Order con ID: {orderId}");
 
-        Console.WriteLine($"🔔 Webhook recibido con Payment ID: {paymentId}");
-
-        var mpPayment = await _paymentGateway.GetPaymentAsync(long.Parse(paymentId));
-
-        if (mpPayment.Order?.Id != null)
-        {
-            bool isPaid = await _paymentGateway.VerifyMerchantOrderAsync(mpPayment.Order.Id.Value);
+            bool isPaid = await _paymentGateway.VerifyMerchantOrderAsync(long.Parse(orderId));
 
             if (isPaid)
             {
-                mpPayment.Status = "approved";
-                Console.WriteLine("✅ MerchantOrder confirma que el pago está APROBADO.");
+                Console.WriteLine("✅ Merchant Order aprobado.");
+            }
+            else
+            {
+                Console.WriteLine("⚠️ Merchant Order no está aprobado.");
             }
         }
-
-     
-        Dictionary<string, object>? metadataDict = null;
-
-        object? metadataObj = mpPayment.Metadata;
-
-        if (metadataObj is IDictionary<string, object> dict)
+        else if (!string.IsNullOrEmpty(paymentId))
         {
-            metadataDict = dict.ToDictionary(k => k.Key, v => v.Value);
-        }
-        else if (metadataObj is JsonElement je && je.ValueKind == JsonValueKind.Object)
-        {
-            metadataDict = je.EnumerateObject()
-                             .ToDictionary(p => p.Name, p => (object)p.Value.ToString());
-        }
-        else if (metadataObj is string jsonString && !string.IsNullOrWhiteSpace(jsonString))
-        {
-            try
+            // Procesar como un Payment
+            Console.WriteLine($"🔔 Procesando Payment con ID: {paymentId}");
+
+            var mpPayment = await _paymentGateway.GetPaymentAsync(long.Parse(paymentId));
+
+            // Verificar si el pago está aprobado
+            if (mpPayment.Status == "approved")
             {
-                using var doc = JsonDocument.Parse(jsonString);
-                var root = doc.RootElement;
-                if (root.ValueKind == JsonValueKind.Object)
+                Console.WriteLine("✅ Pago aprobado.");
+            }
+            else
+            {
+                Console.WriteLine("⚠️ Pago no aprobado.");
+            }
+
+            // Lógica común para manejar metadata
+            Dictionary<string, object>? metadataDict = null;
+            object? metadataObj = mpPayment.Metadata;
+
+            if (metadataObj is IDictionary<string, object> dict)
+            {
+                metadataDict = dict.ToDictionary(k => k.Key, v => v.Value);
+            }
+            else if (metadataObj is JsonElement je && je.ValueKind == JsonValueKind.Object)
+            {
+                metadataDict = je.EnumerateObject()
+                                 .ToDictionary(p => p.Name, p => (object)p.Value.ToString());
+            }
+            else if (metadataObj is string jsonString && !string.IsNullOrWhiteSpace(jsonString))
+            {
+                try
                 {
-                    metadataDict = root.EnumerateObject()
-                                       .ToDictionary(p => p.Name, p => (object)p.Value.ToString());
+                    using var doc = JsonDocument.Parse(jsonString);
+                    var root = doc.RootElement;
+                    if (root.ValueKind == JsonValueKind.Object)
+                    {
+                        metadataDict = root.EnumerateObject()
+                                           .ToDictionary(p => p.Name, p => (object)p.Value.ToString());
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"⚠️ Error al parsear metadata JSON: {e.Message}");
+                    metadataDict = null;
                 }
             }
-            catch(Exception e)
+            else
             {
-                Console.WriteLine($"⚠️ Error al parsear metadata JSON: {e.Message}");
-                metadataDict = null;
+                Console.WriteLine("⚠️ Metadata ausente o en formato desconocido.");
+            }
+
+            // Búsqueda del pago existente en la base de datos
+            var existing = await _paymentRepository.FindByMercadoPagoMetadataAsync(
+                metadataDict, mpPayment.Order?.Id?.ToString(), paymentId
+            );
+
+            if (existing == null)
+            {
+                Console.WriteLine("❌ No se encontró Payment relacionado. Ignorando webhook.");
+                return;
+            }
+
+            if (existing.Status == mpPayment.Status)
+            {
+                Console.WriteLine($"⚙️ Webhook duplicado ignorado. Estado '{mpPayment.Status}' ya procesado.");
+                return;
+            }
+
+            // Actualización del estado de pago en la base de datos
+            existing.MercadoPagoPaymentId = mpPayment.Id.ToString();
+            existing.Status = mpPayment.Status;
+            existing.StatusDetail = mpPayment.StatusDetail;
+            existing.Amount = mpPayment.TransactionAmount ?? existing.Amount;
+            existing.Date = mpPayment.DateApproved ?? mpPayment.DateCreated ?? DateTime.Now;
+            existing.Installments = mpPayment.Installments;
+            existing.InstallmentAmount = mpPayment.TransactionDetails?.InstallmentAmount;
+
+            if (!string.IsNullOrEmpty(mpPayment.PaymentMethodId))
+            {
+                var method = await _paymentMethodRepository.GetOrCreateAsync(mpPayment.PaymentMethodId);
+                existing.PaymentMethodId = method.Id;
+            }
+
+            await _paymentRepository.SaveChangesAsync();
+            Console.WriteLine($"✅ Pago actualizado. Estado: {existing.Status}");
+
+            // Si el estado es "approved", marcar la expensa como pagada
+            if (mpPayment.Status == "approved")
+            {
+                var expense = await _expenseDetailRepository.GetExpenseDetailById(existing.ExpenseDetailByResidenceId);
+                if (expense != null && expense.State != "paid")
+                {
+                    expense.State = "paid";
+                    await _expenseDetailRepository.SaveChangesAsync();
+                    Console.WriteLine($"🏠 Expensa {expense.Id} marcada como pagada.");
+                }
             }
         }
         else
         {
-            Console.WriteLine("⚠️ Metadata ausente o en formato desconocido.");
-        }
-
-        var existing = await _paymentRepository.FindByMercadoPagoMetadataAsync(
-            metadataDict, mpPayment.Order?.Id?.ToString(), paymentId
-        );
-
-
-
-
-        if (existing == null)
-        {
-            Console.WriteLine("❌ No se encontró Payment relacionado. Ignorando webhook.");
-            return;
-        }
-
-        if (existing.Status == mpPayment.Status)
-        {
-            Console.WriteLine($"⚙️ Webhook duplicado ignorado. Estado '{mpPayment.Status}' ya procesado.");
-            return;
-        }
-
-        existing.MercadoPagoPaymentId = mpPayment.Id.ToString();
-        existing.Status = mpPayment.Status;
-        existing.StatusDetail = mpPayment.StatusDetail;
-        existing.Amount = mpPayment.TransactionAmount ?? existing.Amount;
-        existing.Date = mpPayment.DateApproved ?? mpPayment.DateCreated ?? DateTime.Now;
-        existing.Installments = mpPayment.Installments;
-        existing.InstallmentAmount = mpPayment.TransactionDetails?.InstallmentAmount;
-
-        if (!string.IsNullOrEmpty(mpPayment.PaymentMethodId))
-        {
-            var method = await _paymentMethodRepository.GetOrCreateAsync(mpPayment.PaymentMethodId);
-            existing.PaymentMethodId = method.Id;
-        }
-
-        await _paymentRepository.SaveChangesAsync();
-        Console.WriteLine($"✅ Pago actualizado. Estado: {existing.Status}");
-
-        if (mpPayment.Status == "approved")
-        {
-            var expense = await _expenseDetailRepository.GetExpenseDetailById(existing.ExpenseDetailByResidenceId);
-            if (expense != null && expense.State != "paid")
-            {
-                expense.State = "paid";
-                await _expenseDetailRepository.SaveChangesAsync();
-                Console.WriteLine($"🏠 Expensa {expense.Id} marcada como pagada.");
-            }
+            Console.WriteLine("⚠️ Webhook recibido sin un ID válido (paymentId u orderId).");
         }
     }
+
+
 }
