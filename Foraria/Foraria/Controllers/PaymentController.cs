@@ -61,7 +61,6 @@ namespace Foraria.Controllers
             return Ok(result);
         }
 
-        // Ping para la validación del endpoint por MercadoPago
         [HttpGet("webhook")]
         public IActionResult Ping()
         {
@@ -69,7 +68,6 @@ namespace Foraria.Controllers
             return Ok("OK");
         }
 
-        // Endpoint para recibir el webhook con notificaciones de Mercado Pago
         [HttpPost("webhook")]
         public async Task<IActionResult> Webhook([FromBody] JsonElement body)
         {
@@ -81,10 +79,9 @@ namespace Foraria.Controllers
                     body.ValueKind == JsonValueKind.Null)
                 {
                     _logger.LogWarning("[WEBHOOK] Body vacío o inválido");
-                    return Ok(); // MP requiere un 200 OK siempre
+                    return Ok(); 
                 }
 
-                // Mercado Pago puede mandar "topic" o "type"
                 string topic = body.GetPropertyOrDefault("topic")
                                ?? body.GetPropertyOrDefault("type");
 
@@ -109,19 +106,18 @@ namespace Foraria.Controllers
                         break;
                 }
 
-                return Ok(); // Confirmación de recepción exitosa
+                return Ok(); 
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "[WEBHOOK] Error inesperado");
-                return Ok(); // MP requiere un 200 OK siempre, aunque ocurra un error
+                return Ok(); 
             }
         }
 
         private async Task HandlePaymentWebhook(JsonElement json)
         {
-            // Intentamos obtener el paymentId desde "data" -> "id"
             string? paymentIdStr = json.GetNested("data", "id")
                                    ?? json.GetPropertyOrDefault("id")
                                    ?? json.GetPropertyOrDefault("resource");
@@ -134,7 +130,6 @@ namespace Foraria.Controllers
 
             if (!long.TryParse(paymentIdStr, out long paymentId))
             {
-                // Si el paymentId viene en una URL
                 var last = paymentIdStr?.Split('/')?.LastOrDefault();
                 if (!long.TryParse(last, out paymentId))
                 {
@@ -145,17 +140,14 @@ namespace Foraria.Controllers
 
             _logger.LogInformation("[WEBHOOK-PAYMENT] paymentId = {id}", paymentId);
 
-            // Ahora construimos el JsonElement que se espera por ExecuteAsync.
             using var doc = JsonDocument.Parse(json.ToString());
             var body = doc.RootElement;
 
-            // Llamamos al método ExecuteAsync con el JsonElement completo.
             await _processWebHookMP.ExecuteAsync(body);
         }
 
         private async Task HandleMerchantOrderWebhook(JsonElement json)
         {
-            // Extraer el orderId del json
             string? orderIdStr = json.GetNested("data", "id")
                                  ?? json.GetPropertyOrDefault("id");
 
@@ -177,11 +169,9 @@ namespace Foraria.Controllers
 
             _logger.LogInformation("[WEBHOOK-ORDER] orderId = {id}", orderId);
 
-            // Crear el JsonElement del body
             using var doc = JsonDocument.Parse(json.ToString());
             var body = doc.RootElement;
 
-            // Llamar a ExecuteAsync con el JsonElement y isMerchantOrder
             await _processWebHookMP.ExecuteAsync(body, isMerchantOrder: true);
         }
 
