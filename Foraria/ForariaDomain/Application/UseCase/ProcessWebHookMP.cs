@@ -30,23 +30,20 @@ public class ProcessWebHookMP
         string? paymentId = null;
         string? orderId = null;
 
-        // Obtener el paymentId o orderId del cuerpo JSON
         if (body.TryGetProperty("data", out var dataNode))
         {
             if (dataNode.TryGetProperty("id", out var idProp))
             {
-                paymentId = idProp.GetString();  // Puede ser un paymentId
+                paymentId = idProp.GetString();  
             }
             if (dataNode.TryGetProperty("order_id", out var orderIdProp))
             {
-                orderId = orderIdProp.GetString();  // Puede ser un orderId
+                orderId = orderIdProp.GetString();  
             }
         }
 
-        // Verificar si tenemos un paymentId o un orderId
         if (isMerchantOrder && !string.IsNullOrEmpty(orderId))
         {
-            // Procesar como una MerchantOrder
             Console.WriteLine($"🔔 Procesando Merchant Order con ID: {orderId}");
 
             bool isPaid = await _paymentGateway.VerifyMerchantOrderAsync(long.Parse(orderId));
@@ -62,12 +59,10 @@ public class ProcessWebHookMP
         }
         else if (!string.IsNullOrEmpty(paymentId))
         {
-            // Procesar como un Payment
             Console.WriteLine($"🔔 Procesando Payment con ID: {paymentId}");
 
             var mpPayment = await _paymentGateway.GetPaymentAsync(long.Parse(paymentId));
 
-            // Verificar si el pago está aprobado
             if (mpPayment.Status == "approved")
             {
                 Console.WriteLine("✅ Pago aprobado.");
@@ -77,7 +72,6 @@ public class ProcessWebHookMP
                 Console.WriteLine("⚠️ Pago no aprobado.");
             }
 
-            // Lógica común para manejar metadata
             Dictionary<string, object>? metadataDict = null;
             object? metadataObj = mpPayment.Metadata;
 
@@ -113,7 +107,6 @@ public class ProcessWebHookMP
                 Console.WriteLine("⚠️ Metadata ausente o en formato desconocido.");
             }
 
-            // Búsqueda del pago existente en la base de datos
             var existing = await _paymentRepository.FindByMercadoPagoMetadataAsync(
                 metadataDict, mpPayment.Order?.Id?.ToString(), paymentId
             );
@@ -130,7 +123,6 @@ public class ProcessWebHookMP
                 return;
             }
 
-            // Actualización del estado de pago en la base de datos
             existing.MercadoPagoPaymentId = mpPayment.Id.ToString();
             existing.Status = mpPayment.Status;
             existing.StatusDetail = mpPayment.StatusDetail;
@@ -148,7 +140,6 @@ public class ProcessWebHookMP
             await _paymentRepository.SaveChangesAsync();
             Console.WriteLine($"✅ Pago actualizado. Estado: {existing.Status}");
 
-            // Si el estado es "approved", marcar la expensa como pagada
             if (mpPayment.Status == "approved")
             {
                 var expense = await _expenseDetailRepository.GetExpenseDetailById(existing.ExpenseDetailByResidenceId);
