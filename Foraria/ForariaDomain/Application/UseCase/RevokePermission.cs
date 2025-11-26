@@ -26,9 +26,14 @@ public class RevokePermission : IRevokePermission
         var owner = await _userRepository.GetByIdWithRole(ownerId);
         var tenant = await _userRepository.GetByIdWithRole(tenantId);
 
-        if (owner == null || tenant == null)
+        if (owner == null)
         {
-            throw new NotFoundException("Usuario no encontrado");
+            throw new NotFoundException("Propietario no encontrado");
+        }
+
+        if (tenant == null)
+        {
+            throw new NotFoundException("Inquilino no encontrado");
         }
 
         if (owner.Role.Description != "Propietario")
@@ -41,7 +46,7 @@ public class RevokePermission : IRevokePermission
             throw new BusinessException("El usuario especificado no es un Inquilino");
         }
 
-        if (tenant.HasPermission != null && tenant.HasPermission == true)
+        if (tenant.HasPermission == false)
         {
             throw new BusinessException("El inquilino no tiene permisos activos para revocar");
         }

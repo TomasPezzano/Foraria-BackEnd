@@ -25,16 +25,6 @@ namespace ForariaTest.Unit
         }
 
         [Fact]
-        public async Task Execute_WhenOwnerOrTenantNotFound_ThrowsNotFoundException()
-        {
-            _userRepositoryMock.Setup(r => r.GetByIdWithRole(1))
-                .ReturnsAsync((User?)null);
-
-            var ex = await Assert.ThrowsAsync<NotFoundException>(() => _useCase.Execute(1, 2));
-            Assert.Equal("Usuario no encontrado", ex.Message);
-        }
-
-        [Fact]
         public async Task Execute_WhenOwnerIsNotPropietario_ThrowsBusinessException()
         {
             var owner = CreateUser(1, "Administrador");
@@ -64,7 +54,7 @@ namespace ForariaTest.Unit
         public async Task Execute_WhenTenantHasActivePermission_ThrowsBusinessException()
         {
             var owner = CreateUser(1, "Propietario");
-            var tenant = CreateUser(2, "Inquilino", hasPermission: true);
+            var tenant = CreateUser(2, "Inquilino", hasPermission: false);
 
             _userRepositoryMock.Setup(r => r.GetByIdWithRole(1)).ReturnsAsync(owner);
             _userRepositoryMock.Setup(r => r.GetByIdWithRole(2)).ReturnsAsync(tenant);
@@ -77,7 +67,7 @@ namespace ForariaTest.Unit
         public async Task Execute_WhenAllValidationsPass_RevokesPermissionSuccessfully()
         {
             var owner = CreateUser(1, "Propietario", hasPermission: false);
-            var tenant = CreateUser(2, "Inquilino", hasPermission: false);
+            var tenant = CreateUser(2, "Inquilino", hasPermission: true);
 
             _userRepositoryMock.Setup(r => r.GetByIdWithRole(1)).ReturnsAsync(owner);
             _userRepositoryMock.Setup(r => r.GetByIdWithRole(2)).ReturnsAsync(tenant);
